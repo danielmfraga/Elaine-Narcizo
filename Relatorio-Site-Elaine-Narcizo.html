@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Relatório · Site Elaine Narcizo</title>
+<style>
+  :root{
+    --preto:#111;
+    --cinza:#555;
+    --cinza-leve:#888;
+    --linha:#e0e0e0;
+    --verde:#2d6a4f;
+    --laranja:#c8602c;
+    --fundo:#fff;
+    --fundo-alt:#f7f7f5;
+    --font:'DM Sans','Inter','Segoe UI',system-ui,sans-serif;
+    --max:760px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{font-size:16px;background:var(--fundo);}
+  body{font-family:var(--font);color:var(--preto);line-height:1.65;-webkit-font-smoothing:antialiased;}
+
+  /* ---- layout ---- */
+  .page{max-width:var(--max);margin:0 auto;padding:60px 32px 80px;}
+
+  /* ---- header ---- */
+  .header{border-bottom:2px solid var(--preto);padding-bottom:24px;margin-bottom:48px;}
+  .header .eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--cinza);margin-bottom:16px;}
+  .header h1{font-size:clamp(2rem,5vw,2.8rem);font-weight:700;line-height:1.15;margin-bottom:16px;}
+  .header h1 em{font-style:italic;font-weight:300;}
+  .header .meta{font-size:.85rem;color:var(--cinza);display:flex;gap:24px;flex-wrap:wrap;}
+  .header .meta span{display:flex;align-items:center;gap:6px;}
+
+  /* ---- intro ---- */
+  .intro{font-size:1.05rem;color:var(--cinza);margin-bottom:48px;max-width:600px;}
+
+  /* ---- tabela resumo ---- */
+  .resumo-table{width:100%;border-collapse:collapse;margin-bottom:56px;font-size:.9rem;}
+  .resumo-table thead th{text-align:left;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--cinza-leve);border-bottom:1px solid var(--linha);padding:8px 12px 8px 0;}
+  .resumo-table thead th:last-child{padding-right:0;}
+  .resumo-table tbody tr{border-bottom:1px solid var(--linha);}
+  .resumo-table tbody tr:last-child{border-bottom:none;}
+  .resumo-table td{padding:10px 12px 10px 0;vertical-align:top;}
+  .resumo-table td:last-child{padding-right:0;}
+  .badge{display:inline-block;font-size:.7rem;font-weight:600;letter-spacing:.06em;background:var(--fundo-alt);border:1px solid var(--linha);border-radius:4px;padding:2px 7px;white-space:nowrap;}
+  .badge.verde{background:#e8f4ef;border-color:#b2d8c5;color:var(--verde);}
+  .badge.laranja{background:#fdf0ea;border-color:#f0c4a8;color:var(--laranja);}
+  .badge.roxo{background:#f0ebf9;border-color:#cdbceb;color:#6C4BB6;}
+
+  /* ---- fases ---- */
+  .fase{margin-bottom:56px;}
+  .fase-header{display:flex;align-items:baseline;gap:12px;margin-bottom:28px;}
+  .fase-num{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--cinza-leve);}
+  .fase-titulo{font-size:1.25rem;font-weight:700;}
+  .fase-periodo{font-size:.8rem;color:var(--cinza-leve);margin-left:auto;}
+
+  .versao{margin-bottom:28px;padding-left:20px;border-left:2px solid var(--linha);}
+  .versao-header{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;}
+  .versao-num{font-size:.75rem;font-weight:700;letter-spacing:.05em;color:var(--cinza-leve);}
+  .versao-titulo{font-size:1rem;font-weight:600;}
+  .versao-data{font-size:.75rem;color:var(--cinza-leve);margin-left:auto;}
+  .versao ul{padding-left:0;list-style:none;margin-bottom:10px;}
+  .versao ul li{position:relative;padding-left:16px;font-size:.9rem;color:var(--cinza);margin-bottom:4px;}
+  .versao ul li::before{content:"–";position:absolute;left:0;color:var(--linha);}
+
+  .na-pratica{background:var(--fundo-alt);border-radius:6px;padding:12px 16px;font-size:.88rem;color:var(--cinza);margin-top:10px;}
+  .na-pratica strong{color:var(--preto);font-weight:600;}
+
+  /* ---- estado atual ---- */
+  .estado-atual{background:var(--fundo-alt);border-radius:10px;padding:28px 28px 24px;margin-bottom:48px;}
+  .estado-atual h2{font-size:1rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+  .estado-atual h2::before{content:"";display:block;width:10px;height:10px;border-radius:50%;background:#3ab07a;}
+  .estado-atual .links{display:flex;flex-direction:column;gap:6px;}
+  .estado-atual .links a{font-size:.9rem;color:var(--preto);text-decoration:none;border-bottom:1px solid var(--linha);}
+  .estado-atual .links a:hover{border-color:var(--preto);}
+  .estado-atual .links span{font-size:.8rem;color:var(--cinza-leve);margin-left:4px;}
+
+  /* ---- próximos passos ---- */
+  .proximos{margin-bottom:48px;}
+  .proximos h2{font-size:1rem;font-weight:700;margin-bottom:16px;}
+  .proximos ol{padding-left:0;list-style:none;counter-reset:pp;}
+  .proximos ol li{counter-increment:pp;position:relative;padding-left:32px;font-size:.9rem;color:var(--cinza);margin-bottom:10px;}
+  .proximos ol li::before{content:counter(pp);position:absolute;left:0;top:1px;width:20px;height:20px;border-radius:50%;background:var(--preto);color:#fff;font-size:.65rem;font-weight:700;display:flex;align-items:center;justify-content:center;}
+
+  /* ---- footer ---- */
+  .footer{border-top:1px solid var(--linha);padding-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-size:.8rem;color:var(--cinza-leve);}
+
+  /* ---- print ---- */
+  @media print{
+    body{font-size:11pt;}
+    .page{padding:20px 0;}
+    .versao{break-inside:avoid;}
+    .fase{break-inside:avoid;}
+    .estado-atual{break-inside:avoid;}
+    a{color:inherit;text-decoration:none;}
+  }
+  @media(max-width:520px){
+    .page{padding:40px 20px 60px;}
+    .header .meta{flex-direction:column;gap:6px;}
+    .resumo-table{font-size:.82rem;}
+    .fase-header{flex-wrap:wrap;}
+    .fase-periodo{margin-left:0;}
+    .versao-header{flex-wrap:wrap;}
+    .versao-data{margin-left:0;}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ===== CABEÇALHO ===== -->
+  <header class="header">
+    <p class="eyebrow">Relatório de desenvolvimento · elainenarcizo.com.br</p>
+    <h1>O que foi feito<br><em>até agora.</em></h1>
+    <div class="meta">
+      <span>📅 Maio–Julho de 2026</span>
+      <span>👤 Preparado por Daniel Fraga</span>
+      <span>🔗 elainenarcizo.com.br</span>
+    </div>
+  </header>
+
+  <!-- ===== INTRO ===== -->
+  <p class="intro">
+    De maio a julho de 2026, o site de Elaine Narcizo foi construído em cinco fases —
+    da fundação técnica à navegação atual, ao player de mídia própria e às novas seções
+    de experiências. Este documento registra o que foi feito, quando, e o que cada entrega
+    significou na prática.
+  </p>
+
+  <!-- ===== TABELA RESUMO ===== -->
+  <table class="resumo-table">
+    <thead>
+      <tr>
+        <th>Versão</th>
+        <th>Período</th>
+        <th>Em uma linha</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="badge">v1.0</span></td>
+        <td>12/mai</td>
+        <td>Site no ar: design system + oficina PONTE interativa</td>
+      </tr>
+      <tr>
+        <td><span class="badge">v1.1</span></td>
+        <td>17–18/mai</td>
+        <td>Página Repertórios Sensíveis — primeira formação online</td>
+      </tr>
+      <tr>
+        <td><span class="badge">v1.2</span></td>
+        <td>26–27/mai</td>
+        <td>Textos reais da Elaine, unificação desktop + mobile</td>
+      </tr>
+      <tr>
+        <td><span class="badge laranja">v2.0</span></td>
+        <td>01/jun</td>
+        <td>Primeira home lançada (experimentação rápida)</td>
+      </tr>
+      <tr>
+        <td><span class="badge laranja">v2.1</span></td>
+        <td>02–05/jun</td>
+        <td>Exploração editorial — identidade visual da home</td>
+      </tr>
+      <tr>
+        <td><span class="badge verde">v3.0</span></td>
+        <td>06/jun</td>
+        <td>Navegação 2D por mundos — protótipo funcional</td>
+      </tr>
+      <tr>
+        <td><span class="badge verde">v3.1</span></td>
+        <td>07/jun</td>
+        <td>Redesign "galeria editorial" — linguagem visual definitiva</td>
+      </tr>
+      <tr>
+        <td><span class="badge verde">v3.2</span></td>
+        <td>08–09/jun</td>
+        <td>Didática de navegação + conteúdo real embutido</td>
+      </tr>
+      <tr>
+        <td><span class="badge verde">v3.3</span></td>
+        <td>10/jun</td>
+        <td>Nichos Formações e Percursos + PONTE na home</td>
+      </tr>
+      <tr>
+        <td><span class="badge roxo">v4.0</span></td>
+        <td>17–18/jun</td>
+        <td>Rádio Remendo — player próprio (vinil + cartões Podcast/DançaDestino)</td>
+      </tr>
+      <tr>
+        <td><span class="badge roxo">v4.1</span></td>
+        <td>20/jun</td>
+        <td>Áudio próprio no Cloudflare R2 — 17 leituras da Elaine</td>
+      </tr>
+      <tr>
+        <td><span class="badge roxo">v4.2</span></td>
+        <td>20/jun</td>
+        <td>DançaDestino: YouTube dirigido pela nossa interface</td>
+      </tr>
+      <tr>
+        <td><span class="badge roxo">v5.0</span></td>
+        <td>18–23/jun</td>
+        <td>Bilheteria — nova seção de experiências vivas (ingressos)</td>
+      </tr>
+      <tr>
+        <td><span class="badge roxo">v5.1</span></td>
+        <td>24/jun–05/jul</td>
+        <td>DançaDestino — área própria (manifesto em cartazes)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ===== FASE 1 ===== -->
+  <section class="fase">
+    <div class="fase-header">
+      <span class="fase-num">Fase 1</span>
+      <span class="fase-titulo">A fundação</span>
+      <span class="fase-periodo">12–27 mai 2026</span>
+    </div>
+
+    <div class="versao">
+      <div class="versao-header">
+        <span class="versao-num">v1.0</span>
+        <span class="versao-titulo">Site no ar</span>
+        <span class="versao-data">12/mai</span>
+      </div>
+      <ul>
+        <li>Estrutura inicial publicada no Vercel com domínio próprio</li>
+        <li>Design system criado: tipografia, paleta, tokens de cor</li>
+        <li>Oficina PONTE — toda a experiência interativa programada do zero: 3 exercícios, salvamento automático, 8 telas</li>
+        <li>Roteamento e paths relativos ajustados para funcionar na Vercel</li>
+      </ul>
+      <div class="na-pratica"><strong>Na prática:</strong> qualquer pessoa com o link já conseguia acessar e completar a oficina PONTE integralmente.</div>
+    </div>
+
+    <div class="versao">
+      <div class="versao-header">
+        <span class="versao-num">v1.1</span>
+        <span class="versao-titulo">Repertórios Sensíveis</span>
+        <span class="versao-data">17–18/mai</span>
+      </div>
+      <ul>
+        <li>Página completa da formação Repertórios Sensíveis</li>
+        <li>Seções: hero, sobre a formação, 10 temas em accordion (mobile), módulos, bio, FAQ, investimento, CTA</li>
+        <li>Retrato da Elaine em WebP, favicon com a bola laranja</li>
+        <li>CTA "Outro caminho" apontando para WhatsApp e Instagram</li>
+        <li>Animações de entrada: hero, selo, portrait hover, scroll reveal</li>
+      </ul>
+      <div class="na-pratica"><strong>Na prática:</strong> a página de inscrições da formação ficou no ar e pronta para receber interessados.</div>
+    </div>
+
+    <div class="versao">
+      <div class="versao-header">
+        <span class="versao-num">v1.2</span>
+        <span class="versao-titulo">Textos reais e refinamento</span>
+        <span class="versao-data">26–27/mai</span>
+      </div>
+      <ul>
+        <li>Todos os textos provisórios substituídos pelos textos reais da Elaine</li>
+        <li>Versões desktop e mobile unificadas em um único <code>index.html</code></li>
+        <li>Imagens de fundo convertidas para WebP (carregamento mais rápido)</li>
+        <li>Borda arredondada no retrato, ajustes finos de espaçamento</li>
+        <li>Raiz do site redirecionada temporariamente para <code>/repertorios-sensiveis/</code></li>
+      </ul>
+      <div class="na-pratica"><strong>Na prática:</strong> o site ficou com a voz da Elaine, mais rápido e com layout consistente em qualquer tela.</div>
+    </div>
+  </section>
+
+  <!-- ===== FASE 2 ===== -->
+  <section class="fase">
+    <div class="fase-header">
+      <span class="fase-num">Fase 2</span>
+      <span class="fase-titulo">A busca pela nova home</span>
+      <span class="fase-periodo">01–05 jun 2026</span>
+    </div>
+
+    <div class="versao">
+      <div class="versao-header">
+        <span class="versao-num">v2.0</span>
+        <span class="versao-titulo">Primeira home lançada</span>
+        <span class="versao-data">01/jun</span>
+      </div>
+      <ul>
+        <li>Landing page completa publicada como home — primeira tentativa de recepcionar a Elaine na raiz do site</li>
+        <li>Revertida no mesmo dia após avaliação: conteúdo bom, mas formato precisava evoluir</li>
+      </ul>
+      <div class="na-pratica"><strong>Na prática:</strong> iteração rápida que revelou o caminho — não uma página estática, mas uma experiência de exploração.</div>
+    </div>
+
+    <div class="versao">
+      <div class="versao-header">
+        <span class="versao-num">v2.1</span>
+        <span class="versao-titulo">Exploração editorial</span>
+        <span class="versao-data">02–05/jun</span>
+      </div>
+      <ul>
+        <li>Prototipagem da home com linguagem "editorial + brega-brasil"</li>
+        <li>Experimentos com identidade visual: tipografia expressiva, cores vivas, voz da Elaine no texto</li>
+        <li>Arquivo de referência <code>home-nova.html</code> mantido como exploração separada</li>
+      </ul>
+      <div class="na-pratica"><strong>Na prática:</strong> essa fase estabeleceu os valores visuais — papel branco, tipo expressivo, imagens emolduradas — que viraram a base da v3.</div>
+    </div>
+  </section>
+
+  <!-- ===== FASE 3 ===== -->
+  <section class="fase">
+    <div class="fase-header">
+      <span class="fase-num">Fase 3</span>
+      <span class="fase-titulo">Galeria editorial e navegação 2D</span>
+      <span class="fase-periodo">06–10 jun 2026</span>
+    </div>
+
+    <div class="versao">
+      <div class="versao-header">
+        <span class="versao-num">v3.0</span>
+        <span class="versao-titulo">Mapa 2D — protótipo funcional</span>
+        <span class="versao-data">06/jun</span>
+      </div>
+      <ul>
+        <li>Nova home como "mapa de mundos": navegação vertical troca de seção, horizontal explora dentro de cada uma</li>
+        <li>Scroll snap em dois eixos — sem botões, sem menus, gesto puro</li>
+        <li>Menu hambúrguer para salto direto entre seções</li>
+        <li>Correção de bug: scroll vertical bloqueado pelo touch-action no mobile</li>
+      </ul>
+      <div class="na-pratica"><strong>Na prática:</strong> a home virou uma experiência espacial — cada seção tem sua "casa" e o visitante se move como num app nativo.</div>
+    </div>
+
+    <div class="versao">
+      <div class="versao-header">
+        <span class="versao-num">v3.1</span>
+        <span class="versao-titulo">Redesign — linguagem "galeria editorial"</span>
+        <span class="versao-data">07/jun</span>
+      </div>
+      <ul>
+        <li>Visual alinhado ao padrão do site: fundo branco, DM Sans, linha + ponto no eyebrow</li>
+        <li>Cada seção ancorada por uma imagem emoldurada dos assets do projeto</li>
+        <li>Conteúdo revelado com fade + subida ao chegar na seção (scroll reveal)</li>
+        <li>Substituição gradual de imagens: vegetação, colagem orgânica, retrato da Elaine</li>
+        <li>Transição de 2 para 7 mundos, depois refinado para o conjunto atual</li>
+      </ul>
+      <div class="na-pratica"><strong>Na prática:</strong> o "mapa" ganhou a cara do site — quem chega à home já reconhece a identidade visual da Elaine.</div>
+    </div>
+
+    <div class="versao">
+      <div class="versao-header">
+        <span class="versao-num">v3.2</span>
+        <span class="versao-titulo">Didática de navegação + conteúdo real embutido</span>
+        <span class="versao-data">08–09/jun</span>
+      </div>
+      <ul>
+        <li><strong>Didática em 3 camadas:</strong> tour na 1ª visita (até 2×), peek físico (o site se move para mostrar que tem mais), coaches discretos por eixo</li>
+        <li>Seta ⌄ desaparece após o primeiro scroll real; chevron › some após 4 trocas de painel</li>
+        <li>Contadores em localStorage para não repetir dica em quem já aprendeu</li>
+        <li>Destaques da capa (Repertórios Sensíveis e DançaDestino) viram feeds verticais com conteúdo real embutido via iframe</li>
+        <li>Guarda <code>html.embedded</code> nas páginas embutidas: overscroll contido dentro do frame</li>
+        <li>Chip fixo "← tela inicial / ← início da seção" aparece sobre qualquer conteúdo embutido</li>
+        <li>Botão centralizado, borda arredondada, micro-ajustes de espaçamento</li>
+      </ul>
+      <div class="na-pratica"><strong>Na prática:</strong> o site ensina o gesto de navegação sem manual e exibe páginas reais da Elaine embutidas — o visitante vê o Repertórios Sensíveis completo sem sair da home.</div>
+    </div>
+
+    <div class="versao">
+      <div class="versao-header">
+        <span class="versao-num">v3.3</span>
+        <span class="versao-titulo">Nichos Formações e Percursos + PONTE na home</span>
+        <span class="versao-data">10/jun</span>
+      </div>
+      <ul>
+        <li><strong>Estrutura de nichos:</strong> Formações e Percursos são categorias — painel 0 = capa do nicho, itens ficam ao lado (→)</li>
+        <li>Formações: capa própria → desliza para Repertórios Sensíveis embutido</li>
+        <li>Percursos: capa própria → capa-catálogo da PONTE → rola para iniciar a oficina</li>
+        <li>PONTE embutida: rolar para baixo na capa inicia a experiência interativa completa</li>
+        <li>Botão "Faça o percurso ⌄" com seta pulsante; chip de 2 estágios: "← início da PONTE" vai para o "Olá!" sem perder respostas; depois "← início da seção" volta para a capa</li>
+        <li>Textos de todas as capas revisados e aprovados</li>
+        <li>Correção do bug de peek duplicado (tour fechado antes de 6s disparava a animação duas vezes)</li>
+      </ul>
+      <div class="na-pratica"><strong>Na prática:</strong> a home virou uma vitrine navegável — o visitante entende a estrutura (categorias → itens), experimenta a PONTE inteira sem sair da home e pode voltar a qualquer momento sem perder o que escreveu.</div>
+    </div>
+  </section>
+
+  <!-- ===== FASE 4 ===== -->
+  <section class="fase">
+    <div class="fase-header">
+      <span class="fase-num">Fase 4</span>
+      <span class="fase-titulo">Rádio Remendo — mídia própria</span>
+      <span class="fase-periodo">17–20 jun 2026</span>
+    </div>
+
+    <div class="versao">
+      <div class="versao-header">
+        <span class="versao-num">v4.0</span>
+        <span class="versao-titulo">A rádio ganha corpo</span>
+        <span class="versao-data">17–18/jun</span>
+      </div>
+      <ul>
+        <li>A seção "Escritos &amp; Voz" foi renomeada para <strong>Rádio Remendo</strong></li>
+        <li>Capa da seção: um <strong>disco de vinil</strong> que gira, com braço fonográfico, ondas de som e o sinal "no ar"</li>
+        <li>Player desenhado do zero com <strong>dois cartões que se expandem</strong>: Podcast (as leituras da Elaine) ↔ Playlist DançaDestino — desliza de um para o outro</li>
+        <li>Não é um player genérico embutido: é interface própria, com a identidade visual do site</li>
+      </ul>
+      <div class="na-pratica"><strong>Na prática:</strong> a Rádio Remendo deixou de ser um título e virou um tocador de verdade, com a cara da Elaine.</div>
+    </div>
+
+    <div class="versao">
+      <div class="versao-header">
+        <span class="versao-num">v4.1</span>
+        <span class="versao-titulo">Áudio próprio no Cloudflare R2</span>
+        <span class="versao-data">20/jun</span>
+      </div>
+      <ul>
+        <li>As <strong>17 leituras da Elaine</strong> passaram a ser hospedadas em <strong>infraestrutura própria</strong> (Cloudflare R2) — sem depender de plataformas de terceiros e sem custo de banda</li>
+        <li>Player nativo completo: tocar / pausar, avançar / voltar, <strong>barra de progresso</strong> com avanço ao toque, e modo <strong>aleatório</strong></li>
+        <li>Painel <strong>"Sobre o episódio"</strong> (ícone ☰) já preparado para receber as descrições de cada leitura</li>
+        <li>A duração de cada faixa carrega sozinha; ao terminar uma, a próxima entra automaticamente</li>
+      </ul>
+      <div class="na-pratica"><strong>Na prática:</strong> a Elaine passou a ter o próprio "streaming" das leituras — controle total, sem intermediários e sem mensalidade de plataforma.</div>
+    </div>
+
+    <div class="versao">
+      <div class="versao-header">
+        <span class="versao-num">v4.2</span>
+        <span class="versao-titulo">DançaDestino pelo YouTube, com a nossa cara</span>
+        <span class="versao-data">20/jun</span>
+      </div>
+      <ul>
+        <li>A playlist de músicas do DançaDestino toca <strong>pelo YouTube</strong> — a forma correta de respeitar os direitos autorais das músicas de terceiros</li>
+        <li>Mas quem comanda são os <strong>nossos botões</strong>: tocar / pausar agem no vídeo; avançar, voltar e aleatório operam na nossa lista</li>
+        <li>O vídeo aparece na tela, emoldurado pela nossa interface</li>
+        <li>Pré-carregamento inteligente para reduzir a espera no primeiro play</li>
+      </ul>
+      <div class="na-pratica"><strong>Na prática:</strong> uma experiência coesa — o mesmo player para o podcast e para a música, sem abrir o YouTube por fora e dentro da lei.</div>
+    </div>
+  </section>
+
+  <!-- ===== FASE 5 ===== -->
+  <section class="fase">
+    <div class="fase-header">
+      <span class="fase-num">Fase 5</span>
+      <span class="fase-titulo">Bilheteria e DançaDestino</span>
+      <span class="fase-periodo">18 jun – 05 jul 2026</span>
+    </div>
+
+    <div class="versao">
+      <div class="versao-header">
+        <span class="versao-num">v5.0</span>
+        <span class="versao-titulo">Bilheteria — nova seção de experiências</span>
+        <span class="versao-data">18–23/jun</span>
+      </div>
+      <ul>
+        <li>Nova seção <strong>Bilheteria</strong>: uma "bilheteria de experiências vivas", com a chamada <em>"Escolha e embarque"</em></li>
+        <li>Dois <strong>ingressos / portões</strong>: <strong>Dança Destino</strong> e <strong>Cartas entre Homens</strong></li>
+        <li>Cada ingresso abre com uma <strong>revelação em cortina</strong> (exploramos um efeito 3D de dobra, mas a versão em cortina 2D ficou mais estável no iPhone)</li>
+        <li>Ao "embarcar" no ingresso Dança Destino, o visitante segue para a área própria do DançaDestino</li>
+      </ul>
+      <div class="na-pratica"><strong>Na prática:</strong> um portal enxuto e lúdico que convida o visitante a entrar nas experiências participativas da Elaine.</div>
+    </div>
+
+    <div class="versao">
+      <div class="versao-header">
+        <span class="versao-num">v5.1</span>
+        <span class="versao-titulo">DançaDestino — área própria</span>
+        <span class="versao-data">24/jun–05/jul</span>
+      </div>
+      <ul>
+        <li>O DançaDestino ganhou <strong>página própria</strong>: um <strong>manifesto visual em cartazes</strong> (colagem, textura, lettering pesado), em telas que passam com scroll</li>
+        <li>A capa foi aprovada como molde; os demais cartazes seguem em construção</li>
+        <li>Acessível ao "embarcar" pelo ingresso da Bilheteria</li>
+      </ul>
+      <div class="na-pratica"><strong>Na prática:</strong> o ritual do DançaDestino agora tem um espaço com linguagem própria — mais expressiva, afetiva e reconhecível.</div>
+    </div>
+  </section>
+
+  <!-- ===== ESTADO ATUAL ===== -->
+  <div class="estado-atual">
+    <h2>O que está no ar hoje</h2>
+    <div class="links">
+      <a href="https://elainenarcizo.com.br/home-mapa">elainenarcizo.com.br/home-mapa <span>← home em desenvolvimento (WIP)</span></a>
+      <a href="https://elainenarcizo.com.br/repertorios-sensiveis">elainenarcizo.com.br/repertorios-sensiveis <span>← formação com inscrições abertas</span></a>
+      <a href="https://elainenarcizo.com.br/ui_kits/ponte">elainenarcizo.com.br/ui_kits/ponte <span>← oficina PONTE acessível diretamente</span></a>
+    </div>
+  </div>
+
+  <!-- ===== PRÓXIMOS PASSOS ===== -->
+  <div class="proximos">
+    <h2>Próximos passos combinados</h2>
+    <ol>
+      <li>Rádio Remendo: gerar as <strong>capas</strong> e os <strong>textos de descrição</strong> de cada episódio — a estrutura já está pronta, falta só o conteúdo.</li>
+      <li>Bilheteria: finalizar a <strong>abertura dos ingressos</strong> e o conteúdo dos dois portões (Dança Destino e Cartas entre Homens).</li>
+      <li>DançaDestino: concluir os <strong>cartazes do manifesto</strong> (a capa já é o molde aprovado).</li>
+      <li>Layout desktop: a home é mobile-first; versão para telas largas (coluna centralizada) ainda a fazer.</li>
+      <li>Links reais: substituir os <code>href="#"</code> provisórios por URLs e conteúdos definitivos.</li>
+      <li>Visual da PONTE: a oficina ainda usa o design system antigo — pode ganhar a linguagem da galeria editorial no futuro.</li>
+    </ol>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <span>Relatório atualizado em 08/07/2026</span>
+    <span>github.com/danielmfraga/Elaine-Narcizo</span>
+  </footer>
+
+</div>
+</body>
+</html>
