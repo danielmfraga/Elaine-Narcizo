@@ -27,6 +27,24 @@
   @keyframes spin{ to{ transform:rotate(360deg); } }
   @keyframes bob{ 0%,100%{ transform:translateY(0); opacity:.55; } 50%{ transform:translateY(7px); opacity:1; } }
 
+  /* ── BANHO DE MOVIMENTO ─ revelação ao chegar em cada tela + flutuação contínua ──
+     As centralizações migraram de transform p/ a propriedade `translate` (compõe com
+     animações em transform sem conflito). .rv = revela ao chegar; .flo = flutua sempre.
+     html.anim só entra via JS quando NÃO há prefers-reduced-motion → sem JS nada some. */
+  .rv{ translate:var(--tx,0px) var(--ty,0px); }
+  html.anim .rv{ opacity:0; translate:var(--tx,0px) calc(var(--ty,0px) + 26px);
+    transition:opacity .55s ease, translate .65s cubic-bezier(.2,.7,.25,1); transition-delay:var(--d,0s); }
+  html.anim .in .rv{ opacity:1; translate:var(--tx,0px) var(--ty,0px); }
+  @keyframes flo{ from{ transform:translateY(0); } to{ transform:translateY(-9px); } }
+  .flo{ animation:flo var(--fd,8s) ease-in-out var(--fdl,0s) infinite alternate; }
+  @keyframes twk{ 0%,100%{ opacity:.25; transform:scale(.85); } 50%{ opacity:1; transform:scale(1.1); } }
+  .c7-star{ animation:twk 3s ease-in-out infinite; }
+  @keyframes rock{ from{ transform:rotate(-1deg); } to{ transform:rotate(1.4deg); } }
+  .rock{ animation:rock 3.8s ease-in-out infinite alternate; }
+  @media (prefers-reduced-motion:reduce){
+    .flo,.c7-star,.rock,.cv-seal img,#dd-fab .dd-eq i{ animation:none !important; }
+  }
+
   /* ── CAPA (composição fiel ao Capa_0: quadro cheio, elementos em sinergia) ── */
   .capa{ position:relative; height:100vh; height:100svh; min-height:560px; overflow:hidden; scroll-snap-align:start; scroll-snap-stop:always;
     background:radial-gradient(130% 92% at 50% 44%, rgba(0,0,0,0) 50%, rgba(38,9,86,.42) 100%), var(--bg) center/cover, var(--roxo-fundo); }
@@ -74,7 +92,7 @@
   .c1-top{ position:absolute; top:4.5%; left:6%; right:6%; z-index:5; color:var(--amarelo);
     font-family:var(--mono); font-weight:700; line-height:1.5; font-size:clamp(.6rem,2.9vw,.9rem); }
   .c1-yb{ left:13%; top:23%; width:66%; height:46%; transform:rotate(-2.2deg); }
-  .c1-col{ position:absolute; left:50%; bottom:9%; width:90%; transform:translateX(-50%); z-index:3;
+  .c1-col{ position:absolute; left:50%; bottom:9%; width:90%; --tx:-50%; z-index:3;
     filter:drop-shadow(0 16px 24px rgba(0,0,0,.32)); }
   .c1-big{ position:absolute; left:4%; bottom:2%; z-index:2; color:var(--amarelo);
     white-space:nowrap; font-size:clamp(1.75rem,11vw,3.5rem); line-height:.92; }   /* cabe inteiro, estoura na margem SEM cortar */
@@ -87,17 +105,17 @@
   .c2-body{ margin-top:.95em; color:var(--branco); font-family:var(--mono); font-weight:700;
     line-height:1.75; font-size:clamp(.85rem,3.7vw,1.08rem); }
   .c2-yb{ right:5%; bottom:7%; width:32%; height:36%; transform:rotate(2.5deg); }
-  .c2-col{ position:absolute; left:50%; bottom:0; width:84%; transform:translateX(-50%); z-index:3; }
+  .c2-col{ position:absolute; left:50%; bottom:0; width:84%; --tx:-50%; z-index:3; }
 
   /* CARTAZ 3 — UM AGORA E UM LUGAR PARA NOSSO DESTINO */
   .c3-title{ position:absolute; top:1.5%; left:4%; right:2%; z-index:5; color:var(--amarelo);
     font-size:clamp(1.7rem,10vw,3.2rem); }
-  .c3-box{ position:absolute; top:25%; left:50%; transform:translateX(-50%) rotate(-1.5deg); width:80%; z-index:4;
+  .c3-box{ position:absolute; top:25%; left:50%; --tx:-50%; rotate:-1.5deg; width:80%; z-index:4;
     background:var(--amarelo); padding:8% 7% 9%; text-align:center; box-shadow:0 14px 30px rgba(0,0,0,.3); }
   .c3-box p{ color:var(--roxo); font-family:var(--mono); font-weight:700; line-height:1.55;
     font-size:clamp(.82rem,3.7vw,1.12rem); }
   .c3-box p + p{ margin-top:1em; }
-  .c3-col{ position:absolute; left:50%; bottom:4%; width:98%; transform:translateX(-50%); z-index:3; }
+  .c3-col{ position:absolute; left:50%; bottom:4%; width:98%; --tx:-50%; z-index:3; }
 
   /* CARTAZ 4 — DANÇA / MÚSICA (rede de sentidos) */
   .c4-danca{ position:absolute; top:1%; right:4%; z-index:5; color:var(--amarelo);
@@ -108,7 +126,7 @@
     font-family:var(--mono); font-weight:700; line-height:1.5; font-size:clamp(.78rem,3.4vw,1.02rem); }
   .c4-t2{ position:absolute; bottom:13%; left:7%; right:7%; z-index:5; text-align:center; color:var(--branco);
     font-family:var(--mono); font-weight:700; line-height:1.5; font-size:clamp(.78rem,3.4vw,1.02rem); }
-  .c4-col{ position:absolute; left:50%; top:50%; width:98%; transform:translate(-50%,-50%); z-index:3; }
+  .c4-col{ position:absolute; left:50%; top:50%; width:98%; --tx:-50%; --ty:-50%; z-index:3; }
   .c4-yb1{ left:0; top:31%; width:6%; height:12%; }
   .c4-yb2{ right:0; bottom:25%; width:8%; height:10%; }
 
@@ -118,10 +136,10 @@
   .c5-yb{ left:17%; right:17%; top:calc(16% + 5px); bottom:calc(5% + 3px); }   /* -5px topo, -3px base */
   .c5-t1{ position:absolute; top:calc(18% + 13px); left:21%; right:21%; z-index:4; text-align:center; color:var(--roxo);
     font-family:var(--mono); font-weight:700; line-height:1.45; font-size:clamp(.64rem,2.8vw,.9rem); }
-  .c5-col{ position:absolute; left:50%; top:52%; width:66%; transform:translate(-50%,-50%); z-index:3; }
+  .c5-col{ position:absolute; left:50%; top:52%; width:66%; --tx:-50%; --ty:-50%; z-index:3; }
   .c5-t2{ position:absolute; bottom:13%; left:20%; right:20%; z-index:4; text-align:center; color:var(--roxo);
     font-family:var(--mono); font-weight:700; line-height:1.45; font-size:clamp(.62rem,2.75vw,.88rem); }
-  .c5-comp{ position:absolute; bottom:2%; left:50%; transform:translateX(-50%); white-space:nowrap; z-index:5;
+  .c5-comp{ position:absolute; bottom:2%; left:50%; --tx:-50%; white-space:nowrap; z-index:5;
     color:var(--branco); font-size:clamp(2rem,14vw,4.4rem); }   /* COMPANHIA inteiro dentro da margem, sem cortar */
 
   /* CARTAZ 6 — A ECONOMIA POLÍTICA DO ÍNTIMO (texto vertical nas bordas) */
@@ -132,7 +150,7 @@
     font-family:var(--disp); font-weight:700; font-size:clamp(1.55rem,8vw,2.4rem); line-height:1.04; }
   .c6-body{ position:absolute; top:21%; left:9%; right:9%; z-index:5; text-align:center; color:var(--branco);
     font-family:var(--mono); font-weight:700; line-height:1.55; font-size:clamp(.72rem,3.15vw,.96rem); }
-  .c6-col{ position:absolute; left:50%; bottom:3%; width:78%; transform:translateX(-50%); z-index:3; }
+  .c6-col{ position:absolute; left:50%; bottom:3%; width:78%; --tx:-50%; z-index:3; }
   .c6-left{ position:absolute; left:1.5%; bottom:25%; z-index:5; writing-mode:vertical-rl; transform:rotate(180deg);
     color:var(--branco); font-family:var(--disp); font-weight:700; text-transform:uppercase; letter-spacing:.04em;
     font-size:clamp(1rem,4.7vw,1.45rem); }
@@ -148,25 +166,76 @@
   /* CARTAZ 7 — DANÇAR O PRESENTE (final, com hashtag e estrelas) */
   .c7-title{ position:absolute; top:5.5%; left:6%; right:6%; z-index:5; color:var(--amarelo);
     font-family:var(--disp); font-weight:700; font-size:clamp(1.65rem,8.5vw,2.7rem); line-height:1.08; }
-  .c7-tag{ position:absolute; top:30%; left:50%; transform:translateX(-50%) rotate(-2deg); z-index:4;
+  .c7-tag{ position:absolute; top:30%; left:50%; --tx:-50%; rotate:-2deg; z-index:4;
     background:var(--amarelo); padding:.5em 1.1em; white-space:nowrap; }
   .c7-tag span{ color:var(--roxo); font-family:var(--mono); font-weight:700; font-size:clamp(.82rem,3.7vw,1.1rem); }
-  .c7-col{ position:absolute; left:50%; bottom:0; width:68%; transform:translateX(-50%); z-index:3; }
+  .c7-col{ position:absolute; left:50%; bottom:0; width:68%; --tx:-50%; z-index:3; }
   .c7-star{ position:absolute; color:var(--branco); z-index:5; line-height:1; opacity:.9; }
+
+  /* ── MINIPLAYER flutuante · "Rádio DançaDestino" (mesmo motor YouTube do rádio da home) ──
+     right:max(...) prende o botão à coluna de 540px em telas largas. */
+  #dd-fab{ position:fixed; right:max(14px, calc(50vw - 256px)); bottom:calc(16px + env(safe-area-inset-bottom,0px));
+    width:58px; height:58px; border-radius:50%; background:var(--amarelo); border:0; cursor:pointer; z-index:80;
+    display:flex; align-items:center; justify-content:center; box-shadow:0 10px 26px rgba(0,0,0,.45); }
+  #dd-fab svg{ width:24px; height:24px; fill:var(--roxo-escuro); margin-left:2px; }
+  #dd-fab .dd-eq{ display:none; align-items:flex-end; gap:3px; height:20px; }
+  #dd-fab .dd-eq i{ display:block; width:4px; height:20px; border-radius:2px; background:var(--roxo-escuro);
+    transform-origin:bottom; animation:eq 1.05s ease-in-out infinite; }
+  #dd-fab .dd-eq i:nth-child(2){ animation-delay:.18s; }
+  #dd-fab .dd-eq i:nth-child(3){ animation-delay:.36s; }
+  #dd-fab.playing svg{ display:none; }
+  #dd-fab.playing .dd-eq{ display:flex; }
+  @keyframes eq{ 0%,100%{ transform:scaleY(.3); } 50%{ transform:scaleY(1); } }
+
+  #dd-panel{ position:fixed; right:max(14px, calc(50vw - 256px)); bottom:calc(86px + env(safe-area-inset-bottom,0px));
+    width:min(92vw,340px); z-index:70; background:var(--roxo-escuro); border:2px solid var(--amarelo);
+    border-radius:16px; padding:12px; box-shadow:0 26px 54px rgba(0,0,0,.5);
+    opacity:0; pointer-events:none; translate:0 16px; transition:opacity .28s ease, translate .28s ease; }
+  #dd-panel.open{ opacity:1; pointer-events:auto; translate:0 0; }
+  .dd-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:9px; }
+  .dd-eyebrow{ font-size:.6rem; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--amarelo); }
+  #dd-close{ background:none; border:0; color:var(--branco); font-size:1rem; cursor:pointer; padding:2px 6px; }
+  .dd-video{ position:relative; width:100%; aspect-ratio:16/9; background:#1c0640; border-radius:10px; overflow:hidden;
+    border:1px solid rgba(245,217,51,.28); }
+  .dd-video iframe, #dd-yt{ position:absolute; inset:0; width:100% !important; height:100% !important; }
+  .dd-title{ margin-top:10px; font-size:.72rem; font-weight:700; color:var(--branco);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dd-bar{ height:5px; margin-top:9px; border-radius:99px; background:rgba(255,255,255,.18); cursor:pointer; }
+  .dd-fill{ height:100%; width:0; border-radius:99px; background:var(--amarelo); }
+  .dd-times{ display:flex; justify-content:space-between; font-size:.58rem; color:rgba(255,255,255,.55); margin-top:5px; }
+  .dd-ctrls{ display:flex; align-items:center; justify-content:center; gap:16px; margin:8px 0 4px; }
+  .dd-ctrls button{ background:none; border:0; cursor:pointer; padding:6px; display:flex; align-items:center; justify-content:center; }
+  .dd-ctrls svg{ width:20px; height:20px; fill:var(--amarelo); }
+  #dd-shuffle{ opacity:.5; position:relative; }
+  #dd-shuffle.on{ opacity:1; }
+  #dd-shuffle.on::after{ content:''; position:absolute; left:50%; bottom:0; width:4px; height:4px; border-radius:50%;
+    background:var(--amarelo); translate:-50% 0; }
+  #dd-play{ width:46px; height:46px; border-radius:50%; background:var(--amarelo); }
+  #dd-play svg{ fill:var(--roxo-escuro); width:22px; height:22px; margin-left:2px; }
+  #dd-play .ic-pau{ display:none; margin-left:0; }
+  #dd-play.playing .ic-pla{ display:none; }
+  #dd-play.playing .ic-pau{ display:block; }
+  .dd-list{ margin-top:4px; }
+  .dd-row{ display:flex; align-items:center; gap:8px; padding:7px 4px; border-top:1px solid rgba(255,255,255,.12);
+    font-size:.68rem; cursor:pointer; color:rgba(255,255,255,.85); }
+  .dd-row .n{ width:14px; color:rgba(255,255,255,.5); }
+  .dd-row .t{ flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dd-row .p{ color:var(--amarelo); font-size:.58rem; }
+  .dd-row.live, .dd-row.live .n{ color:var(--amarelo); }
 </style>
 </head>
 <body>
   <div class="wrap">
 
     <header class="capa">
-      <img class="cv-paint" src="../assets/Dancadestino/Paint.webp" alt="" aria-hidden="true" />
-      <div class="cv-yb" aria-hidden="true"></div>
-      <img class="cv-col" src="../assets/Dancadestino/Imagem%20principal%20Capa_0.webp" alt="Estátua dançante entre flores" />
-      <img class="cv-candle" src="../assets/Dancadestino/Imagem%20secundaria%20Capa_0.webp" alt="Vela acesa" />
-      <div class="cv-wm"><img src="../assets/Dancadestino/SVG/Lettering%20dAN%C3%87ADESTINO.svg" alt="DançaDestino" /></div>
-      <div class="cv-ht"><img src="../assets/Dancadestino/SVG/Lettering%20hashtag%20dAN%C3%87ADESTINO.svg" alt="#ProjetoDançaDestino" /></div>
-      <div class="cv-seal"><img src="../assets/Dancadestino/Lettering%20Redondo.webp" alt="Você dança, onde estiver" /></div>
-      <div class="cv-tag">
+      <img class="cv-paint rv" style="--d:.55s" src="../assets/Dancadestino/Paint.webp" alt="" aria-hidden="true" />
+      <div class="cv-yb rv" style="--d:0s" aria-hidden="true"></div>
+      <img class="cv-col rv flo" style="--d:.12s;--fd:9s;--fdl:-3s" src="../assets/Dancadestino/Imagem%20principal%20Capa_0.webp" alt="Estátua dançante entre flores" />
+      <img class="cv-candle rv" style="--d:.3s" src="../assets/Dancadestino/Imagem%20secundaria%20Capa_0.webp" alt="Vela acesa" />
+      <div class="cv-wm rv" style="--d:.2s"><img src="../assets/Dancadestino/SVG/Lettering%20dAN%C3%87ADESTINO.svg" alt="DançaDestino" /></div>
+      <div class="cv-ht rv" style="--d:.32s"><img src="../assets/Dancadestino/SVG/Lettering%20hashtag%20dAN%C3%87ADESTINO.svg" alt="#ProjetoDançaDestino" /></div>
+      <div class="cv-seal rv" style="--d:.44s"><img src="../assets/Dancadestino/Lettering%20Redondo.webp" alt="Você dança, onde estiver" /></div>
+      <div class="cv-tag rv" style="--d:.52s">
         <p class="r1">Um ritual<br>para nosso<br>tempo.</p>
         <p class="r2">Toda sexta, 20h.</p>
       </div>
@@ -176,79 +245,106 @@
 
       <!-- CARTAZ 1 — O QUE É? -->
       <section class="poster c1">
-        <p class="c1-top">TODA SEXTA, 20H, UMA MÚSICA.<br>VOCÊ DANÇA. ONDE ESTIVER.<br>SEM CÂMERAS. SEM TELAS.<br>APENAS MOVIMENTO E A SENSAÇÃO<br>SILENCIOSA DE QUE NÃO ESTÁ SOZINHA.</p>
-        <div class="yb c1-yb" aria-hidden="true"></div>
-        <img class="c1-col" src="../assets/Dancadestino/Imagem%20principal%20Cartaz_1.webp" alt="Mulher dançando entre flores" />
-        <p class="c1-big p-disp">O QUE É? OQÉ?<br>O QUE É? OQÉ?</p>
+        <p class="c1-top rv" style="--d:0s">TODA SEXTA, 20H, UMA MÚSICA.<br>VOCÊ DANÇA. ONDE ESTIVER.<br>SEM CÂMERAS. SEM TELAS.<br>APENAS MOVIMENTO E A SENSAÇÃO<br>SILENCIOSA DE QUE NÃO ESTÁ SOZINHA.</p>
+        <div class="yb c1-yb rv" style="--d:.08s" aria-hidden="true"></div>
+        <img class="c1-col rv flo" style="--d:.18s;--fd:7.2s;--fdl:-1.4s" src="../assets/Dancadestino/Imagem%20principal%20Cartaz_1.webp" alt="Mulher dançando entre flores" />
+        <p class="c1-big p-disp rv" style="--d:.3s">O QUE É? OQÉ?<br>O QUE É? OQÉ?</p>
       </section>
 
       <!-- CARTAZ 2 — MICRO-REOCUPAÇÃO -->
       <section class="poster c2">
         <div class="c2-head">
-          <img class="c2-title" src="../assets/Dancadestino/SVG/Lettering%20micro-reocupacao.svg" alt="Micro-reocupação" />
-          <p class="c2-sub">TRANSFORME SUA SALA,<br>QUARTO OU VARANDA EM:</p>
-          <p class="c2-body">Um palco;<br>Um templo;<br>Um território da presença.</p>
+          <img class="c2-title rv" style="--d:0s" src="../assets/Dancadestino/SVG/Lettering%20micro-reocupacao.svg" alt="Micro-reocupação" />
+          <p class="c2-sub rv" style="--d:.12s">TRANSFORME SUA SALA,<br>QUARTO OU VARANDA EM:</p>
+          <p class="c2-body rv" style="--d:.22s">Um palco;<br>Um templo;<br>Um território da presença.</p>
         </div>
-        <div class="yb c2-yb" aria-hidden="true"></div>
-        <img class="c2-col shadow" src="../assets/Dancadestino/Imagem%20principal%20Cartaz_2.webp" alt="Casa com flores e mãos que abraçam" />
+        <div class="yb c2-yb rv" style="--d:.08s" aria-hidden="true"></div>
+        <img class="c2-col shadow rv flo" style="--d:.2s;--fd:7.6s;--fdl:-2.2s" src="../assets/Dancadestino/Imagem%20principal%20Cartaz_2.webp" alt="Casa com flores e mãos que abraçam" />
       </section>
 
       <!-- CARTAZ 3 — UM AGORA E UM LUGAR PARA NOSSO DESTINO -->
       <section class="poster c3">
-        <h2 class="c3-title p-disp">Um agora e um<br>lugar para<br>nosso destino</h2>
-        <div class="c3-box">
+        <h2 class="c3-title p-disp rv" style="--d:0s">Um agora e um<br>lugar para<br>nosso destino</h2>
+        <div class="c3-box rv" style="--d:.14s">
           <p>Outras formas de convívio são necessárias. Outras formas de convívio são possíveis.</p>
           <p>Ressignificar o espaço privado através de convívios inusitados.</p>
         </div>
-        <img class="c3-col sticker" src="../assets/Dancadestino/Imagem%20principal%20Cartaz_3.webp" alt="Mãos idosas entrelaçadas" />
+        <img class="c3-col sticker rv flo" style="--d:.26s;--fd:8.2s;--fdl:-.9s" src="../assets/Dancadestino/Imagem%20principal%20Cartaz_3.webp" alt="Mãos idosas entrelaçadas" />
       </section>
 
       <!-- CARTAZ 4 — DANÇA / MÚSICA -->
       <section class="poster c4">
-        <h2 class="c4-danca p-disp">Dança</h2>
-        <p class="c4-t1">Invocar uma rede de presença invisível através da dANÇADESTINO para movimentar o intangível.</p>
-        <div class="yb c4-yb1" aria-hidden="true"></div>
-        <div class="yb c4-yb2" aria-hidden="true"></div>
-        <img class="c4-col" src="../assets/Dancadestino/Imagem%20principal%20Cartaz_4.webp" alt="Boca, olho, ouvido, nariz, mão e cérebro conectados por linhas" />
-        <p class="c4-t2">Para vibrar intenções. Investigar ritmos coletivos. E gerar pertencimento poético.</p>
-        <h2 class="c4-musica p-disp">Música</h2>
+        <h2 class="c4-danca p-disp rv" style="--d:0s">Dança</h2>
+        <p class="c4-t1 rv" style="--d:.1s">Invocar uma rede de presença invisível através da dANÇADESTINO para movimentar o intangível.</p>
+        <div class="yb c4-yb1 rv" style="--d:.06s" aria-hidden="true"></div>
+        <div class="yb c4-yb2 rv" style="--d:.06s" aria-hidden="true"></div>
+        <img class="c4-col rv flo" style="--d:.2s;--fd:7s;--fdl:-3.4s" src="../assets/Dancadestino/Imagem%20principal%20Cartaz_4.webp" alt="Boca, olho, ouvido, nariz, mão e cérebro conectados por linhas" />
+        <p class="c4-t2 rv" style="--d:.3s">Para vibrar intenções. Investigar ritmos coletivos. E gerar pertencimento poético.</p>
+        <h2 class="c4-musica p-disp rv" style="--d:.4s">Música</h2>
       </section>
 
       <!-- CARTAZ 5 — RESTAURAR A MAGIA DO COMUM / COMPANHIA -->
       <section class="poster c5">
-        <h2 class="c5-title p-disp">Restaurar<br>a magia do comum</h2>
-        <div class="yb c5-yb" aria-hidden="true"></div>
-        <p class="c5-t1">Reencontrar o extraordinário através de outras formas de estar junto.</p>
-        <img class="c5-col sticker" src="../assets/Dancadestino/Imagem%20principal%20Cartaz_5.webp" alt="Duas mãos de dedinho dado" />
-        <p class="c5-t2">O agora nutrido por gestos simultâneos contra o isolamento. Para imaginar o seu, o meu, os nossos e outros destinos.</p>
-        <h2 class="c5-comp p-disp">Companhia</h2>
+        <h2 class="c5-title p-disp rv" style="--d:0s">Restaurar<br>a magia do comum</h2>
+        <div class="yb c5-yb rv" style="--d:.08s" aria-hidden="true"></div>
+        <p class="c5-t1 rv" style="--d:.16s">Reencontrar o extraordinário através de outras formas de estar junto.</p>
+        <img class="c5-col sticker rv flo" style="--d:.26s;--fd:8.6s;--fdl:-1.8s" src="../assets/Dancadestino/Imagem%20principal%20Cartaz_5.webp" alt="Duas mãos de dedinho dado" />
+        <p class="c5-t2 rv" style="--d:.34s">O agora nutrido por gestos simultâneos contra o isolamento. Para imaginar o seu, o meu, os nossos e outros destinos.</p>
+        <h2 class="c5-comp p-disp rv" style="--d:.44s">Companhia</h2>
       </section>
 
       <!-- CARTAZ 6 — A ECONOMIA POLÍTICA DO ÍNTIMO -->
       <section class="poster c6">
-        <div class="c6-acc1" aria-hidden="true"></div>
-        <div class="c6-acc2" aria-hidden="true"></div>
-        <h2 class="c6-title p-disp">A economia política<br>do íntimo</h2>
-        <p class="c6-body">Por uma pausa no Espetáculo, pela não transformação do lazer e da emoção em commodity. Para não desistirmos do nós, por expormos tanto o eu.</p>
-        <img class="c6-col shadow" src="../assets/Dancadestino/Imagem%20principal%20Cartaz_6.webp" alt="Cabeça clássica dividida entre tela e presença" />
-        <p class="c6-left">Um ritual para</p>
-        <p class="c6-right">Nosso tempo.</p>
+        <div class="c6-acc1 rv" style="--d:.06s" aria-hidden="true"></div>
+        <div class="c6-acc2 rv" style="--d:.06s" aria-hidden="true"></div>
+        <h2 class="c6-title p-disp rv" style="--d:0s">A economia política<br>do íntimo</h2>
+        <p class="c6-body rv" style="--d:.12s">Por uma pausa no Espetáculo, pela não transformação do lazer e da emoção em commodity. Para não desistirmos do nós, por expormos tanto o eu.</p>
+        <img class="c6-col shadow rv flo" style="--d:.24s;--fd:7.8s;--fdl:-2.8s" src="../assets/Dancadestino/Imagem%20principal%20Cartaz_6.webp" alt="Cabeça clássica dividida entre tela e presença" />
+        <p class="c6-left rv" style="--d:.36s">Um ritual para</p>
+        <p class="c6-right rv" style="--d:.46s">Nosso tempo.</p>
       </section>
 
       <!-- CARTAZ 7 — DANÇAR O PRESENTE (final) -->
       <section class="poster c7">
-        <span class="c7-star" style="top:8%;right:11%;font-size:1.7rem;">✦</span>
-        <span class="c7-star" style="top:27%;left:8%;font-size:1.1rem;">✦</span>
-        <span class="c7-star" style="bottom:32%;right:7%;font-size:1.4rem;">✦</span>
-        <span class="c7-star" style="bottom:15%;left:13%;font-size:1rem;">✦</span>
-        <h2 class="c7-title p-disp">Dançar o presente<br>com a presença<br>que nos falta.</h2>
-        <div class="c7-tag"><span>#ProjetoDançaDestino</span></div>
-        <img class="c7-col shadow" src="../assets/Dancadestino/Imagem%20principal%20Cartaz_7.webp" alt="Mão segurando uma tulipa" />
+        <span class="c7-star" style="top:8%;right:11%;font-size:1.7rem;animation-duration:2.6s;">✦</span>
+        <span class="c7-star" style="top:27%;left:8%;font-size:1.1rem;animation-duration:3.2s;animation-delay:.5s;">✦</span>
+        <span class="c7-star" style="bottom:32%;right:7%;font-size:1.4rem;animation-duration:2.9s;animation-delay:1.1s;">✦</span>
+        <span class="c7-star" style="bottom:15%;left:13%;font-size:1rem;animation-duration:3.5s;animation-delay:.8s;">✦</span>
+        <h2 class="c7-title p-disp rv" style="--d:0s">Dançar o presente<br>com a presença<br>que nos falta.</h2>
+        <div class="c7-tag rock rv" style="--d:.16s"><span>#ProjetoDançaDestino</span></div>
+        <img class="c7-col shadow rv flo" style="--d:.28s;--fd:8.4s;--fdl:-1.2s" src="../assets/Dancadestino/Imagem%20principal%20Cartaz_7.webp" alt="Mão segurando uma tulipa" />
       </section>
 
     </main>
 
   </div>
+
+  <!-- ── MINIPLAYER · Rádio DançaDestino (botão flutuante + painel) ── -->
+  <button id="dd-fab" aria-label="Rádio DançaDestino">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+    <span class="dd-eq" aria-hidden="true"><i></i><i></i><i></i></span>
+  </button>
+  <aside id="dd-panel" aria-hidden="true">
+    <div class="dd-head">
+      <span class="dd-eyebrow">Rádio · DançaDestino</span>
+      <button id="dd-close" aria-label="Fechar">✕</button>
+    </div>
+    <div class="dd-video"><div id="dd-yt"></div></div>
+    <p class="dd-title" id="dd-title">Toque play pra rodar o ritual ♪</p>
+    <div class="dd-bar" id="dd-bar"><div class="dd-fill" id="dd-fill"></div></div>
+    <div class="dd-times"><span id="dd-cur">0:00</span><span id="dd-dur">0:00</span></div>
+    <div class="dd-ctrls">
+      <button id="dd-shuffle" aria-label="Aleatório"><svg viewBox="0 0 24 24"><path d="M10.59 9.17 5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg></button>
+      <button id="dd-prev" aria-label="Anterior"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm12 0-8.5 6 8.5 6z"/></svg></button>
+      <button id="dd-play" aria-label="Tocar ou pausar">
+        <svg class="ic-pla" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg class="ic-pau" viewBox="0 0 24 24"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>
+      </button>
+      <button id="dd-next" aria-label="Próxima"><svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zM6 6l8.5 6L6 18z"/></svg></button>
+    </div>
+    <div class="dd-list" id="dd-list"></div>
+  </aside>
+
   <script>
     if(window!==window.top)document.documentElement.classList.add('embedded');
     /* C6 — "Um ritual para" / "Nosso tempo": quebra em letras p/ a onda leve escalonada */
@@ -256,11 +352,141 @@
       var t=el.textContent; el.textContent='';
       [].forEach.call(t,function(ch,i){
         var s=document.createElement('span');
-        s.textContent = (ch===' ') ? ' ' : ch;
+        s.textContent = (ch===' ') ? ' ' : ch;
         s.style.animationDelay = (i*0.1)+'s';
         el.appendChild(s);
       });
     });
+
+    /* ── BANHO DE MOVIMENTO: revela ao chegar em cada tela; re-arma ao sair (replay a cada visita).
+       Só liga sem prefers-reduced-motion e com IntersectionObserver → sem JS/anim, nada fica escondido. */
+    (function(){
+      if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if(!('IntersectionObserver' in window)) return;
+      document.documentElement.classList.add('anim');
+      var io=new IntersectionObserver(function(es){
+        es.forEach(function(en){
+          if(en.intersectionRatio>=.35) en.target.classList.add('in');
+          else if(en.intersectionRatio<=.06) en.target.classList.remove('in');
+        });
+      },{ root:document.querySelector('.wrap'), threshold:[0,.06,.35] });
+      document.querySelectorAll('.capa,.poster').forEach(function(s){ io.observe(s); });
+    })();
+
+    /* ── MINIPLAYER · Rádio DançaDestino — mesmo motor do rádio da home (home-mapa):
+       YouTube IFrame API com vídeo visível e NOSSOS controles dirigindo (play/pause no
+       vídeo; prev/next/aleatório na playlist ddTracks). Kick = correção do 2º toque.
+       ⚠️ Playlist duplicada da home: mudou lá, mudar aqui. */
+    var ddTracks=[
+      { id:'nAyXMqB_6Kc', title:'Casaco Marron (Bye, Bye, Ceci)', artist:'DançaDestino' },
+      { id:'AA_8wtG62DI', title:'Jokerman', artist:'Caetano Veloso' },
+      { id:'rLsP8NgS01Y', title:'Faixa 03', artist:'DançaDestino' }
+    ];
+    var ddPlayer=null,ddApiReady=false,ddApiLoading=false,ddReady=false,ddPendingIdx=null,ddPoll=null,ddLoadedId=null,ddCur=-1,ddShuffle=false;
+    var ddFab=document.getElementById('dd-fab'),ddPanel=document.getElementById('dd-panel'),
+        ddTitle=document.getElementById('dd-title'),ddFill=document.getElementById('dd-fill'),
+        ddBar=document.getElementById('dd-bar'),ddCurEl=document.getElementById('dd-cur'),
+        ddDurEl=document.getElementById('dd-dur'),ddList=document.getElementById('dd-list'),
+        ddPlayBtn=document.getElementById('dd-play');
+    function ddFmt(s){ s=Math.max(0,Math.floor(s||0)); return Math.floor(s/60)+':'+('0'+(s%60)).slice(-2); }
+    function ddRenderList(){
+      ddList.innerHTML='';
+      ddTracks.forEach(function(tr,i){
+        var r=document.createElement('div');
+        r.className='dd-row'+(i===ddCur?' live':'');
+        var n=document.createElement('span'); n.className='n'; n.textContent=i===ddCur?'♪':String(i+1);
+        var t=document.createElement('span'); t.className='t'; t.textContent=tr.title+' · '+tr.artist;
+        var p=document.createElement('span'); p.className='p'; p.textContent=i===ddCur?'':'▶';
+        r.appendChild(n); r.appendChild(t); r.appendChild(p);
+        r.addEventListener('click',function(){ ddPlayIndex(i); });
+        ddList.appendChild(r);
+      });
+    }
+    function ddMarkRows(){
+      [].forEach.call(ddList.children,function(r,j){
+        r.classList.toggle('live',j===ddCur);
+        r.querySelector('.n').textContent=j===ddCur?'♪':String(j+1);
+        r.querySelector('.p').textContent=j===ddCur?'':'▶';
+      });
+    }
+    function ddLoadApi(){
+      if(ddApiReady||ddApiLoading) return;
+      ddApiLoading=true;
+      var prev=window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady=function(){
+        if(typeof prev==='function'){ try{ prev(); }catch(e){} }
+        ddApiReady=true; ddCreatePlayer();
+      };
+      var s=document.createElement('script'); s.src='https://www.youtube.com/iframe_api'; s.async=true;
+      document.body.appendChild(s);
+    }
+    function ddCreatePlayer(){
+      if(ddPlayer||!ddApiReady||!window.YT||!YT.Player||!document.getElementById('dd-yt')) return;
+      ddPlayer=new YT.Player('dd-yt',{
+        width:'100%', height:'100%',
+        playerVars:{ controls:0, rel:0, modestbranding:1, playsinline:1, fs:0, iv_load_policy:3 },
+        events:{
+          onReady:function(){ ddReady=true;
+            if(ddPendingIdx!=null){ var i=ddPendingIdx; ddPendingIdx=null; ddPlayIndex(i); }
+            else{ var t=ddTracks[0]; try{ ddPlayer.cueVideoById(t.id); ddLoadedId=t.id; }catch(e){} }
+          },
+          onStateChange:ddOnState
+        }
+      });
+    }
+    function ddPrewarm(){ ddLoadApi(); if(ddApiReady) ddCreatePlayer(); }
+    function ddIsPlaying(){ try{ return !!(ddPlayer&&ddPlayer.getPlayerState&&ddPlayer.getPlayerState()===1); }catch(e){ return false; } }
+    function ddSync(p){ ddFab.classList.toggle('playing',p); ddPlayBtn.classList.toggle('playing',p); }
+    function ddOnState(e){
+      var S=window.YT&&YT.PlayerState; if(!S) return;
+      if(e.data===S.PLAYING){ ddSync(true); ddStartPoll(); }
+      else if(e.data===S.PAUSED){ ddSync(false); ddStopPoll(); }
+      else if(e.data===S.ENDED){ ddSync(false); ddStopPoll(); ddNext(); }
+    }
+    function ddStartPoll(){ if(!ddPoll) ddPoll=setInterval(ddTick,250); }
+    function ddStopPoll(){ if(ddPoll){ clearInterval(ddPoll); ddPoll=null; } }
+    function ddTick(){
+      if(!ddPlayer||!ddPlayer.getDuration) return;
+      var d=ddPlayer.getDuration()||0, p=ddPlayer.getCurrentTime()||0;
+      if(d) ddFill.style.width=(100*p/d)+'%';
+      ddCurEl.textContent=ddFmt(p); ddDurEl.textContent=ddFmt(d);
+    }
+    function ddPlayIndex(i){
+      var tr=ddTracks[i]; if(!tr) return;
+      ddCur=i;
+      ddTitle.textContent=tr.title+' · '+tr.artist;
+      ddMarkRows();
+      if(!ddPlayer){ ddPendingIdx=i; ddLoadApi(); if(ddApiReady) ddCreatePlayer(); return; }
+      if(!ddReady){ ddPendingIdx=i; return; }
+      if(ddLoadedId===tr.id){ ddKick(); return; }   /* já engatilhada → play instantâneo */
+      ddLoadedId=tr.id; try{ ddPlayer.loadVideoById(tr.id); }catch(e){}
+    }
+    /* "chute": play e, se em ~350ms não tocar, repete (vídeo cued pedia 2 toques) */
+    function ddKick(){
+      try{ ddPlayer.playVideo(); }catch(e){}
+      setTimeout(function(){ try{ if(ddPlayer&&ddPlayer.getPlayerState&&ddPlayer.getPlayerState()!==1) ddPlayer.playVideo(); }catch(e){} },350);
+    }
+    function ddToggle(){
+      if(!ddPlayer||!ddReady||ddCur<0){ ddPlayIndex(ddCur>=0?ddCur:0); return; }
+      if(ddIsPlaying()) ddPlayer.pauseVideo(); else ddKick();
+    }
+    function ddRandIdx(){ if(ddTracks.length<2) return ddCur<0?0:ddCur; var r; do{ r=Math.floor(Math.random()*ddTracks.length); }while(r===ddCur); return r; }
+    function ddPrev(){ ddPlayIndex(ddShuffle?ddRandIdx():((ddCur<=0?ddTracks.length:ddCur)-1)); }
+    function ddNext(){ ddPlayIndex(ddShuffle?ddRandIdx():(ddCur+1)%ddTracks.length); }
+    ddBar.addEventListener('click',function(e){
+      if(!ddPlayer||!ddReady) return;
+      var r=ddBar.getBoundingClientRect(), f=(e.clientX-r.left)/r.width, d=ddPlayer.getDuration()||0;
+      if(d){ try{ ddPlayer.seekTo(Math.max(0,Math.min(1,f))*d,true); }catch(e2){} }
+    });
+    ddPlayBtn.addEventListener('click',ddToggle);
+    document.getElementById('dd-prev').addEventListener('click',ddPrev);
+    document.getElementById('dd-next').addEventListener('click',ddNext);
+    document.getElementById('dd-shuffle').addEventListener('click',function(){ ddShuffle=!ddShuffle; this.classList.toggle('on',ddShuffle); });
+    function ddOpen(){ ddPanel.classList.add('open'); ddPanel.setAttribute('aria-hidden','false'); ddPrewarm(); }
+    function ddClose(){ ddPanel.classList.remove('open'); ddPanel.setAttribute('aria-hidden','true'); }
+    ddFab.addEventListener('click',function(){ ddPanel.classList.contains('open')?ddClose():ddOpen(); });
+    document.getElementById('dd-close').addEventListener('click',ddClose);
+    ddRenderList();
   </script>
   <style>html.embedded,html.embedded body{ overscroll-behavior-y:contain; }</style>
 </body>
