@@ -466,18 +466,25 @@ body.nav-hidden .menu-btn{ box-shadow:0 7px 16px rgba(0,0,0,.3); }
 /* ── PFRAME: página real embutida como conteúdo do destaque ── */
 .pframe{ background:var(--paper); }
 .pframe iframe{ width:100%; height:100%; border:0; display:block; }
+/* VOLTAR/SAIR = "X" no topo-ESQUERDO, espelho do menu (3 pauzinhos, topo-direito).
+   Aparece sempre que há p/ onde voltar (.on, em qualquer página embutida). O texto
+   dinâmico fica oculto (font-size:0) e o X é desenhado nos ::before/::after.
+   z-index 65: acima da tarja (60), abaixo do overlay do menu (70) → some quando o menu abre. */
 .back-chip{
-  position:fixed; left:14px; bottom:14px; z-index:56;
-  display:none; align-items:center; gap:7px;
-  background:var(--ink); color:var(--paper);
-  font-size:11px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase;
-  padding:10px 14px; box-shadow:0 4px 18px rgba(0,0,0,0.18);
+  position:fixed; top:0; left:0; z-index:65; width:52px; height:var(--bar-top);
+  display:none; align-items:center; justify-content:center;
+  background:var(--ink); box-shadow:18px 0 16px var(--ink);
+  font-size:0; color:transparent; border:0; cursor:pointer;
 }
-.back-chip.on{ display:inline-flex; }
+.back-chip.on{ display:flex; }
+.back-chip::before, .back-chip::after{
+  content:''; position:absolute; top:50%; left:50%; width:18px; height:1px; background:rgba(255,255,255,0.65);
+}
+.back-chip::before{ transform:translate(-50%,-50%) rotate(45deg); }
+.back-chip::after{ transform:translate(-50%,-50%) rotate(-45deg); }
 /* DançaDestino: esconde só o TEXTO rolante da tarja; a barra continua no topo
    (mantém o alinhamento — a diagramação do DançaDestino parte de a barra estar lá). */
 body.frame-danca .bar .track{ visibility:hidden; }
-body.frame-danca .back-chip{ display:none; }   /* voltar vira o "X" do topo-esquerdo */
 
 /* ── ENDCAP: fim de seção → voltar ── */
 .endcap{ display:flex; flex-direction:column; align-items:flex-start; gap:10px; padding-top:6px; }
@@ -685,17 +692,6 @@ body.coach-x .world-dots::after{
 .menu-btn.open i:nth-child(1){ transform:translateY(6px) rotate(45deg); }
 .menu-btn.open i:nth-child(2){ opacity:0; }
 .menu-btn.open i:nth-child(3){ transform:translateY(-6px) rotate(-45deg); }
-
-/* ── BOTÃO X (voltar) — espelho do menu, no topo-ESQUERDO; só no DançaDestino ── */
-.close-btn{
-  position:fixed; top:0; left:0; z-index:90; width:52px; height:var(--bar-top);
-  display:none; align-items:center; justify-content:center;
-  cursor:pointer; border:0; background:var(--ink); box-shadow:18px 0 16px var(--ink);
-}
-body.frame-danca .close-btn{ display:flex; }
-.close-btn i{ position:absolute; top:50%; left:50%; width:18px; height:1px; background:rgba(255,255,255,0.65); }
-.close-btn i:nth-child(1){ transform:translate(-50%,-50%) rotate(45deg); }
-.close-btn i:nth-child(2){ transform:translate(-50%,-50%) rotate(-45deg); }
 
 /* ── MENU OVERLAY ── */
 .menu{
@@ -1305,7 +1301,6 @@ body.frame-danca .close-btn{ display:flex; }
 
 <!-- MENU -->
 <button class="menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false"><i></i><i></i><i></i></button>
-<button class="close-btn" id="ddClose" aria-label="Voltar"><i></i><i></i></button>
 <nav class="menu" id="menu" aria-hidden="true">
   <p class="menu-cap">Navegar</p>
   <ul class="menu-list" id="menuList"></ul>
@@ -1589,9 +1584,6 @@ body.frame-danca .close-btn{ display:flex; }
     if(pz) setTimeout(function(){ pz.scrollTop=0; },700); /* rearma a capa; autosave preserva tudo */
     if(radio) setTimeout(function(){ radio.scrollTop=0; },700);
   });
-  /* X do topo-esquerdo (DançaDestino) = mesma função de voltar do back-chip */
-  var ddClose=document.getElementById('ddClose');
-  if(ddClose) ddClose.addEventListener('click',function(e){ e.preventDefault(); backChip.click(); });
 
   /* RÁDIO REMENDO: Spotify (tela 1) + DançaDestino YouTube (tela 2) */
   var radio=document.getElementById('radio');
