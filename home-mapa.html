@@ -632,6 +632,9 @@ body.frame-danca .bar .track{ visibility:hidden; }
 }
 .worlds-rail i{ display:block; width:6px; height:6px; border-radius:50%; background:rgba(10,10,10,0.16); cursor:pointer; transition:height var(--dur) var(--ease), background var(--dur); }
 .worlds-rail i.on{ height:18px; border-radius:3px; background:var(--ink); }
+/* páginas embutidas (repertórios, PONTE, DançaDestino…): sem trilho de seções à direita
+   → o dedo na lateral direita não troca mais de mundo sem querer */
+body.in-frame .worlds-rail{ opacity:0; pointer-events:none; }
 
 /* ── NAV: bolinhas de painéis (rodapé) ── */
 .world-dots{
@@ -1503,6 +1506,7 @@ body.coach-x .world-dots::after{
     mundos.forEach(function(x){ x.classList.toggle('lockY', x===m&&locked); });
     backChip.classList.toggle('on', isFrame); /* saída sempre visível sobre a página embutida */
     if(isFrame) backChip.textContent = cur===0 ? '← tela inicial' : '← início da seção';
+    document.body.classList.toggle('in-frame', isFrame); /* embutida: some o trilho de seções (não troca de mundo ao passar o dedo na direita) */
     /* no player de áudio (Rádio Remendo): esconde trilha + bolinhas + letreiro e
        deixa a capa vazar até o topo; reajusta o scroll p/ o mundo não desalinhar */
     var noChrome=!!(p&&p.classList&&p.classList.contains('nochrome')); /* DançaDestino: esconde só o texto rolante; a barra fica (alinhamento parte dela) */
