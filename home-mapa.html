@@ -474,11 +474,10 @@ body.nav-hidden .menu-btn{ box-shadow:0 7px 16px rgba(0,0,0,.3); }
   padding:10px 14px; box-shadow:0 4px 18px rgba(0,0,0,0.18);
 }
 .back-chip.on{ display:inline-flex; }
-/* DançaDestino (nochrome): tarja escondida → botão de voltar sobe pro TOPO (pill) */
-body.frame-top-back .back-chip{
-  top:calc(10px + env(safe-area-inset-top,0px)); bottom:auto; left:12px;
-  border-radius:99px; padding:9px 15px; box-shadow:0 6px 20px rgba(0,0,0,0.32);
-}
+/* DançaDestino: esconde só o TEXTO rolante da tarja; a barra continua no topo
+   (mantém o alinhamento — a diagramação do DançaDestino parte de a barra estar lá).
+   Back-chip fica no lugar padrão (rodapé). */
+body.frame-danca .bar .track{ visibility:hidden; }
 
 /* ── ENDCAP: fim de seção → voltar ── */
 .endcap{ display:flex; flex-direction:column; align-items:flex-start; gap:10px; padding-top:6px; }
@@ -1499,10 +1498,10 @@ body.coach-x .world-dots::after{
     if(isFrame) backChip.textContent = cur===0 ? '← tela inicial' : '← início da seção';
     /* no player de áudio (Rádio Remendo): esconde trilha + bolinhas + letreiro e
        deixa a capa vazar até o topo; reajusta o scroll p/ o mundo não desalinhar */
-    var noChrome=!!(p&&p.classList&&p.classList.contains('nochrome')); /* DançaDestino: sem tarja + voltar no topo */
-    var hide=!!(p&&p.querySelector&&p.querySelector('.sp-player')) || noChrome;
+    var noChrome=!!(p&&p.classList&&p.classList.contains('nochrome')); /* DançaDestino: esconde só o texto rolante; a barra fica (alinhamento parte dela) */
+    var hide=!!(p&&p.querySelector&&p.querySelector('.sp-player'));
     document.body.classList.toggle('nav-hidden', hide);
-    document.body.classList.toggle('frame-top-back', noChrome);
+    document.body.classList.toggle('frame-danca', noChrome);
     if(hide!==navHidden){
       navHidden=hide; var k=cur;
       requestAnimationFrame(function(){ try{ stage.scrollTop=k*stage.clientHeight; }catch(e){} });
