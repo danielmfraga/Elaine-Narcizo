@@ -42,7 +42,7 @@
   @keyframes rock{ from{ transform:rotate(-1deg); } to{ transform:rotate(1.4deg); } }
   .rock{ animation:rock 3.8s ease-in-out infinite alternate; }
   @media (prefers-reduced-motion:reduce){
-    .flo,.c7-star,.rock,.cv-seal img,#dd-fab .dd-eq i{ animation:none !important; }
+    .flo,.c7-star,.rock,.cv-seal img,#dd-fab .dd-eq i,#dd-fab::before,#dd-fab::after{ animation:none !important; }
   }
 
   /* ── CAPA (composição fiel ao Capa_0: quadro cheio, elementos em sinergia) ── */
@@ -143,7 +143,7 @@
     color:var(--branco); font-size:clamp(2rem,14vw,4.4rem); }   /* COMPANHIA inteiro dentro da margem, sem cortar */
 
   /* CARTAZ 6 — A ECONOMIA POLÍTICA DO ÍNTIMO (texto vertical nas bordas) */
-  .c6-acc1{ position:absolute; background:var(--amarelo); z-index:6; top:2.5%; right:5%; width:15%; height:4.5%; transform:rotate(17deg); opacity:.92; }
+  .c6-acc1{ position:absolute; background:var(--amarelo); z-index:6; top:1%; right:5%; width:15%; height:4.5%; transform:rotate(17deg); opacity:.92; }   /* subiu p/ pegar só a pontinha de "política" */
   .c6-acc2{ position:absolute; background:var(--amarelo); z-index:6; top:31%; left:-3%; width:13%; height:5%; transform:rotate(-13deg); opacity:.92; }
   /* C6 e C7 usam a display MAIS FINA (Space Grotesk 700), como nos cartazes-modelo 6 e 7 — não a Archivo Black */
   .c6-title{ position:absolute; top:4%; left:7%; right:7%; z-index:5; text-align:center; color:var(--branco);
@@ -176,7 +176,17 @@
      right:max(...) prende o botão à coluna de 540px em telas largas. */
   #dd-fab{ position:fixed; right:max(14px, calc(50vw - 256px)); bottom:calc(16px + env(safe-area-inset-bottom,0px));
     width:58px; height:58px; border-radius:50%; background:var(--amarelo); border:0; cursor:pointer; z-index:80;
-    display:flex; align-items:center; justify-content:center; box-shadow:0 10px 26px rgba(0,0,0,.45); }
+    display:flex; align-items:center; justify-content:center; box-shadow:0 10px 26px rgba(0,0,0,.45);
+    transition:transform .4s cubic-bezier(.2,.7,.25,1), opacity .3s ease; }
+  /* ondinhas leves pulsando (só quando NÃO está tocando; tocando = equalizador) */
+  #dd-fab::before, #dd-fab::after{ content:''; position:absolute; inset:0; border-radius:50%;
+    border:2px solid var(--amarelo); pointer-events:none; opacity:0; }
+  #dd-fab:not(.playing)::before, #dd-fab:not(.playing)::after{ animation:ripple 2.6s ease-out infinite; }
+  #dd-fab:not(.playing)::after{ animation-delay:1.3s; }
+  @keyframes ripple{ 0%{ transform:scale(1); opacity:.5; } 100%{ transform:scale(2.2); opacity:0; } }
+  /* estados por tela (setados via IntersectionObserver): capa = fantasma; C1/C5 sobem p/ não cair no lettering */
+  #dd-fab.dd-up{ transform:translateY(-90px); }
+  #dd-fab.dd-ghost:not(.playing){ opacity:.35; }
   #dd-fab svg{ width:24px; height:24px; fill:var(--roxo-escuro); margin-left:2px; }
   #dd-fab .dd-eq{ display:none; align-items:flex-end; gap:3px; height:20px; }
   #dd-fab .dd-eq i{ display:block; width:4px; height:20px; border-radius:2px; background:var(--roxo-escuro);
@@ -361,13 +371,19 @@
     /* ── BANHO DE MOVIMENTO: revela ao chegar em cada tela; re-arma ao sair (replay a cada visita).
        Só liga sem prefers-reduced-motion e com IntersectionObserver → sem JS/anim, nada fica escondido. */
     (function(){
-      if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(!reduce) document.documentElement.classList.add('anim');   /* sem 'anim', .rv não esconde nada */
       if(!('IntersectionObserver' in window)) return;
-      document.documentElement.classList.add('anim');
+      var fab=document.getElementById('dd-fab');
+      function setFab(sec){
+        if(!fab) return;
+        fab.classList.toggle('dd-ghost', sec.classList.contains('capa'));       /* pág 1: transparente */
+        fab.classList.toggle('dd-up', sec.classList.contains('c1')||sec.classList.contains('c5')); /* pág 2 e 6: sobe */
+      }
       var io=new IntersectionObserver(function(es){
         es.forEach(function(en){
-          if(en.intersectionRatio>=.35) en.target.classList.add('in');
-          else if(en.intersectionRatio<=.06) en.target.classList.remove('in');
+          if(en.intersectionRatio>=.35){ en.target.classList.add('in'); setFab(en.target); }
+          else if(en.intersectionRatio<=.06){ en.target.classList.remove('in'); }
         });
       },{ root:document.querySelector('.wrap'), threshold:[0,.06,.35] });
       document.querySelectorAll('.capa,.poster').forEach(function(s){ io.observe(s); });
