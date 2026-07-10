@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tudo Quer Viver — Cartas entre homens</title>
+<meta name="description" content="Tudo Quer Viver — uma experiência de troca de cartas entre homens, mantida pela escrita." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..440&display=swap" rel="stylesheet">
+<style>
+  /* ═══════════════════════════════════════════════════════════
+     CARTAS ENTRE HOMENS · "Tudo Quer Viver" — ESBOÇO (jul/2026)
+     Tom: epistolar, íntimo, discreto. Papel de carta + tinta.
+     Segue a lógica técnica da área DançaDestino (pasta própria,
+     scroller interno com scroll-snap, embutível por iframe),
+     mas com identidade própria — o avesso da colagem/energia.
+     ═══════════════════════════════════════════════════════════ */
+  :root{
+    --paper:#F4EEE3;        /* creme quente — papel de carta */
+    --ink:#252017;          /* tinta quase-preta, quente */
+    --ink-soft:#4C453A;
+    --mute:#978C79;
+    --line:#DDD2BF;
+    --tinta:#39496A;        /* azul de caneta-tinteiro — acento */
+    --serif:"Newsreader",Georgia,serif;
+    --sans:"DM Sans",-apple-system,BlinkMacSystemFont,sans-serif;
+    --ease:cubic-bezier(.2,.7,.25,1);
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html,body{ height:100%; }
+  body{ background:var(--paper); color:var(--ink); font-family:var(--sans);
+    -webkit-font-smoothing:antialiased; overflow:hidden; }
+  em{ font-family:var(--serif); font-style:italic; font-weight:400; }
+
+  /* scroller interno: viewport estável (barra do Safari não recolhe) → snap liso */
+  .wrap{ height:100vh; height:100svh; height:100dvh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    scroll-snap-type:y mandatory; overscroll-behavior-y:contain; max-width:560px; margin:0 auto;
+    background:repeating-linear-gradient(0deg, transparent 0 37px, rgba(57,47,32,.035) 37px 38px);
+    scrollbar-width:none; }
+  .wrap::-webkit-scrollbar{ display:none; }
+
+  .tela{ position:relative; min-height:100svh; scroll-snap-align:start; scroll-snap-stop:always;
+    display:flex; flex-direction:column; justify-content:center;
+    padding:clamp(44px,9vh,88px) clamp(28px,7vw,56px); }
+
+  .eyebrow{ font-size:11px; font-weight:500; letter-spacing:.22em; text-transform:uppercase; color:var(--mute);
+    display:inline-flex; align-items:center; gap:11px; margin-bottom:24px; }
+  .eyebrow::before{ content:""; width:26px; height:1px; background:var(--tinta); flex-shrink:0; }
+
+  h1{ font-family:var(--serif); font-weight:400; font-size:clamp(2.9rem,13vw,4.6rem); line-height:.98; letter-spacing:-.015em; }
+  h2{ font-family:var(--serif); font-weight:400; font-size:clamp(1.95rem,7.6vw,2.9rem); line-height:1.04; letter-spacing:-.01em; max-width:16ch; }
+  p.txt{ font-size:clamp(1rem,3.6vw,1.1rem); font-weight:300; line-height:1.72; color:var(--ink-soft); max-width:34ch; margin-top:18px; }
+
+  /* citação da capa */
+  .quote{ font-family:var(--serif); font-style:italic; font-weight:300; font-size:clamp(1.18rem,4.6vw,1.44rem); line-height:1.5; color:var(--ink); max-width:27ch; margin-top:28px; }
+  .quote cite{ display:block; font-style:normal; font-family:var(--sans); font-size:.76rem; letter-spacing:.08em; text-transform:uppercase; color:var(--mute); margin-top:14px; }
+
+  .num{ font-family:var(--serif); font-size:.92rem; color:var(--tinta); letter-spacing:.08em; margin-bottom:16px; }
+
+  /* dica de rolar (só na capa) */
+  .hint{ position:absolute; left:0; right:0; bottom:28px; text-align:center; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--mute); }
+  .hint b{ display:block; font-weight:400; font-size:16px; margin-top:7px; animation:bob 1.9s var(--ease) infinite; }
+  @keyframes bob{ 0%,100%{ transform:translateY(0); opacity:.5; } 50%{ transform:translateY(6px); opacity:1; } }
+
+  .btn{ display:inline-flex; align-items:center; gap:9px; align-self:flex-start;
+    font-size:12px; font-weight:500; letter-spacing:.12em; text-transform:uppercase; cursor:pointer;
+    color:var(--paper); background:var(--tinta); padding:14px 24px; border-radius:26px; margin-top:28px; text-decoration:none; border:0; transition:gap .28s var(--ease); }
+  .btn:hover{ gap:14px; }
+  .btn.ghost{ background:none; color:var(--ink); border:1px solid var(--line); }
+
+  .foot{ margin-top:auto; padding-top:12vh; }
+  .fim{ font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--mute); margin-bottom:16px; }
+
+  /* revelação ao chegar */
+  .rv{ opacity:0; transform:translateY(20px); transition:opacity .7s var(--ease), transform .7s var(--ease); transition-delay:var(--d,0s); }
+  .in .rv{ opacity:1; transform:none; }
+  @media (prefers-reduced-motion:reduce){ .rv{ opacity:1; transform:none; } .hint b{ animation:none; } }
+</style>
+</head>
+<body>
+  <div class="wrap" id="wrap">
+
+    <!-- CAPA -->
+    <section class="tela in">
+      <span class="eyebrow rv">Cartas entre homens</span>
+      <h1 class="rv" style="--d:.06s">Tudo Quer <em>Viver</em></h1>
+      <blockquote class="quote rv" style="--d:.14s">
+        “Enviar uma carta é um bom meio de ir a algum lugar sem mover nada a não ser o coração.”
+        <cite>Phillis Theroux</cite>
+      </blockquote>
+      <div class="hint">role<b>⌄</b></div>
+    </section>
+
+    <!-- 01 · O PROJETO -->
+    <section class="tela">
+      <span class="num rv">01 · O projeto</span>
+      <h2 class="rv" style="--d:.05s">Um contato feito <em>só de escrita</em>.</h2>
+      <p class="txt rv" style="--d:.12s">Uma experiência de troca de cartas entre homens que não se conhecem — mantendo contato exclusivamente por meio da escrita.</p>
+      <p class="txt rv" style="--d:.18s">A mediação é simples e direta: a coordenação apenas conecta os participantes, organiza os pares e facilita o início da correspondência.</p>
+    </section>
+
+    <!-- 02 · OBJETIVO -->
+    <section class="tela">
+      <span class="num rv">02 · Objetivo</span>
+      <h2 class="rv" style="--d:.05s">Um espaço de <em>escuta</em> e de aprendizagem.</h2>
+      <p class="txt rv" style="--d:.12s">Explorar uma forma de relação pouco comum na cultura masculina — favorecendo a expressão de si e a abertura ao outro por meio da escrita epistolar.</p>
+    </section>
+
+    <!-- 03 · COMO FUNCIONA -->
+    <section class="tela">
+      <span class="num rv">03 · Como funciona</span>
+      <h2 class="rv" style="--d:.05s">Aberto, contínuo, <em>sem fim marcado</em>.</h2>
+      <p class="txt rv" style="--d:.12s">A entrada pode ser feita a qualquer momento — assim como a indicação de novos participantes ou a sugestão de grupos. A coordenação faz o contato direto e as articulações necessárias.</p>
+      <p class="txt rv" style="--d:.18s">Um projeto perene: sem ciclos fechados, sem prazos de encerramento.</p>
+    </section>
+
+    <!-- 04 · DISCRIÇÃO -->
+    <section class="tela">
+      <span class="num rv">04 · Discrição</span>
+      <h2 class="rv" style="--d:.05s">A privacidade é <em>parte da proposta</em>.</h2>
+      <p class="txt rv" style="--d:.12s">Não há divulgação pública dos nomes envolvidos, nem publicidade sobre os participantes ou as correspondências. O processo preserva a privacidade como fundamento.</p>
+    </section>
+
+    <!-- PARTICIPAR / FIM -->
+    <section class="tela">
+      <span class="eyebrow rv">Participar</span>
+      <h2 class="rv" style="--d:.05s">Quer <em>entrar na troca</em>?</h2>
+      <p class="txt rv" style="--d:.12s">A qualquer momento. Fale com a coordenação e a gente organiza os pares.</p>
+      <a class="btn rv" style="--d:.18s" href="#" data-cta>Falar com a coordenação →</a>
+      <div class="foot">
+        <p class="fim rv">fim · Tudo Quer Viver</p>
+        <a class="btn ghost rv" href="#" data-back>← Voltar</a>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+  (function(){
+    try{
+      var wrap = document.getElementById('wrap');
+      var telas = [].slice.call(document.querySelectorAll('.tela'));
+      if('IntersectionObserver' in window){
+        var io = new IntersectionObserver(function(es){
+          es.forEach(function(en){ if(en.isIntersecting) en.target.classList.add('in'); });
+        }, { root: wrap, threshold:.4 });
+        telas.forEach(function(t){ io.observe(t); });
+      } else { telas.forEach(function(t){ t.classList.add('in'); }); }
+    }catch(e){ [].forEach.call(document.querySelectorAll('.tela'),function(t){ t.classList.add('in'); }); }
+  })();
+  </script>
+</body>
+</html>
