@@ -8,7 +8,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..440&display=swap" rel="stylesheet">
+<script>if(window!==window.top)document.documentElement.classList.add('embedded');</script>
 <style>
+  /* embutida na home-mapa (Bilheteria): contém o overscroll — não vaza pro stage pai */
+  html.embedded,html.embedded body{ overscroll-behavior-y:contain; }
   /* ═══════════════════════════════════════════════════════════
      CARTAS ENTRE HOMENS · "Tudo Quer Viver" — ESBOÇO (jul/2026)
      Tom: epistolar, íntimo, discreto. Papel de carta + tinta.
@@ -130,7 +133,6 @@
       <a class="btn rv" style="--d:.18s" href="#" data-cta>Falar com a coordenação →</a>
       <div class="foot">
         <p class="fim rv">fim · Tudo Quer Viver</p>
-        <a class="btn ghost rv" href="#" data-back>← Voltar</a>
       </div>
     </section>
 
