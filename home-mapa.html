@@ -323,10 +323,16 @@ h2{ font-size:clamp(2rem,8.2vw,3.4rem); font-weight:200; letter-spacing:-0.03em;
   background:var(--laranja); color:#fff; text-decoration:none;
   border-radius:999px; padding:16px 32px;
   font-size:13px; font-weight:700; letter-spacing:.16em; text-transform:uppercase;
+  transition:background .18s var(--ease), box-shadow .18s var(--ease);
   animation:tune-glow 2.2s var(--ease) infinite;
 }
 .btn-tune .ar{ transition:transform .3s var(--ease); }
 .btn-tune:hover .ar{ transform:translateX(4px); }
+/* apertado/clicado: vira VERDE-FOLHA e o pulso para — feedback claro do toque */
+.btn-tune:active, .btn-tune:focus-visible{
+  background:var(--verde); box-shadow:0 6px 18px rgba(168,183,63,.55); animation:none;
+}
+.btn-tune:active::before, .btn-tune:active::after{ animation:none; opacity:0; }
 @keyframes tune-glow{
   0%,100%{ box-shadow:0 8px 22px rgba(232,122,50,.34); }
   50%{ box-shadow:0 10px 30px rgba(232,122,50,.62); }
@@ -1292,10 +1298,10 @@ body.in-frame .worlds-rail{ opacity:0; pointer-events:none; }
      Chaves localStorage antigas en_tour/en_gy/en_gx ficam órfãs — inofensivas. */
 
   /* Capa do Rádio: deixa o vídeo mais lento SEM reexportar o arquivo.
-     0.7 = 10s viram ~14,3s. Só mudar RV_RATE p/ calibrar (menor = mais lento). */
+     0.5 = 10s viram ~20s. Só mudar RV_RATE p/ calibrar (menor = mais lento). */
   var radioVid=document.querySelector('.radio-video');
   if(radioVid){
-    var RV_RATE=0.7;
+    var RV_RATE=0.5;
     radioVid.playbackRate=RV_RATE;
     radioVid.addEventListener('loadedmetadata',function(){ radioVid.playbackRate=RV_RATE; });
   }
