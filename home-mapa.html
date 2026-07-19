@@ -308,7 +308,7 @@ h2{ font-size:clamp(2rem,8.2vw,3.4rem); font-weight:200; letter-spacing:-0.03em;
 .radio-cover{ position:relative; overflow:hidden; isolation:isolate;
   background:radial-gradient(ellipse 88% 52% at 50% 72%, #f4e9e1 0%, var(--paper) 68%); }
 .radio-video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; pointer-events:none;
-  transform:translateX(-15px); }   /* cola o vídeo na aba. AJUSTE: mais negativo = mais p/ a esquerda */
+  transform:translateX(-30px); }   /* cola o vídeo na aba (= largura dela). AJUSTE: mais negativo = mais p/ a esquerda */
 /* véu bem leve: não há mais texto escuro p/ proteger (só o botão, que tem contraste
    próprio), então o vídeo aparece quase inteiro. AJUSTE = só este alpha. */
 .radio-cover::after{ content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
@@ -320,13 +320,22 @@ h2{ font-size:clamp(2rem,8.2vw,3.4rem); font-weight:200; letter-spacing:-0.03em;
 
 /* ── ABA lateral roxa: abre o Pequeno Manifesto Tinhoso ── */
 .tinhosa-tab{
-  position:absolute; top:0; right:0; bottom:0; width:15px; z-index:3;
+  position:absolute; top:0; right:0; bottom:0; width:30px; z-index:3;
   background:var(--roxo); border:0; padding:0; cursor:pointer;
   display:flex; align-items:center; justify-content:center;
-  writing-mode:vertical-rl; white-space:nowrap;
-  color:#fff; font-family:var(--font); font-size:8px; font-weight:600;
+  writing-mode:vertical-rl; transform:rotate(180deg);   /* gira: o texto lê de BAIXO p/ CIMA */
+  white-space:nowrap;
+  color:#fff; font-family:var(--font); font-size:10px; font-weight:600;
   letter-spacing:.18em; text-transform:uppercase;
 }
+/* movimento: o texto respira ao longo da aba (convida o toque).
+   Fica no <span> e não no botão p/ não brigar com o rotate(180deg) acima. */
+.tt-txt{ display:block; animation:tin-drift 4.5s var(--ease) infinite; }
+@keyframes tin-drift{
+  0%,100%{ transform:translateY(0); opacity:.82; }
+  50%{ transform:translateY(14px); opacity:1; }
+}
+@media(prefers-reduced-motion:reduce){ .tt-txt{ animation:none; opacity:1; } }
 /* ── TELA do manifesto (sobrepõe a capa; rola por dentro) ── */
 .tinhosa-manifesto{
   position:absolute; inset:0; z-index:6; background:var(--paper);
@@ -1019,7 +1028,7 @@ body.in-frame .worlds-rail{ opacity:0; pointer-events:none; }
       </div>
 
       <!-- aba lateral: abre o manifesto -->
-      <button class="tinhosa-tab" id="tinhosaTab" aria-label="Abrir o Pequeno manifesto Tinhoso">Pequeno manifesto Tinhoso</button>
+      <button class="tinhosa-tab" id="tinhosaTab" aria-label="Abrir o Pequeno manifesto Tinhoso"><span class="tt-txt">Pequeno manifesto Tinhoso</span></button>
 
       <!-- tela do Pequeno Manifesto Tinhoso -->
       <div class="tinhosa-manifesto" id="tinhosaManifesto" aria-hidden="true">
