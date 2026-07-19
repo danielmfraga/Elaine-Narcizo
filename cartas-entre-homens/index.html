@@ -7,132 +7,291 @@
 <meta name="description" content="Tudo Quer Viver — uma experiência de troca de cartas entre homens, mantida pela escrita." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..440&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Homemade+Apple&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..440&family=Special+Elite&display=swap" rel="stylesheet">
 <script>if(window!==window.top)document.documentElement.classList.add('embedded');</script>
 <style>
   /* embutida na home-mapa (Bilheteria): contém o overscroll — não vaza pro stage pai */
   html.embedded,html.embedded body{ overscroll-behavior-y:contain; }
   /* ═══════════════════════════════════════════════════════════
-     CARTAS ENTRE HOMENS · "Tudo Quer Viver" — ESBOÇO (jul/2026)
-     Tom: epistolar, íntimo, discreto. Papel de carta + tinta.
-     Segue a lógica técnica da área DançaDestino (pasta própria,
-     scroller interno com scroll-snap, embutível por iframe),
-     mas com identidade própria — o avesso da colagem/energia.
+     CARTAS ENTRE HOMENS · "Tudo Quer Viver" — CONCEPÇÃO v1 (jul/2026)
+     Linguagem: MESA DE ARQUIVO (moodboard do Daniel) — papéis com grão,
+     fita adesiva datilografada, verso de postal, clipe, caligrafia de
+     tinteiro, numeração de edição. Sem fotos: a discrição é o material.
+     Tipos: Special Elite (máquina) · Homemade Apple (tinteiro) · Newsreader (corpo).
+     Nota: glifos ã/õ em fonte manuscrita variam — os textos à mão preferem evitá-los.
      ═══════════════════════════════════════════════════════════ */
   :root{
-    --paper:#F4EEE3;        /* creme quente — papel de carta */
-    --ink:#252017;          /* tinta quase-preta, quente */
-    --ink-soft:#4C453A;
-    --mute:#978C79;
-    --line:#DDD2BF;
+    --mesa:#E5E2DB;         /* a mesa: cinza-quente de galeria */
+    --paper:#F8F5EE;        /* papel branco-osso */
+    --paper2:#F2EDE0;       /* papel creme */
+    --kraft:#E9E3D3;
+    --ink:#2A2620;          /* tinta quase-preta, quente */
+    --ink-soft:#4C463C;
+    --mute:#93897A;
+    --line:#D8D2C4;
     --tinta:#39496A;        /* azul de caneta-tinteiro — acento */
+    --type:"Special Elite",Courier,monospace;
+    --hand:"Homemade Apple",cursive;
     --serif:"Newsreader",Georgia,serif;
-    --sans:"DM Sans",-apple-system,BlinkMacSystemFont,sans-serif;
     --ease:cubic-bezier(.2,.7,.25,1);
+    --shadow:0 12px 28px rgba(42,38,32,.12), 0 2px 8px rgba(42,38,32,.07);
   }
   *{ margin:0; padding:0; box-sizing:border-box; }
   html,body{ height:100%; }
-  body{ background:var(--paper); color:var(--ink); font-family:var(--sans);
+  body{ background:var(--mesa); color:var(--ink); font-family:var(--serif);
     -webkit-font-smoothing:antialiased; overflow:hidden; }
-  em{ font-family:var(--serif); font-style:italic; font-weight:400; }
+
+  /* grão de papel sobre tudo (feTurbulence embutido — sem rede) */
+  body::after{ content:''; position:fixed; inset:0; z-index:60; pointer-events:none; opacity:.05;
+    background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"); }
 
   /* scroller interno: viewport estável (barra do Safari não recolhe) → snap liso */
   .wrap{ height:100vh; height:100svh; height:100dvh; overflow-y:auto; -webkit-overflow-scrolling:touch;
     scroll-snap-type:y mandatory; overscroll-behavior-y:contain; max-width:560px; margin:0 auto;
-    background:repeating-linear-gradient(0deg, transparent 0 37px, rgba(57,47,32,.035) 37px 38px);
     scrollbar-width:none; }
   .wrap::-webkit-scrollbar{ display:none; }
 
   .tela{ position:relative; min-height:100svh; scroll-snap-align:start; scroll-snap-stop:always;
-    display:flex; flex-direction:column; justify-content:center;
-    padding:clamp(44px,9vh,88px) clamp(28px,7vw,56px); }
+    display:flex; flex-direction:column; justify-content:center; align-items:center;
+    padding:clamp(40px,8vh,80px) clamp(22px,6vw,48px); }
 
-  .eyebrow{ font-size:11px; font-weight:500; letter-spacing:.22em; text-transform:uppercase; color:var(--mute);
-    display:inline-flex; align-items:center; gap:11px; margin-bottom:24px; }
-  .eyebrow::before{ content:""; width:26px; height:1px; background:var(--tinta); flex-shrink:0; }
+  /* rótulo datilografado fora da peça */
+  .cap{ font-family:var(--type); font-size:10px; letter-spacing:.34em; text-transform:uppercase;
+    color:var(--mute); }
 
-  h1{ font-family:var(--serif); font-weight:400; font-size:clamp(2.9rem,13vw,4.6rem); line-height:.98; letter-spacing:-.015em; }
-  h2{ font-family:var(--serif); font-weight:400; font-size:clamp(1.95rem,7.6vw,2.9rem); line-height:1.04; letter-spacing:-.01em; max-width:16ch; }
-  p.txt{ font-size:clamp(1rem,3.6vw,1.1rem); font-weight:300; line-height:1.72; color:var(--ink-soft); max-width:34ch; margin-top:18px; }
+  /* corpo de carta */
+  .body{ font-family:var(--serif); font-weight:300; font-size:clamp(.98rem,3.5vw,1.08rem);
+    line-height:1.7; color:var(--ink-soft); }
+  .type{ font-family:var(--type); line-height:1.5; color:var(--ink); }
+  .hand{ font-family:var(--hand); color:var(--tinta); line-height:1.9; }
 
-  /* citação da capa */
-  .quote{ font-family:var(--serif); font-style:italic; font-weight:300; font-size:clamp(1.18rem,4.6vw,1.44rem); line-height:1.5; color:var(--ink); max-width:27ch; margin-top:28px; }
-  .quote cite{ display:block; font-style:normal; font-family:var(--sans); font-size:.76rem; letter-spacing:.08em; text-transform:uppercase; color:var(--mute); margin-top:14px; }
+  /* revelação ao chegar (rotação persiste depois do reveal) */
+  .rv{ opacity:0; transform:translateY(22px) rotate(var(--rot,0deg));
+    transition:opacity .7s var(--ease), transform .75s var(--ease); transition-delay:var(--d,0s); }
+  .in .rv{ opacity:1; transform:translateY(0) rotate(var(--rot,0deg)); }
+  @media (prefers-reduced-motion:reduce){ .rv{ opacity:1; transform:rotate(var(--rot,0deg)); } }
 
-  .num{ font-family:var(--serif); font-size:.92rem; color:var(--tinta); letter-spacing:.08em; margin-bottom:16px; }
+  .sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
 
-  /* dica de rolar (só na capa) */
-  .hint{ position:absolute; left:0; right:0; bottom:28px; text-align:center; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--mute); }
-  .hint b{ display:block; font-weight:400; font-size:16px; margin-top:7px; animation:bob 1.9s var(--ease) infinite; }
+  /* ── CAPA: tiras de fita datilografadas ── */
+  .strips{ width:100%; display:flex; flex-direction:column; gap:clamp(14px,2.6vh,24px); }
+  .strip{ align-self:flex-start; font-family:var(--type); font-size:clamp(1.6rem,7.4vw,2.4rem);
+    letter-spacing:.3em; text-transform:uppercase; color:var(--ink-soft); white-space:nowrap;
+    padding:.5em .9em .42em 1.05em;
+    background:linear-gradient(180deg, rgba(249,245,233,.96), rgba(238,231,213,.92));
+    box-shadow:0 3px 9px rgba(42,38,32,.14), inset 0 0 16px rgba(255,255,255,.5);
+    clip-path:polygon(1.2% 0, 99.4% 3%, 100% 97%, .4% 100%);
+  }
+  .strip.s2{ align-self:center; }
+  .strip.s3{ align-self:flex-start; margin-left:14%; }
+  .strip.small{ align-self:flex-end; font-size:clamp(.62rem,2.6vw,.78rem); letter-spacing:.22em;
+    color:var(--mute); padding:.7em 1.2em .6em; }
+  .ed{ margin-top:clamp(26px,5vh,44px); align-self:flex-end; font-size:clamp(.95rem,3.8vw,1.1rem);
+    transform:rotate(-2deg); }
+  .capa .hint{ position:absolute; left:0; right:0; bottom:24px; text-align:center;
+    font-family:var(--type); font-size:10px; letter-spacing:.3em; text-transform:uppercase; color:var(--mute); }
+  .capa .hint b{ display:block; font-weight:400; font-size:15px; margin-top:6px; animation:bob 1.9s var(--ease) infinite; }
   @keyframes bob{ 0%,100%{ transform:translateY(0); opacity:.5; } 50%{ transform:translateY(6px); opacity:1; } }
 
-  .btn{ display:inline-flex; align-items:center; gap:9px; align-self:flex-start;
-    font-size:12px; font-weight:500; letter-spacing:.12em; text-transform:uppercase; cursor:pointer;
-    color:var(--paper); background:var(--tinta); padding:14px 24px; border-radius:26px; margin-top:28px; text-decoration:none; border:0; transition:gap .28s var(--ease); }
-  .btn:hover{ gap:14px; }
-  .btn.ghost{ background:none; color:var(--ink); border:1px solid var(--line); }
+  /* ── PEÇAS DE PAPEL (base) ── */
+  .piece{ position:relative; width:100%; background:var(--paper); box-shadow:var(--shadow); }
 
-  .foot{ margin-top:auto; padding-top:12vh; }
-  .fim{ font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--mute); margin-bottom:16px; }
+  /* fita adesiva nos cantos */
+  .tp{ position:absolute; width:74px; height:24px; opacity:.85;
+    background:linear-gradient(180deg, rgba(246,241,227,.9), rgba(236,229,210,.85));
+    box-shadow:0 2px 4px rgba(42,38,32,.10); clip-path:polygon(2% 0,98% 6%,100% 94%,0 100%); }
+  .tp.tl{ top:-10px; left:-18px; transform:rotate(-44deg); }
+  .tp.tr{ top:-10px; right:-18px; transform:rotate(44deg); }
 
-  /* revelação ao chegar */
-  .rv{ opacity:0; transform:translateY(20px); transition:opacity .7s var(--ease), transform .7s var(--ease); transition-delay:var(--d,0s); }
-  .in .rv{ opacity:1; transform:none; }
-  @media (prefers-reduced-motion:reduce){ .rv{ opacity:1; transform:none; } .hint b{ animation:none; } }
+  /* ── 01 · CARTÃO-LEMBRETE com clipe ── */
+  .note{ padding:clamp(30px,7vw,48px) clamp(24px,6vw,44px) clamp(34px,7vw,50px); text-align:center;
+    overflow:hidden; }
+  .note .clipsvg{ position:absolute; top:-16px; left:50%; transform:translateX(-50%); width:52px; }
+  .note .cap{ display:block; margin-bottom:22px; }
+  .note .t1{ font-size:clamp(1.12rem,4.6vw,1.4rem); max-width:17ch; margin:0 auto 18px; }
+  .note .body{ max-width:30ch; margin:0 auto; }
+  .note .body + .body{ margin-top:14px; }
+  .note .ghost{ position:absolute; left:-4%; bottom:-6%; font-family:var(--hand); font-size:3rem;
+    color:var(--tinta); opacity:.09; transform:rotate(-7deg); white-space:nowrap; pointer-events:none; }
+
+  /* ── 02 · FOLHA RASGADA sobre página pautada ── */
+  .sheet{ width:100%; background:var(--paper2); box-shadow:var(--shadow);
+    padding:clamp(28px,7vw,46px) clamp(20px,5vw,36px) clamp(24px,6vw,40px);
+    background-image:
+      repeating-linear-gradient(90deg, transparent 0 25px, rgba(57,73,106,.05) 25px 26px),
+      repeating-linear-gradient(0deg, transparent 0 29px, rgba(42,38,32,.055) 29px 30px);
+  }
+  .torn{ background:var(--paper); box-shadow:0 8px 18px rgba(42,38,32,.10);
+    padding:clamp(24px,6vw,38px) clamp(20px,5vw,34px) clamp(30px,7vw,44px); transform:rotate(-.8deg);
+    clip-path:polygon(0 0,100% 0,100% 93%,96% 97%,91% 93%,85% 98%,79% 94%,72% 98%,65% 94%,58% 98%,51% 93%,44% 97%,37% 93%,30% 98%,23% 94%,16% 97%,9% 93%,4% 97%,0 93%);
+  }
+  .torn .cap{ display:block; margin-bottom:18px; }
+  .torn .t1{ font-size:clamp(1.05rem,4.3vw,1.3rem); margin-bottom:16px; max-width:20ch; }
+  .circ{ position:relative; display:inline-block; }
+  .circ::after{ content:''; position:absolute; inset:-5px -13px -7px; border:1.5px solid var(--tinta);
+    border-radius:48% 52% 55% 45%/58% 46% 54% 42%; transform:rotate(-3deg); opacity:.7; }
+  .margin-note{ display:flex; align-items:flex-end; gap:8px; justify-content:flex-end;
+    margin-top:20px; padding-right:6px; font-size:clamp(.92rem,3.7vw,1.05rem); transform:rotate(-2deg); }
+  .margin-note svg{ width:34px; flex-shrink:0; margin-bottom:8px; color:var(--tinta); }
+
+  /* ── 03 · VERSO DE POSTAL ── */
+  .postcard{ padding:clamp(20px,5vw,32px) clamp(18px,4.6vw,30px) clamp(22px,5vw,32px); --rot:.6deg; }
+  .pc-head{ font-family:var(--type); text-align:center; font-size:clamp(.8rem,3.4vw,1rem);
+    letter-spacing:.58em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:6px; }
+  .pc-head::after{ content:''; display:block; width:38px; height:1px; background:var(--ink-soft);
+    opacity:.5; margin:10px auto 0; }
+  .pc-grid{ display:grid; grid-template-columns:1.06fr 1fr; min-height:340px; }
+  .pc-left{ padding:18px 16px 8px 2px; }
+  .pc-left .body{ font-size:clamp(.82rem,3.2vw,.94rem); line-height:1.68; }
+  .pc-left .body + .body{ margin-top:12px; }
+  .pc-right{ border-left:1px solid rgba(42,38,32,.28); padding:12px 2px 8px 16px;
+    display:flex; flex-direction:column; }
+  .stamp{ align-self:flex-end; width:62px; height:74px; border:1px dashed rgba(42,38,32,.4);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+    font-family:var(--type); font-size:8px; letter-spacing:.16em; color:var(--mute);
+    text-transform:uppercase; transform:rotate(1.6deg); }
+  .stamp b{ font-weight:400; font-size:13px; color:var(--ink-soft); }
+  .pc-cancel{ align-self:flex-end; width:56px; margin:6px 4px 0 0; color:var(--mute); opacity:.75; }
+  .pc-hand{ font-size:clamp(1.05rem,4.4vw,1.3rem); margin:14px 0 0 2px; transform:rotate(-2.5deg); }
+  .pc-addr{ margin-top:auto; padding:0 4px 6px 2px; }
+  .pc-addr i{ display:block; height:1px; background:rgba(42,38,32,.24); margin-top:27px; }
+  .pc-tag{ margin-top:18px; text-align:center; }
+
+  /* ── 04 · ENVELOPE fechado ── */
+  .env-scene{ width:100%; display:flex; flex-direction:column; align-items:center; }
+  .envelope{ position:relative; width:min(82%,320px); aspect-ratio:8/5; background:var(--paper2);
+    box-shadow:var(--shadow); --rot:-1.6deg; }
+  .envelope::before{ content:''; position:absolute; left:0; right:0; top:0; height:56%;
+    background:var(--kraft); clip-path:polygon(0 0,100% 0,50% 100%);
+    box-shadow:0 3px 6px rgba(42,38,32,.06); }
+  .env-to{ position:absolute; left:10%; bottom:9%; font-size:clamp(.98rem,4vw,1.15rem);
+    transform:rotate(-1.4deg); }
+  .seal{ position:absolute; right:-16px; bottom:-16px; border:2px solid var(--tinta); color:var(--tinta);
+    border-radius:50%; width:96px; height:96px; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:2px; text-align:center;
+    font-family:var(--type); font-size:9px; letter-spacing:.2em; text-transform:uppercase;
+    background:rgba(248,245,238,.72); transform:rotate(-9deg); opacity:.92; }
+  .seal b{ font-weight:400; font-size:11px; }
+  .env-txt{ margin-top:clamp(30px,6vh,48px); text-align:center; }
+  .env-txt .cap{ display:block; margin-bottom:16px; }
+  .env-txt .t1{ font-size:clamp(1.05rem,4.4vw,1.32rem); margin-bottom:14px; }
+  .env-txt .body{ max-width:32ch; margin:0 auto; }
+
+  /* ── 05 · PARTICIPAR ── */
+  .join{ text-align:center; display:flex; flex-direction:column; align-items:center; }
+  .join .cap{ margin-bottom:20px; }
+  .join .t1{ font-size:clamp(1.3rem,5.6vw,1.7rem); margin-bottom:14px; }
+  .join .body{ max-width:30ch; }
+  .join .nr{ margin-top:26px; font-size:clamp(1.05rem,4.4vw,1.3rem); transform:rotate(-2deg); }
+  .join .nr u{ text-decoration:none; border-bottom:1.5px solid var(--tinta); padding:0 20px; }
+  .btn-seal{ display:inline-block; margin-top:26px; padding:15px 24px 13px;
+    font-family:var(--type); font-size:11px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--tinta); background:rgba(255,255,255,.55); border:1.5px dashed var(--tinta);
+    text-decoration:none; transform:rotate(-.6deg); transition:background .3s var(--ease); }
+  .btn-seal:hover{ background:#fff; }
+  .ps{ margin-top:clamp(34px,7vh,56px); max-width:30ch; font-style:italic; font-weight:300;
+    font-size:clamp(.95rem,3.8vw,1.06rem); line-height:1.6; color:var(--ink-soft); }
+  .ps .hand{ font-style:normal; font-size:1.05em; margin-right:6px; }
+  .ps cite{ display:block; font-style:normal; font-family:var(--type); font-size:9px;
+    letter-spacing:.26em; text-transform:uppercase; color:var(--mute); margin-top:12px; }
+  .fim{ margin-top:clamp(26px,5vh,40px); font-family:var(--type); font-size:9px;
+    letter-spacing:.34em; text-transform:uppercase; color:var(--mute); }
 </style>
 </head>
 <body>
   <div class="wrap" id="wrap">
 
-    <!-- CAPA -->
-    <section class="tela in">
-      <span class="eyebrow rv">Cartas entre homens</span>
-      <h1 class="rv" style="--d:.06s">Tudo Quer <em>Viver</em></h1>
-      <blockquote class="quote rv" style="--d:.14s">
-        “Enviar uma carta é um bom meio de ir a algum lugar sem mover nada a não ser o coração.”
-        <cite>Phillis Theroux</cite>
-      </blockquote>
+    <!-- CAPA · tiras de fita -->
+    <section class="tela capa in">
+      <h1 class="sr">Tudo Quer Viver — cartas entre homens</h1>
+      <div class="strips" aria-hidden="true">
+        <span class="strip rv" style="--rot:-1.6deg">Tudo</span>
+        <span class="strip s2 rv" style="--rot:1.1deg;--d:.09s">Quer</span>
+        <span class="strip s3 rv" style="--rot:-.7deg;--d:.18s">Viver</span>
+        <span class="strip small rv" style="--rot:1.4deg;--d:.3s">correspondência entre homens · só pela escrita</span>
+      </div>
+      <p class="ed hand rv" style="--d:.42s">n&ordm; 001 — primeiras cartas</p>
       <div class="hint">role<b>⌄</b></div>
     </section>
 
-    <!-- 01 · O PROJETO -->
+    <!-- 01 · O PROJETO — cartão-lembrete com clipe -->
     <section class="tela">
-      <span class="num rv">01 · O projeto</span>
-      <h2 class="rv" style="--d:.05s">Um contato feito <em>só de escrita</em>.</h2>
-      <p class="txt rv" style="--d:.12s">Uma experiência de troca de cartas entre homens que não se conhecem — mantendo contato exclusivamente por meio da escrita.</p>
-      <p class="txt rv" style="--d:.18s">A mediação é simples e direta: a coordenação apenas conecta os participantes, organiza os pares e facilita o início da correspondência.</p>
+      <article class="piece note rv" style="--rot:-.9deg">
+        <svg class="clipsvg" viewBox="0 0 56 36" aria-hidden="true">
+          <path d="M10 32 V13 Q10 5 18 5 H38 Q46 5 46 13 V32" fill="none" stroke="#6E675C" stroke-width="4.6" stroke-linecap="round"/>
+          <rect x="4" y="27" width="48" height="9" rx="1.6" fill="#4A443B"/>
+        </svg>
+        <span class="cap">o projeto</span>
+        <p class="type t1">Um contato feito só de escrita.</p>
+        <p class="body">Uma experiência de troca de cartas entre homens que não se conhecem — mantendo contato exclusivamente por meio da escrita.</p>
+        <p class="body">A mediação é simples e direta: a coordenação apenas conecta os participantes, organiza os pares e facilita o início da correspondência.</p>
+        <span class="ghost" aria-hidden="true">tudo quer viver</span>
+      </article>
     </section>
 
-    <!-- 02 · OBJETIVO -->
+    <!-- 02 · OBJETIVO — folha rasgada na página pautada -->
     <section class="tela">
-      <span class="num rv">02 · Objetivo</span>
-      <h2 class="rv" style="--d:.05s">Um espaço de <em>escuta</em> e de aprendizagem.</h2>
-      <p class="txt rv" style="--d:.12s">Explorar uma forma de relação pouco comum na cultura masculina — favorecendo a expressão de si e a abertura ao outro por meio da escrita epistolar.</p>
+      <article class="sheet rv" style="--rot:.5deg">
+        <div class="torn">
+          <span class="cap">objetivo</span>
+          <p class="type t1">Um espaço de <span class="circ">escuta</span> e de aprendizagem.</p>
+          <p class="body">Explorar uma forma de relação pouco comum na cultura masculina — favorecendo a expressão de si e a abertura ao outro por meio da escrita epistolar.</p>
+        </div>
+        <p class="margin-note hand rv" style="--d:.25s">nem tudo precisa ser dito em voz alta
+          <svg viewBox="0 0 40 30" aria-hidden="true"><path d="M3 5 C14 21 23 25 33 19 M33 19 l-7.5 -.8 M33 19 l-3.4 6.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </p>
+      </article>
     </section>
 
-    <!-- 03 · COMO FUNCIONA -->
+    <!-- 03 · COMO FUNCIONA — verso de postal -->
     <section class="tela">
-      <span class="num rv">03 · Como funciona</span>
-      <h2 class="rv" style="--d:.05s">Aberto, contínuo, <em>sem fim marcado</em>.</h2>
-      <p class="txt rv" style="--d:.12s">A entrada pode ser feita a qualquer momento — assim como a indicação de novos participantes ou a sugestão de grupos. A coordenação faz o contato direto e as articulações necessárias.</p>
-      <p class="txt rv" style="--d:.18s">Um projeto perene: sem ciclos fechados, sem prazos de encerramento.</p>
+      <article class="piece postcard rv">
+        <span class="tp tl" aria-hidden="true"></span>
+        <header class="pc-head">Post&nbsp;Card</header>
+        <div class="pc-grid">
+          <div class="pc-left">
+            <p class="body">A entrada pode ser feita a qualquer momento — assim como a indicação de novos participantes ou a sugestão de grupos.</p>
+            <p class="body">A coordenação faz o contato direto e as articulações necessárias.</p>
+            <p class="body">Um projeto perene: sem ciclos fechados, sem prazos de encerramento.</p>
+          </div>
+          <div class="pc-right">
+            <div class="stamp"><b>TQV</b>correio<br>de papel</div>
+            <svg class="pc-cancel" viewBox="0 0 60 24" aria-hidden="true"><path d="M2 4 q8 6 16 0 t16 0 t16 0 M2 12 q8 6 16 0 t16 0 t16 0 M2 20 q8 6 16 0 t16 0 t16 0" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+            <p class="hand pc-hand">sem pressa.<br>cont&iacute;nuo.<br>em aberto.</p>
+            <div class="pc-addr" aria-hidden="true"><i></i><i></i><i></i></div>
+          </div>
+        </div>
+      </article>
+      <span class="cap pc-tag rv" style="--d:.2s">— como funciona —</span>
     </section>
 
-    <!-- 04 · DISCRIÇÃO -->
+    <!-- 04 · DISCRIÇÃO — envelope fechado -->
     <section class="tela">
-      <span class="num rv">04 · Discrição</span>
-      <h2 class="rv" style="--d:.05s">A privacidade é <em>parte da proposta</em>.</h2>
-      <p class="txt rv" style="--d:.12s">Não há divulgação pública dos nomes envolvidos, nem publicidade sobre os participantes ou as correspondências. O processo preserva a privacidade como fundamento.</p>
+      <div class="env-scene">
+        <div class="envelope rv">
+          <p class="env-to hand">para quem chegar</p>
+          <span class="seal"><b>entre nós</b>discri&ccedil;&atilde;o<br>garantida</span>
+        </div>
+        <div class="env-txt rv" style="--d:.18s">
+          <span class="cap">discrição</span>
+          <p class="type t1">A privacidade é parte da proposta.</p>
+          <p class="body">Não há divulgação pública dos nomes envolvidos, nem publicidade sobre os participantes ou as correspondências. O processo preserva a privacidade como fundamento.</p>
+        </div>
+      </div>
     </section>
 
-    <!-- PARTICIPAR / FIM -->
+    <!-- 05 · PARTICIPAR -->
     <section class="tela">
-      <span class="eyebrow rv">Participar</span>
-      <h2 class="rv" style="--d:.05s">Quer <em>entrar na troca</em>?</h2>
-      <p class="txt rv" style="--d:.12s">A qualquer momento. Fale com a coordenação e a gente organiza os pares.</p>
-      <a class="btn rv" style="--d:.18s" href="#" data-cta>Falar com a coordenação →</a>
-      <div class="foot">
-        <p class="fim rv">fim · Tudo Quer Viver</p>
+      <div class="join">
+        <span class="cap rv">participar</span>
+        <p class="type t1 rv" style="--d:.06s">Quer entrar na troca?</p>
+        <p class="body rv" style="--d:.12s">A qualquer momento. Fale com a coordenação e a gente organiza os pares.</p>
+        <p class="nr hand rv" style="--d:.18s">n&ordm; <u>&nbsp;</u> / em aberto</p>
+        <a class="btn-seal rv" style="--d:.24s" href="#" data-cta>Falar com a coordena&ccedil;&atilde;o &rarr;</a>
+        <p class="ps rv" style="--d:.32s"><span class="hand">P.S. —</span>“Enviar uma carta é um bom meio de ir a algum lugar sem mover nada a não ser o coração.”
+          <cite>Phillis Theroux</cite>
+        </p>
+        <p class="fim rv" style="--d:.4s">fim · tudo quer viver</p>
       </div>
     </section>
 
