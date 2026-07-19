@@ -324,6 +324,9 @@ h2{ font-size:clamp(2rem,8.2vw,3.4rem); font-weight:200; letter-spacing:-0.03em;
   background:var(--roxo); border:0; padding:0; cursor:pointer;
   display:flex; align-items:center; justify-content:center;
   writing-mode:vertical-rl; transform:rotate(180deg);   /* gira: o texto lê de BAIXO p/ CIMA */
+  /* sombrinha caindo sobre o vídeo. x POSITIVO de propósito: o rotate(180deg)
+     acima inverte o eixo, então na tela ela aparece p/ a ESQUERDA. */
+  box-shadow:5px 0 16px rgba(0,0,0,.20);
   white-space:nowrap;
   color:#fff; font-family:var(--font); font-size:10px; font-weight:600;
   letter-spacing:.18em; text-transform:uppercase;
@@ -712,9 +715,12 @@ body.frame-danca .bar .track{ visibility:hidden; }
 .js .panel.is-in .r{ opacity:1; transform:none; }
 
 /* ── NAV: trilha de mundos (direita) ── */
+/* NAVEGAÇÃO LATERAL REMOVIDA a pedido (era display:flex). Trocar de seção segue
+   pelo menu ☰ e pelo scroll vertical; as bolinhas do rodapé seguem indicando painel. */
 .worlds-rail{
+  display:none;
   position:fixed; right:12px; top:50%; transform:translateY(-50%); z-index:55;
-  display:flex; flex-direction:column; gap:8px; align-items:center;
+  flex-direction:column; gap:8px; align-items:center;
 }
 .worlds-rail i{ display:block; width:6px; height:6px; border-radius:50%; background:rgba(10,10,10,0.16); cursor:pointer; transition:height var(--dur) var(--ease), background var(--dur); }
 .worlds-rail i.on{ height:18px; border-radius:3px; background:var(--ink); }
@@ -778,7 +784,7 @@ body.in-frame .worlds-rail{ opacity:0; pointer-events:none; }
 .nav-arrow:hover{ background:var(--warm); border-color:var(--ink); }
 .nav-arrow.up{ top:calc(var(--bar-top) + 12px); }
 .nav-arrow.down{ bottom:54px; }
-@media(min-width:900px){ .nav-arrow{ display:flex; } .worlds-rail{ right:64px; } }
+/* (era aqui que as setas ↑↓ apareciam no desktop — removidas junto com o trilho) */
 @media(prefers-reduced-motion:reduce){ *{ animation:none!important; } .r{ opacity:1!important; transform:none!important; } .stage{ scroll-behavior:auto!important; } }
 </style>
 </head>
