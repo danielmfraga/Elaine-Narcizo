@@ -86,9 +86,17 @@
     transition:opacity .7s var(--ease), translate .75s var(--ease); transition-delay:var(--d,0s); }
   .in .rv{ opacity:1; translate:0 0; }
 
-  /* deriva: os papéis respiram sobre a mesa (amplitude mínima, bem lento) */
+  /* deriva: os papéis respiram sobre a mesa. --amp = altura, --sway = balanço */
   .drift{ animation:drift var(--fd,9s) ease-in-out var(--fdl,0s) infinite alternate; }
-  @keyframes drift{ from{ transform:translateY(0); } to{ transform:translateY(-6px); } }
+  @keyframes drift{
+    from{ transform:translateY(0) rotate(0deg); }
+    to{ transform:translateY(calc(var(--amp,6px) * -1)) rotate(var(--sway,.3deg)); } }
+
+  /* pêndulo: o papel PENDE do clipe (origem no alto, onde o clipe segura) */
+  .swing{ transform-origin:50% -2%; animation:swing var(--fd,7.5s) ease-in-out var(--fdl,0s) infinite alternate; }
+  @keyframes swing{
+    from{ transform:rotate(-.5deg) translateY(0); }
+    to{ transform:rotate(.5deg) translateY(-3px); } }
 
   /* caligrafia que SE ESCREVE ao chegar (revela da esquerda p/ a direita;
      folgas verticais generosas p/ as hastes enormes da Homemade Apple) */
@@ -105,7 +113,8 @@
 
   /* ── CAPA: tiras de fita datilografadas ── */
   .strips{ width:100%; display:flex; flex-direction:column; gap:clamp(14px,2.6vh,24px); }
-  .strip{ align-self:flex-start; font-family:var(--type); font-size:clamp(1.6rem,7.4vw,2.4rem);
+  .strip{ --amp:9px; --sway:.55deg;   /* capa: deriva um pouco mais viva que as demais peças */
+    align-self:flex-start; font-family:var(--type); font-size:clamp(1.6rem,7.4vw,2.4rem);
     letter-spacing:.3em; text-transform:uppercase; color:var(--ink-soft); white-space:nowrap;
     padding:.5em .9em .42em 1.05em;
     background:linear-gradient(180deg, rgba(249,245,233,.96), rgba(238,231,213,.92));
@@ -114,8 +123,12 @@
   }
   .strip.s2{ align-self:center; }
   .strip.s3{ align-self:flex-start; margin-left:14%; }
-  .strip.small{ align-self:flex-end; font-size:clamp(.62rem,2.6vw,.78rem); letter-spacing:.22em;
-    color:var(--mute); padding:.7em 1.2em .6em; }
+  /* tira de apoio: centralizada e com quebra de linha — com nowrap ela ficava
+     mais larga que a tela e, alinhada à direita, vazava cortando o "c" inicial */
+  .strip.small{ align-self:center; text-align:center; white-space:normal;
+    max-width:min(100%,32ch); line-height:1.75;
+    font-size:clamp(.6rem,2.5vw,.75rem); letter-spacing:.2em;
+    color:var(--mute); padding:.75em 1.3em .65em; }
   .ed{ margin-top:clamp(26px,5vh,44px); align-self:flex-end; font-size:clamp(.95rem,3.8vw,1.1rem);
     transform:rotate(-2deg); }
   .capa .hint{ position:absolute; left:0; right:0; bottom:24px; text-align:center;
@@ -159,9 +172,16 @@
   }
   .torn .cap{ display:block; margin-bottom:18px; }
   .torn .t1{ font-size:clamp(1.05rem,4.3vw,1.3rem); margin-bottom:16px; max-width:20ch; }
+  /* "escuta" circulada: o traço SE DESENHA ao chegar (stroke-dashoffset).
+     vector-effect mantém a espessura uniforme mesmo com o SVG esticado. */
   .circ{ position:relative; display:inline-block; }
-  .circ::after{ content:''; position:absolute; inset:-5px -13px -7px; border:1.5px solid var(--tinta);
-    border-radius:48% 52% 55% 45%/58% 46% 54% 42%; transform:rotate(-3deg); opacity:.7; }
+  .circ svg{ position:absolute; left:-8%; top:-26%; width:116%; height:156%;
+    overflow:visible; color:var(--tinta); pointer-events:none; }
+  .circ svg path{ fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round;
+    opacity:.75; stroke-dasharray:340; stroke-dashoffset:340;
+    transition:stroke-dashoffset 1.2s cubic-bezier(.35,.6,.4,1); transition-delay:var(--cd,.75s); }
+  .in .circ svg path{ stroke-dashoffset:0; }
+  @media (prefers-reduced-motion:reduce){ .circ svg path{ stroke-dashoffset:0; transition:none; } }
   .margin-note{ display:flex; align-items:flex-end; gap:8px; justify-content:flex-end;
     margin-top:20px; padding-right:6px; font-size:clamp(.92rem,3.7vw,1.05rem); transform:rotate(-2deg); }
   .margin-note svg{ width:34px; flex-shrink:0; margin-bottom:8px; color:var(--tinta); }
@@ -216,11 +236,19 @@
   .join .body{ max-width:30ch; }
   .join .nr{ margin-top:26px; font-size:clamp(1.05rem,4.4vw,1.3rem); transform:rotate(-2deg); }
   .join .nr u{ text-decoration:none; border-bottom:1.5px solid var(--tinta); padding:0 20px; }
-  .btn-seal{ display:inline-block; margin-top:26px; padding:15px 24px 13px;
+  .btn-seal{ position:relative; display:inline-block; margin-top:26px; padding:15px 24px 13px;
     font-family:var(--type); font-size:11px; letter-spacing:.22em; text-transform:uppercase;
     color:var(--tinta); background:rgba(255,255,255,.55); border:1.5px dashed var(--tinta);
     text-decoration:none; transition:background .3s var(--ease); }   /* rotação via --rot inline (transform livre p/ o drift) */
   .btn-seal:hover{ background:#fff; }
+  /* halo de carimbo: um anel tracejado pulsa saindo do botão (efeito de "carimbar").
+     Vai no ::after porque o transform do próprio botão já é usado pela deriva. */
+  .btn-seal::after{ content:''; position:absolute; inset:-7px; border:1px dashed var(--tinta);
+    opacity:0; pointer-events:none; animation:seal-halo 3.2s ease-out infinite; }
+  @keyframes seal-halo{
+    0%{ transform:scale(.94); opacity:.5; }
+    70%,100%{ transform:scale(1.12); opacity:0; } }
+  @media (prefers-reduced-motion:reduce){ .btn-seal::after{ animation:none; } }
   .ps{ margin-top:clamp(34px,7vh,56px); max-width:30ch; font-style:italic; font-weight:300;
     font-size:clamp(.95rem,3.8vw,1.06rem); line-height:1.6; color:var(--ink-soft); }
   .ps .hand{ display:inline-block; font-style:normal; font-size:1.05em; margin-right:6px; }   /* inline-block: clip-path do .write precisa de caixa */
@@ -248,7 +276,7 @@
 
     <!-- 01 · O PROJETO — cartão-lembrete com clipe -->
     <section class="tela">
-      <article class="piece note rv drift" style="--rot:-.9deg;--fd:9.2s">
+      <article class="piece note rv swing" style="--rot:-.9deg;--fd:7.8s">
         <svg class="clipsvg" viewBox="0 0 56 36" aria-hidden="true">
           <path d="M10 32 V13 Q10 5 18 5 H38 Q46 5 46 13 V32" fill="none" stroke="#6E675C" stroke-width="4.6" stroke-linecap="round"/>
           <rect x="4" y="27" width="48" height="9" rx="1.6" fill="#4A443B"/>
@@ -266,7 +294,7 @@
       <article class="sheet rv drift" style="--rot:.5deg;--fd:10.4s;--fdl:-4.4s">
         <div class="torn">
           <span class="cap">objetivo</span>
-          <p class="type t1">Um espaço de <span class="circ">escuta</span> e de aprendizagem.</p>
+          <p class="type t1">Um espaço de <span class="circ">escuta<svg viewBox="0 0 120 46" preserveAspectRatio="none" aria-hidden="true"><path vector-effect="non-scaling-stroke" d="M100 7 C82 1, 40 0, 20 6 C3 11, 2 32, 22 39 C44 46, 92 45, 108 36 C119 29, 116 13, 104 7 C99 4, 94 4, 90 4"/></svg></span> e de aprendizagem.</p>
           <p class="body">Explorar uma forma de relação pouco comum na cultura masculina — favorecendo a expressão de si e a abertura ao outro por meio da escrita epistolar.</p>
         </div>
         <p class="margin-note hand write" style="--wd:.9s">nem tudo precisa ser dito em voz alta
@@ -323,7 +351,7 @@
         <p class="ps rv" style="--d:.32s"><span class="hand write" style="--wd:.9s">P.S. —</span>“Enviar uma carta é um bom meio de ir a algum lugar sem mover nada a não ser o coração.”
           <cite>Phillis Theroux</cite>
         </p>
-        <p class="fim rv" style="--d:.4s">fim · tudo quer viver</p>
+        <p class="fim rv" style="--d:.4s">tudo quer viver</p>
       </div>
     </section>
 
