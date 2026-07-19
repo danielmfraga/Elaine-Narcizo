@@ -308,12 +308,10 @@ h2{ font-size:clamp(2rem,8.2vw,3.4rem); font-weight:200; letter-spacing:-0.03em;
 .radio-cover{ position:relative; overflow:hidden; isolation:isolate;
   background:radial-gradient(ellipse 88% 52% at 50% 72%, #f4e9e1 0%, var(--paper) 68%); }
 .radio-video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; pointer-events:none; }
-/* véu de leitura: o texto é quase preto sobre papel branco — segura o contraste no
-   topo/base (onde mora o texto) e deixa o miolo do vídeo respirar.
-   AJUSTE FINO = só os alphas abaixo (menor = vídeo mais visível). */
+/* véu bem leve: não há mais texto escuro p/ proteger (só o botão, que tem contraste
+   próprio), então o vídeo aparece quase inteiro. AJUSTE = só este alpha. */
 .radio-cover::after{ content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
-  background:linear-gradient(180deg, rgba(255,255,255,.90) 0%, rgba(255,255,255,.45) 30%,
-                                     rgba(255,255,255,.45) 65%, rgba(255,255,255,.92) 100%); }
+  background:rgba(255,255,255,.14); }
 /* iOS Safari: ao começar a tocar, o vídeo ganha camada de composição e pode ser
    pintado POR CIMA do conteúdo (o botão sumia mas seguia clicável, porque o vídeo
    é pointer-events:none). Camada própria no conteúdo trava a ordem de empilhamento. */
@@ -976,23 +974,10 @@ body.in-frame .worlds-rail{ opacity:0; pointer-events:none; }
       <video class="radio-video" src="assets/radio-capa.mp4"
              autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
       <div class="inner">
-        <div class="head">
-          <span class="radio-live r" style="--r:0"><i></i> no ar</span>
-          <div class="title-deco r" style="--r:1">
-            <span class="td-line"></span>
-            <h2>Rádio <em>Remendo.</em></h2>
-          </div>
-          <p class="sub r" style="--r:2; text-align:center">Lorem ypsilon Lorem ypsilon<br>Lorem ypsilon Lorem ypsilon.</p>
-        </div>
-        <div class="vinyl-center r" style="--r:3">
-          <span class="tag">Podcast · Músicas</span>
-          <div class="now-playing">
-            <span class="np-label">Tocando agora</span>
-            <span class="np-track">Jokerman — Caetano Veloso</span>
-          </div>
-          <div class="foot">
-            <a class="btn-tune" href="#" data-slide="1">Sintonize <span class="ar">→</span></a>
-          </div>
+        <!-- capa = só o vídeo + o botão. SEM a classe .r de propósito: sendo o
+             único elemento, ele não pode depender da revelação p/ ficar visível. -->
+        <div class="vinyl-center">
+          <a class="btn-tune" href="#" data-slide="1">Sintonize <span class="ar">→</span></a>
         </div>
       </div>
     </div>
