@@ -507,8 +507,10 @@ body.nav-hidden .worlds-rail,
 body.nav-hidden .world-dots,
 body.nav-hidden .bar{ opacity:0; pointer-events:none; }
 body.nav-hidden .stage{ top:0; }
-/* sem letreiro: a sombra lateral do menu (que mascara o letreiro) vai pra baixo */
-body.nav-hidden .menu-btn{ box-shadow:0 7px 16px rgba(0,0,0,.3); }
+/* sem letreiro: a sombra lateral (que mascarava o letreiro) vira sombra pra baixo.
+   Vale p/ o ☰ E p/ o X — senão o X fica com um borrão lateral deslocado. */
+body.nav-hidden .menu-btn,
+body.nav-hidden .back-chip{ box-shadow:0 7px 16px rgba(0,0,0,.3); }
 .feed-hint{
   font-size:11px; font-weight:500; letter-spacing:0.18em; text-transform:uppercase;
   color:var(--mute); display:inline-flex; align-items:center; gap:8px;
