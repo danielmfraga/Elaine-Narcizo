@@ -307,7 +307,8 @@ h2{ font-size:clamp(2rem,8.2vw,3.4rem); font-weight:200; letter-spacing:-0.03em;
 /* fundo da capa: VÍDEO em loop (o gradiente fica de fallback enquanto carrega/se falhar) */
 .radio-cover{ position:relative; overflow:hidden; isolation:isolate;
   background:radial-gradient(ellipse 88% 52% at 50% 72%, #f4e9e1 0%, var(--paper) 68%); }
-.radio-video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; pointer-events:none; }
+.radio-video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; pointer-events:none;
+  transform:translateX(-15px); }   /* cola o vídeo na aba. AJUSTE: mais negativo = mais p/ a esquerda */
 /* véu bem leve: não há mais texto escuro p/ proteger (só o botão, que tem contraste
    próprio), então o vídeo aparece quase inteiro. AJUSTE = só este alpha. */
 .radio-cover::after{ content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
@@ -316,6 +317,41 @@ h2{ font-size:clamp(2rem,8.2vw,3.4rem); font-weight:200; letter-spacing:-0.03em;
    pintado POR CIMA do conteúdo (o botão sumia mas seguia clicável, porque o vídeo
    é pointer-events:none). Camada própria no conteúdo trava a ordem de empilhamento. */
 .radio-cover .inner{ position:relative; z-index:2; transform:translateZ(0); }
+
+/* ── ABA lateral roxa: abre o Pequeno Manifesto Tinhoso ── */
+.tinhosa-tab{
+  position:absolute; top:0; right:0; bottom:0; width:15px; z-index:3;
+  background:var(--roxo); border:0; padding:0; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  writing-mode:vertical-rl; white-space:nowrap;
+  color:#fff; font-family:var(--font); font-size:8px; font-weight:600;
+  letter-spacing:.18em; text-transform:uppercase;
+}
+/* ── TELA do manifesto (sobrepõe a capa; rola por dentro) ── */
+.tinhosa-manifesto{
+  position:absolute; inset:0; z-index:6; background:var(--paper);
+  overflow-y:auto; -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain; touch-action:pan-y;  /* rola aqui dentro, não troca de mundo */
+  opacity:0; visibility:hidden; pointer-events:none;
+  transition:opacity .32s var(--ease), visibility .32s;
+}
+.tinhosa-manifesto.open{ opacity:1; visibility:visible; pointer-events:auto; }
+.tm-close{
+  position:sticky; top:12px; display:block; margin:12px 12px 0 auto;
+  width:34px; height:34px; border-radius:50%; border:0; cursor:pointer;
+  background:var(--roxo); color:#fff; font-size:13px; line-height:1; z-index:2;
+}
+.tm-inner{ padding:4px clamp(20px,6vw,40px) 52px; max-width:560px; margin:0 auto; }
+.tm-lead{ font-size:clamp(1.05rem,4.6vw,1.35rem); line-height:1.35; font-weight:500; color:var(--ink); margin-bottom:30px; }
+.tm-title{ font-family:var(--serif); font-size:clamp(1.5rem,7vw,2.1rem); font-weight:500; line-height:1.1; color:var(--roxo); margin-bottom:14px; }
+.tm-cap{ font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--mute); margin-bottom:16px; }
+.tm-list{ list-style:none; margin:0 0 26px; padding:0; }
+.tm-list li{ font-family:var(--serif); font-size:clamp(1rem,4.2vw,1.14rem); line-height:1.5;
+  color:var(--ink-soft); padding:7px 0 7px 16px; border-left:2px solid var(--line); }
+.tm-sub{ font-size:clamp(1rem,4.4vw,1.2rem); font-weight:600; color:var(--ink); margin:6px 0 10px; }
+.tm-body{ font-size:clamp(.92rem,3.9vw,1.05rem); line-height:1.6; color:var(--ink-soft); margin-bottom:34px; }
+/* o botão aqui dentro não leva o deslocamento de 80px que existe na capa */
+.tinhosa-manifesto .btn-tune{ transform:none; }
 
 /* botão SINTONIZE — chamada principal da capa do Rádio: evidente e pulsante.
    Pulso é no brilho (box-shadow), não em scale, p/ o texto não borrar. */
@@ -981,6 +1017,46 @@ body.in-frame .worlds-rail{ opacity:0; pointer-events:none; }
           <a class="btn-tune" href="#" data-slide="1">Sintonize <span class="ar">→</span></a>
         </div>
       </div>
+
+      <!-- aba lateral: abre o manifesto -->
+      <button class="tinhosa-tab" id="tinhosaTab" aria-label="Abrir o Pequeno manifesto Tinhoso">Pequeno manifesto Tinhoso</button>
+
+      <!-- tela do Pequeno Manifesto Tinhoso -->
+      <div class="tinhosa-manifesto" id="tinhosaManifesto" aria-hidden="true">
+        <button class="tm-close" aria-label="Fechar o manifesto">✕</button>
+        <div class="tm-inner">
+          <p class="tm-lead">Tinhosa, a rádio que acompanha as teimosias do mundo.</p>
+
+          <h3 class="tm-title">Pequeno manifesto Tinhoso</h3>
+          <p class="tm-cap">Ficamos ao lado da:</p>
+
+          <ul class="tm-list">
+            <li>Teimosia da alegria e de tudo que vibra</li>
+            <li>Dos caminhos improváveis</li>
+            <li>Teimosia dos ovos, das lagartas, crisálidas e borboletas</li>
+            <li>Dos sonhos daqueles que perderam</li>
+            <li>Teimosia da imaginação no coração de tudo que sonha: pedras, pássaros, meninas</li>
+            <li>Dos peixes brilhantes no céu da Amazônia</li>
+          </ul>
+
+          <ul class="tm-list">
+            <li>Teimosia das pessoas delicadas</li>
+            <li>Teimosia das pessoas bondosas</li>
+            <li>Teimosia da esperança e seu vento incessante</li>
+            <li>Das travestis e seus sorrisos</li>
+            <li>Teimosia das belezas que nascem do chão, entre as mãos</li>
+            <li>Das portas nos livros</li>
+            <li>Teimosia daquilo que é incerto e também aberto</li>
+            <li>Teimosia das amizades improváveis e dos amores difíceis</li>
+            <li>Teimosia do conviver, que é a forma mais cabal de teimosia política.</li>
+          </ul>
+
+          <h4 class="tm-sub">O que você encontra na Rádio Tinhosa:</h4>
+          <p class="tm-body">Uma programação de podcasts, playlists e programas que escutam o mundo sem encerrá-lo em uma sentença, observando e fazendo companhia ao que nele ainda insiste em viver.</p>
+
+          <a class="btn-tune" href="#" data-slide="1">Sintonize <span class="ar">→</span></a>
+        </div>
+      </div>
     </div>
 
     <!-- tocador: Spotify (tela 1) + DançaDestino YouTube (tela 2) -->
@@ -1293,6 +1369,22 @@ body.in-frame .worlds-rail{ opacity:0; pointer-events:none; }
     var RV_RATE=0.5;
     radioVid.playbackRate=RV_RATE;
     radioVid.addEventListener('loadedmetadata',function(){ radioVid.playbackRate=RV_RATE; });
+  }
+
+  /* Rádio Tinhosa: a aba lateral abre/fecha o Pequeno Manifesto */
+  var tinTab=document.getElementById('tinhosaTab'), tinMan=document.getElementById('tinhosaManifesto');
+  if(tinTab&&tinMan){
+    var tinHide=function(){
+      tinMan.classList.remove('open'); tinMan.setAttribute('aria-hidden','true'); tinMan.scrollTop=0;
+    };
+    tinTab.addEventListener('click',function(){
+      tinMan.classList.add('open'); tinMan.setAttribute('aria-hidden','false');
+    });
+    var tinX=tinMan.querySelector('.tm-close');
+    if(tinX) tinX.addEventListener('click',tinHide);
+    /* o Sintonize de dentro do manifesto navega (data-slide) e fecha atrás de si */
+    var tinGo=tinMan.querySelector('.btn-tune');
+    if(tinGo) tinGo.addEventListener('click',function(){ setTimeout(tinHide,450); });
   }
 
   /* SETAS + TECLADO */
