@@ -1431,15 +1431,19 @@ body.in-frame .worlds-rail{ opacity:0; pointer-events:none; }
   function syncLock(){
     var m=mundos[cur], pi=getPanelIdx(m), p=panelAt(m);
     var isFrame=!!(p&&p.classList.contains('pframe'));
+    var isPlayer=!!(p&&p.querySelector&&p.querySelector('.sp-player')); /* tocador do rádio */
     var locked=pi>0&&!isFrame; /* iframe cuida do próprio Y; trava só os painéis comuns */
     mundos.forEach(function(x){ x.classList.toggle('lockY', x===m&&locked); });
-    backChip.classList.toggle('on', isFrame); /* saída sempre visível sobre a página embutida */
+    /* X de saída (topo-esquerdo, espelho do ☰): sobre página embutida E sobre o tocador.
+       Antes o tocador só ganhava o X depois de rolar a lista — no topo ficava sem saída. */
+    backChip.classList.toggle('on', isFrame||isPlayer);
     if(isFrame) backChip.textContent = cur===0 ? '← tela inicial' : '← início da seção';
+    else if(isPlayer) backChip.textContent = '← início da seção';
     document.body.classList.toggle('in-frame', isFrame); /* embutida: some o trilho de seções (não troca de mundo ao passar o dedo na direita) */
     /* no player de áudio (Rádio Remendo): esconde trilha + bolinhas + letreiro e
        deixa a capa vazar até o topo; reajusta o scroll p/ o mundo não desalinhar */
     var noChrome=!!(p&&p.classList&&p.classList.contains('nochrome')); /* DançaDestino: esconde só o texto rolante; a barra fica (alinhamento parte dela) */
-    var hide=!!(p&&p.querySelector&&p.querySelector('.sp-player'));
+    var hide=isPlayer;
     document.body.classList.toggle('nav-hidden', hide);
     document.body.classList.toggle('frame-danca', noChrome);
     if(hide!==navHidden){
