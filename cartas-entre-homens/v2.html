@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tudo Quer Viver — Cartas entre homens (v2 · selos)</title>
+<meta name="description" content="Tudo Quer Viver — uma experiência de troca de cartas entre homens, mantida pela escrita." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Homemade+Apple&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..440&family=Special+Elite&display=swap" rel="stylesheet">
+<script>if(window!==window.top)document.documentElement.classList.add('embedded');</script>
+<style>
+  html.embedded,html.embedded body{ overscroll-behavior-y:contain; }
+  /* ═══════════════════════════════════════════════════════════
+     CARTAS ENTRE HOMENS · "Tudo Quer Viver" — V2 "SÉRIE DE SELOS"
+     Conceito (Daniel, a partir do francobollimontilessini):
+     cada tela = 1 SELO sobre um fundo colorido próprio. Ao rolar,
+     o fundo troca de cor e o selo troca — com o anterior/próximo
+     ESPIANDO nas bordas. O título migra p/ o rodapé e desliza
+     pelas laterais a cada troca.
+     Fluidez: zero imagens, só transform/opacity + snap nativo.
+     ⚠️ v1 (index.html) preservada — esta é a alternativa.
+     ═══════════════════════════════════════════════════════════ */
+  :root{
+    --paper:#F2E9D8;        /* creme da paleta — papel do selo (constante = a série) */
+    --ink:#2A2620;
+    --ink-soft:#4C463C;
+    --mute:#8C8271;
+    --type:"Special Elite",Courier,monospace;
+    --hand:"Homemade Apple",cursive;
+    --serif:"Newsreader",Georgia,serif;
+    --ease:cubic-bezier(.2,.7,.25,1);
+    --bg:#59718A;           /* trocado pelo JS a cada selo */
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html,body{ height:100%; }
+  body{ font-family:var(--serif); color:var(--ink); overflow:hidden; -webkit-font-smoothing:antialiased; }
+
+  /* fundo: camada fixa que faz cross-fade de cor a cada selo */
+  .bg{ position:fixed; inset:0; z-index:0; background-color:var(--bg);
+    transition:background-color .6s var(--ease); }
+  /* grão sutil por cima do fundo */
+  .bg::after{ content:''; position:absolute; inset:0; opacity:.055; pointer-events:none;
+    background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"); }
+
+  /* ── TRILHO: scroller interno (viewport estável) ── */
+  .rail{ position:relative; z-index:1; height:100dvh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    scroll-snap-type:y mandatory; overscroll-behavior-y:contain;
+    padding:10dvh 0 calc(10dvh + 84px);   /* topo/rodapé p/ o 1º e o último centralizarem */
+    scrollbar-width:none; }
+  .rail::-webkit-scrollbar{ display:none; }
+
+  /* slot maior que o selo → sobra a fresta em que o vizinho ESPIA */
+  .slot{ height:80dvh; scroll-snap-align:center; scroll-snap-stop:always;
+    display:flex; align-items:center; justify-content:center;
+    padding:0 clamp(20px,7vw,44px); }
+
+  /* wrapper leva a sombra (o mask do selo recortaria um box-shadow) */
+  .selo-wrap{ width:min(100%,376px); height:74dvh;
+    filter:drop-shadow(0 16px 30px rgba(20,16,12,.30));
+    transition:transform .55s var(--ease), opacity .55s var(--ease);
+    transform:scale(.9); opacity:.5; }
+  .slot.on .selo-wrap{ transform:scale(1); opacity:1; }
+
+  /* ── O SELO: papel creme com picote nas 4 bordas ──
+     4 gradientes radiais em máscara, combinados por interseção.
+     Se o navegador não suportar mask-composite, o selo aparece como
+     retângulo (degrada bem). Ajuste: --r (raio) e --s (passo). */
+  .selo{ --r:8px; --s:26px;
+    position:relative; height:100%; background:var(--paper);
+    display:flex; flex-direction:column; padding:26px 22px 20px;
+    -webkit-mask:
+      radial-gradient(var(--r) at 50% 0,#0000 98%,#000) 50% 0/var(--s) 100% repeat-x,
+      radial-gradient(var(--r) at 50% 100%,#0000 98%,#000) 50% 100%/var(--s) 100% repeat-x,
+      radial-gradient(var(--r) at 0 50%,#0000 98%,#000) 0 50%/100% var(--s) repeat-y,
+      radial-gradient(var(--r) at 100% 50%,#0000 98%,#000) 100% 50%/100% var(--s) repeat-y;
+    mask:
+      radial-gradient(var(--r) at 50% 0,#0000 98%,#000) 50% 0/var(--s) 100% repeat-x,
+      radial-gradient(var(--r) at 50% 100%,#0000 98%,#000) 50% 100%/var(--s) 100% repeat-x,
+      radial-gradient(var(--r) at 0 50%,#0000 98%,#000) 0 50%/100% var(--s) repeat-y,
+      radial-gradient(var(--r) at 100% 50%,#0000 98%,#000) 100% 50%/100% var(--s) repeat-y;
+    -webkit-mask-composite:source-in; mask-composite:intersect; }
+
+  /* moldura interna do selo (aquele filete clássico) */
+  .selo::before{ content:''; position:absolute; inset:14px; border:1px solid var(--ac);
+    opacity:.4; pointer-events:none; }
+
+  /* cabeçalho e rodapé do selo */
+  .selo-top{ display:flex; align-items:baseline; justify-content:space-between; gap:10px;
+    font-family:var(--type); font-size:9px; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--ac); flex-shrink:0; }
+  .selo-top .val{ font-size:15px; letter-spacing:.04em; }
+  .selo-foot{ margin-top:auto; padding-top:14px; flex-shrink:0;
+    font-family:var(--type); font-size:8px; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--mute); text-align:center; }
+
+  /* miolo */
+  .selo-body{ flex:1; display:flex; flex-direction:column; justify-content:center;
+    gap:13px; padding:14px 6px; text-align:center; min-height:0; }
+  .selo-body p{ font-weight:300; font-size:clamp(.86rem,3.4vw,.98rem); line-height:1.62; color:var(--ink-soft); }
+  .tw{ font-family:var(--type); font-size:clamp(.92rem,3.8vw,1.06rem); line-height:1.5; color:var(--ink); }
+  .hw{ font-family:var(--hand); color:var(--ac); font-size:clamp(1rem,4.2vw,1.18rem); line-height:1.8; }
+
+  /* emblema da capa */
+  .emblema{ font-family:var(--type); text-transform:uppercase; letter-spacing:.16em;
+    font-size:clamp(1.5rem,7vw,2rem); line-height:1.18; color:var(--ink); }
+
+  /* "escuta" circulada — o traço se desenha quando o selo entra */
+  .circ{ position:relative; display:inline-block; }
+  .circ svg{ position:absolute; left:-9%; top:-28%; width:118%; height:158%; overflow:visible;
+    color:var(--ac); pointer-events:none; }
+  .circ svg path{ fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; opacity:.8;
+    stroke-dasharray:340; stroke-dashoffset:340; transition:stroke-dashoffset 1.1s var(--ease) .35s; }
+  .slot.on .circ svg path{ stroke-dashoffset:0; }
+
+  /* carimbo CONFIDENCIAL */
+  .carimbo{ align-self:center; border:2.5px solid var(--ac); color:var(--ac);
+    padding:7px 13px 5px; font-family:var(--type); font-size:.7rem; letter-spacing:.24em;
+    text-transform:uppercase; transform:rotate(-9deg); opacity:.8;
+    box-shadow:inset 0 0 0 1px currentColor; }
+
+  /* CTA */
+  .cta{ align-self:center; display:inline-block; margin-top:4px; padding:13px 20px 11px;
+    font-family:var(--type); font-size:10px; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--ac); border:1.5px dashed var(--ac); text-decoration:none;
+    transition:background .3s var(--ease); }
+  .cta:hover{ background:rgba(255,255,255,.5); }
+
+  .ps{ font-style:italic; font-size:clamp(.8rem,3.2vw,.9rem); line-height:1.55; color:var(--ink-soft); }
+  .ps cite{ display:block; font-style:normal; font-family:var(--type); font-size:8px;
+    letter-spacing:.22em; text-transform:uppercase; color:var(--mute); margin-top:9px; }
+
+  /* ── RODAPÉ: o título desliza pelas laterais a cada troca ── */
+  .tit-bar{ position:fixed; left:0; right:0; bottom:0; z-index:5; pointer-events:none;
+    padding:14px clamp(20px,7vw,44px) calc(20px + env(safe-area-inset-bottom,0px));
+    text-align:center;
+    background:linear-gradient(to top, rgba(0,0,0,.22), rgba(0,0,0,0)); }
+  .clip{ overflow:hidden; }
+  .tit-cap{ display:block; font-family:var(--type); font-size:9px; letter-spacing:.28em;
+    text-transform:uppercase; color:rgba(255,255,255,.68); }
+  .tit{ display:block; font-family:var(--serif); font-weight:400;
+    font-size:clamp(1.15rem,5vw,1.5rem); line-height:1.24; color:#fff; margin-top:5px; }
+  .tit-cap,.tit{ transition:transform .36s var(--ease), opacity .36s var(--ease); }
+
+  @media (prefers-reduced-motion:reduce){
+    .bg,.selo-wrap,.tit-cap,.tit{ transition:none; }
+    .selo-wrap{ transform:none; opacity:1; }
+    .circ svg path{ stroke-dashoffset:0; transition:none; }
+  }
+</style>
+</head>
+<body>
+  <div class="bg" id="bg"></div>
+
+  <div class="rail" id="rail">
+
+    <!-- 01 · CAPA -->
+    <section class="slot" data-bg="#59718A" data-ac="#3C5570"
+             data-cap="cartas entre homens" data-tit="Tudo Quer Viver">
+      <div class="selo-wrap"><article class="selo" style="--ac:#3C5570">
+        <header class="selo-top"><span>Correio de papel</span><span class="val">01</span></header>
+        <div class="selo-body">
+          <p class="emblema">Tudo<br>Quer<br>Viver</p>
+          <p class="hw">primeiras cartas</p>
+        </div>
+        <footer class="selo-foot">correspondência entre homens · só pela escrita</footer>
+      </article></div>
+    </section>
+
+    <!-- 02 · O PROJETO -->
+    <section class="slot" data-bg="#E07A47" data-ac="#A9522A"
+             data-cap="o projeto" data-tit="Um contato feito pela escrita">
+      <div class="selo-wrap"><article class="selo" style="--ac:#A9522A">
+        <header class="selo-top"><span>Tudo Quer Viver</span><span class="val">02</span></header>
+        <div class="selo-body">
+          <p class="tw">Um contato feito pela escrita.</p>
+          <p>Uma experiência de troca de cartas entre homens que não se conhecem — mantendo contato exclusivamente por meio da escrita.</p>
+          <p>A mediação é simples e direta: a coordenação apenas conecta os participantes, organiza os pares e facilita o início da correspondência.</p>
+        </div>
+        <footer class="selo-foot">o projeto</footer>
+      </article></div>
+    </section>
+
+    <!-- 03 · OBJETIVO -->
+    <section class="slot" data-bg="#2F6F6D" data-ac="#20514F"
+             data-cap="objetivo" data-tit="Escuta e aprendizagem">
+      <div class="selo-wrap"><article class="selo" style="--ac:#20514F">
+        <header class="selo-top"><span>Tudo Quer Viver</span><span class="val">03</span></header>
+        <div class="selo-body">
+          <p class="tw">Um espaço de <span class="circ">escuta<svg viewBox="0 0 120 46" preserveAspectRatio="none" aria-hidden="true"><path vector-effect="non-scaling-stroke" d="M100 7 C82 1, 40 0, 20 6 C3 11, 2 32, 22 39 C44 46, 92 45, 108 36 C119 29, 116 13, 104 7 C99 4, 94 4, 90 4"/></svg></span> e de aprendizagem.</p>
+          <p>Explorar uma forma de relação pouco comum na cultura masculina — favorecendo a expressão de si e a abertura ao outro por meio da escrita epistolar.</p>
+          <p class="hw">nem tudo precisa ser dito em voz alta</p>
+        </div>
+        <footer class="selo-foot">objetivo</footer>
+      </article></div>
+    </section>
+
+    <!-- 04 · COMO FUNCIONA -->
+    <section class="slot" data-bg="#D4A72C" data-ac="#8A6A11"
+             data-cap="como funciona" data-tit="Aberto e contínuo">
+      <div class="selo-wrap"><article class="selo" style="--ac:#8A6A11">
+        <header class="selo-top"><span>Tudo Quer Viver</span><span class="val">04</span></header>
+        <div class="selo-body">
+          <p>A entrada pode ser feita a qualquer momento — assim como a indicação de novos participantes ou a sugestão de grupos.</p>
+          <p>A coordenação faz o contato direto e as articulações necessárias.</p>
+          <p class="hw">sem pressa. cont&iacute;nuo. aberto.</p>
+        </div>
+        <footer class="selo-foot">sem ciclos fechados · sem prazo de encerramento</footer>
+      </article></div>
+    </section>
+
+    <!-- 05 · DISCRIÇÃO -->
+    <section class="slot" data-bg="#5B3A62" data-ac="#43294A"
+             data-cap="discrição" data-tit="A privacidade é parte da proposta">
+      <div class="selo-wrap"><article class="selo" style="--ac:#43294A">
+        <header class="selo-top"><span>Tudo Quer Viver</span><span class="val">05</span></header>
+        <div class="selo-body">
+          <span class="carimbo">Confidencial</span>
+          <p>Não há divulgação pública dos nomes envolvidos, nem publicidade sobre os participantes ou as correspondências. O processo preserva a privacidade como fundamento.</p>
+        </div>
+        <footer class="selo-foot">discrição</footer>
+      </article></div>
+    </section>
+
+    <!-- 06 · PARTICIPAR -->
+    <section class="slot" data-bg="#8FA68F" data-ac="#4F6A50"
+             data-cap="participar" data-tit="Quer entrar na troca?">
+      <div class="selo-wrap"><article class="selo" style="--ac:#4F6A50">
+        <header class="selo-top"><span>Tudo Quer Viver</span><span class="val">06</span></header>
+        <div class="selo-body">
+          <p>A qualquer momento. Fale com a coordenação e a gente organiza os pares.</p>
+          <p class="hw">vagas abertas</p>
+          <a class="cta" href="#" data-cta>Falar com a coordena&ccedil;&atilde;o &rarr;</a>
+          <p class="ps">“Enviar uma carta é um bom meio de ir a algum lugar sem mover nada a não ser o coração.”
+            <cite>Phillis Theroux</cite></p>
+        </div>
+        <footer class="selo-foot">tudo quer viver</footer>
+      </article></div>
+    </section>
+
+  </div>
+
+  <div class="tit-bar">
+    <div class="clip"><span class="tit-cap" id="titCap">cartas entre homens</span></div>
+    <div class="clip"><span class="tit" id="tit">Tudo Quer Viver</span></div>
+  </div>
+
+  <script>
+  (function(){
+    var rail=document.getElementById('rail');
+    var bg=document.getElementById('bg');
+    var titCap=document.getElementById('titCap'), tit=document.getElementById('tit');
+    var slots=[].slice.call(document.querySelectorAll('.slot'));
+    var cur=-1;
+
+    /* troca o texto deslizando: sai pela esquerda, entra pela direita */
+    function slide(el,txt,delay){
+      el.style.transition='transform .3s var(--ease), opacity .3s var(--ease)';
+      el.style.transitionDelay=(delay||0)+'ms';
+      el.style.transform='translateX(-26px)'; el.style.opacity='0';
+      setTimeout(function(){
+        el.style.transition='none'; el.style.transitionDelay='0ms';
+        el.style.transform='translateX(26px)';
+        el.textContent=txt;
+        void el.offsetWidth;                 /* força o reflow p/ a volta animar */
+        el.style.transition='transform .38s var(--ease), opacity .38s var(--ease)';
+        el.style.transform='translateX(0)'; el.style.opacity='1';
+      }, 300+(delay||0));
+    }
+
+    function activate(i){
+      if(i===cur||!slots[i]) return;
+      cur=i;
+      var s=slots[i];
+      slots.forEach(function(x,k){ x.classList.toggle('on',k===i); });
+      document.documentElement.style.setProperty('--bg', s.getAttribute('data-bg'));
+      slide(titCap, s.getAttribute('data-cap'), 0);
+      slide(tit,    s.getAttribute('data-tit'), 60);
+    }
+
+    if('IntersectionObserver' in window){
+      var io=new IntersectionObserver(function(es){
+        /* o selo mais visível vira o ativo */
+        var best=null;
+        es.forEach(function(en){ if(en.isIntersecting&&(!best||en.intersectionRatio>best.intersectionRatio)) best=en; });
+        if(best) activate(slots.indexOf(best.target));
+      },{ root:rail, threshold:[.5,.75,.95] });
+      slots.forEach(function(s){ io.observe(s); });
+    }
+    /* estado inicial sem animar (evita o 1º slide "do nada") */
+    slots[0].classList.add('on'); cur=0;
+    document.documentElement.style.setProperty('--bg', slots[0].getAttribute('data-bg'));
+  })();
+  </script>
+</body>
+</html>
