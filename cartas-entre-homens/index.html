@@ -98,6 +98,11 @@
     from{ transform:rotate(-.5deg) translateY(0); }
     to{ transform:rotate(.5deg) translateY(-3px); } }
 
+  /* "DIGITADO": as letras aparecem uma a uma (transição instantânea + delay
+     escalonado por letra, montado no JS). Ritmo: data-td (início) e data-step. */
+  .typed span{ opacity:0; transition:opacity .01s linear; }
+  .in .typed span{ opacity:1; }
+
   /* caligrafia que SE ESCREVE ao chegar (revela da esquerda p/ a direita;
      folgas verticais generosas p/ as hastes enormes da Homemade Apple) */
   .write{ clip-path:inset(-40% 103% -55% -6%); transition:clip-path 1.5s cubic-bezier(.3,.6,.4,1); transition-delay:var(--wd,.5s); }
@@ -105,8 +110,9 @@
 
   @media (prefers-reduced-motion:reduce){
     .rv{ opacity:1; translate:0 0; }
-    .drift{ animation:none; }
+    .drift,.swing{ animation:none; }
     .write{ clip-path:inset(-40% -6% -55% -6%); transition:none; }
+    .typed span{ opacity:1; transition:none; }
   }
 
   .sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
@@ -189,7 +195,7 @@
   /* ── 03 · VERSO DE POSTAL ── */
   .postcard{ padding:clamp(20px,5vw,32px) clamp(18px,4.6vw,30px) clamp(22px,5vw,32px); --rot:.6deg; }
   .pc-head{ font-family:var(--type); text-align:center; font-size:clamp(.8rem,3.4vw,1rem);
-    letter-spacing:.58em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:6px; }
+    letter-spacing:.3em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:6px; }   /* .58em era p/ "POST CARD"; apertado p/ caber "COMO FUNCIONA" */
   .pc-head::after{ content:''; display:block; width:38px; height:1px; background:var(--ink-soft);
     opacity:.5; margin:10px auto 0; }
   .pc-grid{ display:grid; grid-template-columns:1.06fr 1fr; min-height:340px; }
@@ -218,12 +224,13 @@
     box-shadow:0 3px 6px rgba(42,38,32,.06); }
   .env-to{ position:absolute; left:10%; bottom:9%; font-size:clamp(.98rem,4vw,1.15rem);
     transform:rotate(-1.4deg); }
-  .seal{ position:absolute; right:-16px; bottom:-16px; border:2px solid var(--tinta); color:var(--tinta);
-    border-radius:50%; width:96px; height:96px; display:flex; flex-direction:column;
-    align-items:center; justify-content:center; gap:2px; text-align:center;
-    font-family:var(--type); font-size:9px; letter-spacing:.2em; text-transform:uppercase;
-    background:rgba(248,245,238,.72); transform:rotate(-9deg); opacity:.92; }
-  .seal b{ font-weight:400; font-size:11px; }
+  /* carimbo "CONFIDENCIAL": retângulo torto de borda dupla, tinta gasta */
+  .seal{ position:absolute; right:-12px; bottom:-15px; color:var(--tinta);
+    border:2.5px solid currentColor; padding:8px 14px 6px;
+    font-family:var(--type); font-size:clamp(.62rem,2.7vw,.78rem); letter-spacing:.26em;
+    text-transform:uppercase; white-space:nowrap;
+    background:rgba(248,245,238,.4); transform:rotate(-11deg); opacity:.78;
+    box-shadow:inset 0 0 0 1px rgba(57,73,106,.28); }
   .env-txt{ margin-top:clamp(30px,6vh,48px); text-align:center; }
   .env-txt .cap{ display:block; margin-bottom:16px; }
   .env-txt .t1{ font-size:clamp(1.05rem,4.4vw,1.32rem); margin-bottom:14px; }
@@ -262,7 +269,8 @@
   <div class="wrap" id="wrap">
 
     <!-- CAPA · tiras de fita -->
-    <section class="tela capa in">
+    <!-- sem "in" fixo: com ele as animações da capa já nasciam prontas e nunca rodavam -->
+    <section class="tela capa">
       <h1 class="sr">Tudo Quer Viver — cartas entre homens</h1>
       <div class="strips" aria-hidden="true">
         <span class="strip rv drift" style="--rot:-1.6deg;--fd:8.5s">Tudo</span>
@@ -270,7 +278,7 @@
         <span class="strip s3 rv drift" style="--rot:-.7deg;--d:.18s;--fd:8.8s;--fdl:-6.1s">Viver</span>
         <span class="strip small rv drift" style="--rot:1.4deg;--d:.3s;--fd:10s;--fdl:-1.8s">correspondência entre homens · só pela escrita</span>
       </div>
-      <p class="ed hand write" style="--wd:.6s">n&ordm; 001 — primeiras cartas</p>
+      <p class="ed hand typed" data-td=".7" data-step=".055">primeiras cartas</p>
       <div class="hint">role<b>⌄</b></div>
     </section>
 
@@ -282,9 +290,9 @@
           <rect x="4" y="27" width="48" height="9" rx="1.6" fill="#4A443B"/>
         </svg>
         <span class="cap">o projeto</span>
-        <p class="type t1">Um contato feito só de escrita.</p>
-        <p class="body">Uma experiência de troca de cartas entre homens que não se conhecem — mantendo contato exclusivamente por meio da escrita.</p>
-        <p class="body">A mediação é simples e direta: a coordenação apenas conecta os participantes, organiza os pares e facilita o início da correspondência.</p>
+        <p class="type t1 typed" data-td=".3" data-step=".03">Um contato feito pela escrita.</p>
+        <p class="body typed" data-td="1.25" data-step=".007">Uma experiência de troca de cartas entre homens que não se conhecem — mantendo contato exclusivamente por meio da escrita.</p>
+        <p class="body typed" data-td="2.3" data-step=".007">A mediação é simples e direta: a coordenação apenas conecta os participantes, organiza os pares e facilita o início da correspondência.</p>
         <span class="ghost" aria-hidden="true">tudo quer viver</span>
       </article>
     </section>
@@ -307,7 +315,7 @@
     <section class="tela">
       <article class="piece postcard rv drift" style="--fd:9.8s;--fdl:-2.6s">
         <span class="tp tl" aria-hidden="true"></span>
-        <header class="pc-head">Post&nbsp;Card</header>
+        <header class="pc-head">Como funciona</header>
         <div class="pc-grid">
           <div class="pc-left">
             <p class="body">A entrada pode ser feita a qualquer momento — assim como a indicação de novos participantes ou a sugestão de grupos.</p>
@@ -317,12 +325,11 @@
           <div class="pc-right">
             <div class="stamp"><b>TQV</b>correio<br>de papel</div>
             <svg class="pc-cancel" viewBox="0 0 60 24" aria-hidden="true"><path d="M2 4 q8 6 16 0 t16 0 t16 0 M2 12 q8 6 16 0 t16 0 t16 0 M2 20 q8 6 16 0 t16 0 t16 0" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
-            <p class="hand pc-hand write" style="--wd:.7s">sem pressa.<br>cont&iacute;nuo.<br>em aberto.</p>
+            <p class="hand pc-hand write" style="--wd:.7s">sem pressa.<br>cont&iacute;nuo.<br>aberto.</p>
             <div class="pc-addr" aria-hidden="true"><i></i><i></i><i></i></div>
           </div>
         </div>
       </article>
-      <span class="cap pc-tag rv" style="--d:.2s">— como funciona —</span>
     </section>
 
     <!-- 04 · DISCRIÇÃO — envelope fechado -->
@@ -330,7 +337,7 @@
       <div class="env-scene">
         <div class="envelope rv drift" style="--fd:9s;--fdl:-5.3s">
           <p class="env-to hand write" style="--wd:.55s">para quem chegar</p>
-          <span class="seal"><b>entre nós</b>discri&ccedil;&atilde;o<br>garantida</span>
+          <span class="seal">Confidencial</span>
         </div>
         <div class="env-txt rv" style="--d:.18s">
           <span class="cap">discrição</span>
@@ -346,7 +353,7 @@
         <span class="cap rv">participar</span>
         <p class="type t1 rv" style="--d:.06s">Quer entrar na troca?</p>
         <p class="body rv" style="--d:.12s">A qualquer momento. Fale com a coordenação e a gente organiza os pares.</p>
-        <p class="nr hand write" style="--wd:.4s">n&ordm; <u>&nbsp;</u> / em aberto</p>
+        <p class="nr hand write" style="--wd:.4s">vagas abertas</p>
         <a class="btn-seal rv drift" style="--d:.24s;--rot:-.6deg;--fd:8.4s;--fdl:-1.2s" href="#" data-cta>Falar com a coordena&ccedil;&atilde;o &rarr;</a>
         <p class="ps rv" style="--d:.32s"><span class="hand write" style="--wd:.9s">P.S. —</span>“Enviar uma carta é um bom meio de ir a algum lugar sem mover nada a não ser o coração.”
           <cite>Phillis Theroux</cite>
@@ -361,6 +368,25 @@
   (function(){
     try{
       var wrap = document.getElementById('wrap');
+
+      /* "digitado": quebra o texto em letras p/ aparecerem uma a uma.
+         Os ESPAÇOS ficam como texto solto (não viram span) — assim a quebra de
+         linha segue natural; e como as letras ocultas já ocupam o lugar, o
+         layout não pula enquanto "digita". Roda ANTES do observer. */
+      [].forEach.call(document.querySelectorAll('.typed'), function(el){
+        var txt = el.textContent;
+        var base = parseFloat(el.getAttribute('data-td')) || 0;
+        var step = parseFloat(el.getAttribute('data-step')) || .045;
+        el.textContent = '';
+        for(var i=0;i<txt.length;i++){
+          if(txt.charAt(i)===' '){ el.appendChild(document.createTextNode(' ')); continue; }
+          var s = document.createElement('span');
+          s.textContent = txt.charAt(i);
+          s.style.transitionDelay = (base + i*step).toFixed(3) + 's';
+          el.appendChild(s);
+        }
+      });
+
       var telas = [].slice.call(document.querySelectorAll('.tela'));
       if('IntersectionObserver' in window){
         var io = new IntersectionObserver(function(es){
