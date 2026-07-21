@@ -590,10 +590,13 @@ body.frame-danca .bar .track{ visibility:hidden; }
 .mundo.lockY{ touch-action:pan-x; }
 
 /* ── TRAVA X: sobre um embarque (pframe) → o swipe lateral não troca de painel
-   (ex.: DançaDestino ⇄ Cartas entre Homens, vizinhos na Bilheteria). overflow
-   hidden bloqueia toque/wheel/teclado; o scrollTo() do chip (JS) continua
-   funcionando normal — é a única saída. ── */
-.mundo.lockX{ overflow-x:hidden; touch-action:pan-y; }
+   (ex.: DançaDestino ⇄ Cartas entre Homens, vizinhos na Bilheteria). SÓ
+   touch-action — nada de overflow-x:hidden aqui: o listener de scroll do
+   .mundo liga essa classe DURANTE a animação suave do "Embarcar" (o painel
+   já lê como o próximo antes do scroll chegar lá), e overflow-x:hidden
+   cancelava esse scroll em andamento, travando a tela no meio do caminho.
+   touch-action nunca interrompe scrollTo() — só barra o gesto do usuário. ── */
+.mundo.lockX{ touch-action:pan-y; }
 
 /* ── CONTADOR DançaDestino (preenche o meio) ── */
 .clock-wrap{ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; justify-content:center; gap:16px; }
