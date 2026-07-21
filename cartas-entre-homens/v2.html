@@ -31,6 +31,7 @@
     --serif:"Newsreader",Georgia,serif;
     --ease:cubic-bezier(.2,.7,.25,1);
     --bg:#59718A;           /* trocado pelo JS a cada selo */
+    --tc:#C47C8A;           /* cor do tipo grande — contraste do fundo, idem */
   }
   *{ margin:0; padding:0; box-sizing:border-box; }
   html,body{ height:100%; }
@@ -50,15 +51,18 @@
     background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='linear' slope='2.2' intercept='-.35'/></feComponentTransfer></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"); }
 
   /* ── TRILHO: scroller interno (viewport estável) ── */
-  .rail{ position:relative; z-index:1; height:100dvh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  .rail{ position:relative; z-index:2; height:100dvh; overflow-y:auto; -webkit-overflow-scrolling:touch;
     scroll-snap-type:y mandatory; overscroll-behavior-y:contain;
-    padding:12dvh 0;   /* (100 − slot)/2 → o 1º e o último centralizam */
+    padding:16dvh 0;   /* (100 − slot)/2 → o 1º e o último centralizam */
     scrollbar-width:none; }
   .rail::-webkit-scrollbar{ display:none; }
 
-  /* GEOMETRIA (dvh) — vão entre selos = slot − selo = 10 (onde mora o título);
-     espiada do vizinho = 50 − slot + selo/2 = 7 (mesma de antes). */
-  .slot{ height:76dvh; scroll-snap-align:center; scroll-snap-stop:always;
+  /* GEOMETRIA (dvh) — invariante: espiada + vão = 50 − selo/2.
+     Agora o título NÃO mora mais no vão (virou camada fixa na viewport),
+     então o vão só governa o espaçamento da trilha; o selo encolheu p/ dar
+     escala ao tipo. slot 68 = selo 50 + vão 18 → espiada = 50−68+25 = 7
+     (mesma de antes, que o Daniel gosta). Mudou algum? refazer as 3 contas. */
+  .slot{ height:68dvh; scroll-snap-align:center; scroll-snap-stop:always;
     display:flex; align-items:center; justify-content:center;
     padding:0 clamp(20px,7vw,44px); }
 
@@ -68,12 +72,17 @@
      (mask com várias perfurações) toda vez que o elemento se move no scroll,
      mesmo sem transição rodando — é isso que piscava (selo + sombra juntos)
      ao passar de uma lâmina pra outra. */
-  .selo-wrap{ width:min(100%,376px); height:66dvh;
-    filter:drop-shadow(0 16px 30px rgba(20,16,12,.30));
+  .selo-wrap{ width:min(100%,376px); height:50dvh;
+    filter:drop-shadow(9px 13px 20px rgba(18,14,10,.32));
     will-change:transform,opacity;
     transition:transform .55s var(--ease), opacity .55s var(--ease);
-    transform:scale(.9); opacity:.5; }
-  .slot.on .selo-wrap{ transform:scale(1); opacity:1; }
+    transform:translateX(0) scale(.9); opacity:.5; }
+  /* TRILHA DIAGONAL: o que já passou espia deslocado p/ a esquerda, o que vem
+     espia p/ a direita — então o selo novo entra de baixo-direita e assenta no
+     centro (o movimento do francobolli, com o eixo virado p/ vertical). */
+  .slot.above .selo-wrap{ transform:translateX(-13%) scale(.9); }
+  .slot.below .selo-wrap{ transform:translateX(13%)  scale(.9); }
+  .slot.on    .selo-wrap{ transform:translateX(0)    scale(1); opacity:1; }
 
   /* ── O SELO: papel creme com picote nas 4 bordas ──
      4 gradientes radiais em máscara, combinados por interseção.
@@ -81,7 +90,7 @@
      retângulo (degrada bem). Ajuste: --r (raio) e --s (passo). */
   .selo{ --r:8px; --s:26px;
     position:relative; height:100%; background:var(--paper);
-    display:flex; flex-direction:column; padding:26px 22px 20px;
+    display:flex; flex-direction:column; padding:20px 18px 15px;
     -webkit-mask:
       radial-gradient(var(--r) at 50% 0,#0000 98%,#000) 50% 0/var(--s) 100% repeat-x,
       radial-gradient(var(--r) at 50% 100%,#0000 98%,#000) 50% 100%/var(--s) 100% repeat-x,
@@ -103,20 +112,22 @@
     font-family:var(--type); font-size:9px; letter-spacing:.2em; text-transform:uppercase;
     color:var(--ac); flex-shrink:0; }
   .selo-top .val{ font-size:15px; letter-spacing:.04em; }
-  .selo-foot{ margin-top:auto; padding-top:14px; flex-shrink:0;
+  .selo-foot{ margin-top:auto; padding-top:10px; flex-shrink:0;
     font-family:var(--type); font-size:8px; letter-spacing:.2em; text-transform:uppercase;
     color:var(--mute); text-align:center; }
 
-  /* miolo */
+  /* miolo (compacto: o selo agora é 50dvh, o tipo grande é que carrega a tela) */
   .selo-body{ flex:1; display:flex; flex-direction:column; justify-content:center;
-    gap:13px; padding:14px 6px; text-align:center; min-height:0; }
-  .selo-body p{ font-weight:300; font-size:clamp(.86rem,3.4vw,.98rem); line-height:1.62; color:var(--ink-soft); }
-  .tw{ font-family:var(--type); font-size:clamp(.92rem,3.8vw,1.06rem); line-height:1.5; color:var(--ink); }
-  .hw{ font-family:var(--hand); color:var(--ac); font-size:clamp(1rem,4.2vw,1.18rem); line-height:1.8; }
+    gap:10px; padding:8px 4px; text-align:center; min-height:0; }
+  .selo-body p{ font-weight:300; font-size:clamp(.8rem,3.1vw,.92rem); line-height:1.56; color:var(--ink-soft); }
+  .tw{ font-family:var(--type); font-size:clamp(.88rem,3.5vw,1rem); line-height:1.45; color:var(--ink); }
+  .hw{ font-family:var(--hand); color:var(--ac); font-size:clamp(.95rem,3.9vw,1.1rem); line-height:1.7; }
 
-  /* emblema da capa */
-  .emblema{ font-family:var(--type); text-transform:uppercase; letter-spacing:.16em;
-    font-size:clamp(2.1rem,9.6vw,2.75rem); line-height:1.16; color:var(--ink); }
+  /* monograma da capa — o nome do projeto migrou p/ o tipo grande da viewport,
+     então a capa fica com a marca da série (como o "ITALIA" do francobolli) */
+  .mono{ font-family:var(--type); text-transform:uppercase; letter-spacing:.22em;
+    font-size:clamp(2.2rem,10vw,2.8rem); line-height:1; color:var(--ink); text-indent:.22em; }
+  .rule{ width:54px; height:0; margin:2px auto; border-top:1.5px dashed var(--ac); opacity:.5; }
 
   /* "DIGITADO": as letras aparecem uma a uma (delays escalonados montados no JS).
      Ritmo por elemento: data-td (início) e data-step (intervalo entre letras). */
@@ -160,23 +171,30 @@
   .ps cite{ display:block; font-style:normal; font-family:var(--type); font-size:8px;
     letter-spacing:.22em; text-transform:uppercase; color:var(--mute); margin-top:9px; }
 
-  /* ── RODAPÉ: o título desliza pelas laterais a cada troca ── */
-  /* CENTRADO no vão entre o selo atual e o que espia embaixo (não colado no fim):
-     bottom = centro do vão; translateY(50%) centra a própria barra nesse ponto. */
-  .tit-bar{ position:fixed; left:0; right:0; bottom:12dvh; transform:translateY(50%);
-    z-index:5; pointer-events:none; padding:0 clamp(20px,7vw,44px); text-align:center; }
+  /* ── TÍTULO: duas faixas fixas que ABRAÇAM o selo (uma palavra em cima,
+     outra embaixo + legendas) — a composição do francobollimontilessini.
+     z-index 1 = ATRÁS do trilho: o selo que passa ENCOBRE a letra (é o
+     "MONTE" virando "ONTE" da referência). Sem isso o efeito não existe. */
+  .tit-layer{ position:fixed; inset:0; z-index:1; pointer-events:none; }
+  .tit-top{ position:absolute; left:0; right:0; top:9dvh; text-align:center; }
+  .tit-bot{ position:absolute; left:0; right:0; bottom:6dvh; text-align:center; }
+  /* sem padding lateral de propósito: palavra longa VAZA pela borda (o
+     "DELLE SFINGI" cortado da referência) — o clip corta na viewport. */
   .clip{ overflow:hidden; }
-  /* sombra: sem o gradiente, o branco precisa segurar nos fundos claros (mostarda/sage) */
-  .tit-cap{ display:block; font-family:var(--type); font-size:9px; letter-spacing:.28em;
-    text-transform:uppercase; color:rgba(255,255,255,.75); text-shadow:0 1px 4px rgba(0,0,0,.4); }
-  .tit{ display:block; font-family:var(--serif); font-weight:400;
-    font-size:clamp(1.15rem,5vw,1.5rem); line-height:1.24; color:#fff; margin-top:5px;
-    text-shadow:0 1px 5px rgba(0,0,0,.42); }
-  .tit-cap,.tit{ transition:transform .36s var(--ease), opacity .36s var(--ease); }
+  .tw1,.tw2{ display:block; font-family:var(--type); text-transform:uppercase;
+    font-size:clamp(2.05rem,9.8vw,3rem); line-height:1.06; letter-spacing:.015em;
+    white-space:nowrap; color:var(--tc); text-shadow:0 3px 12px rgba(0,0,0,.2); }
+  /* legendas em branco — o texto-shadow segura nos fundos claros (mostarda/sage) */
+  .tsub{ display:block; font-family:var(--type); font-size:10px; letter-spacing:.26em;
+    text-transform:uppercase; color:#fff; margin-top:11px; text-shadow:0 1px 4px rgba(0,0,0,.4); }
+  .tmeta{ display:block; font-family:var(--type); font-size:8px; letter-spacing:.2em;
+    text-transform:uppercase; color:rgba(255,255,255,.62); margin-top:5px;
+    text-shadow:0 1px 4px rgba(0,0,0,.4); }
+  .tw1,.tw2,.tsub,.tmeta{ transition:transform .36s var(--ease), opacity .36s var(--ease); }
 
   @media (prefers-reduced-motion:reduce){
-    .bg,.selo-wrap,.tit-cap,.tit{ transition:none; }
-    .selo-wrap{ transform:none; opacity:1; }
+    .bg,.selo-wrap,.tw1,.tw2,.tsub,.tmeta{ transition:none; }
+    .slot .selo-wrap,.slot.above .selo-wrap,.slot.below .selo-wrap{ transform:none; opacity:1; }
     .circ svg path{ stroke-dashoffset:0; transition:none; }
     .typed span{ opacity:1; transition:none; }
     .carimbo{ transform:rotate(-9deg); opacity:.8; transition:none; }
@@ -191,12 +209,14 @@
   <div class="rail" id="rail">
 
     <!-- 01 · CAPA -->
-    <section class="slot" data-bg="#59718A" data-ac="#3C5570"
-             data-cap="cartas entre homens" data-tit="Tudo Quer Viver">
+    <section class="slot" data-bg="#59718A" data-ac="#3C5570" data-tc="#C47C8A"
+             data-t1="Tudo" data-t2="Quer Viver"
+             data-sub="cartas entre homens" data-meta="nº 01 / 06 · correio de papel">
       <div class="selo-wrap"><article class="selo" style="--ac:#3C5570">
         <header class="selo-top"><span>Correio de papel</span><span class="val">01</span></header>
         <div class="selo-body">
-          <p class="emblema">Tudo<br>Quer<br>Viver</p>
+          <p class="mono">TQV</p>
+          <div class="rule"></div>
           <p class="hw typed" data-td=".55" data-step=".055">primeiras cartas</p>
         </div>
         <footer class="selo-foot">correspondência entre homens · só pela escrita</footer>
@@ -204,8 +224,9 @@
     </section>
 
     <!-- 02 · O PROJETO -->
-    <section class="slot" data-bg="#E07A47" data-ac="#A9522A"
-             data-cap="o projeto" data-tit="Um contato feito pela escrita">
+    <section class="slot" data-bg="#E07A47" data-ac="#A9522A" data-tc="#5B3A62"
+             data-t1="Um contato" data-t2="pela escrita"
+             data-sub="o projeto" data-meta="nº 02 / 06 · correio de papel">
       <div class="selo-wrap"><article class="selo" style="--ac:#A9522A">
         <header class="selo-top"><span>Tudo Quer Viver</span><span class="val">02</span></header>
         <div class="selo-body">
@@ -213,13 +234,14 @@
           <p>Uma experiência de troca de cartas entre homens que não se conhecem — mantendo contato exclusivamente por meio da escrita.</p>
           <p>A mediação é simples e direta: a coordenação apenas conecta os participantes, organiza os pares e facilita o início da correspondência.</p>
         </div>
-        <footer class="selo-foot">o projeto</footer>
+        <footer class="selo-foot">correio de papel</footer>
       </article></div>
     </section>
 
     <!-- 03 · OBJETIVO -->
-    <section class="slot" data-bg="#2F6F6D" data-ac="#20514F"
-             data-cap="objetivo" data-tit="Escuta e aprendizagem">
+    <section class="slot" data-bg="#2F6F6D" data-ac="#20514F" data-tc="#D4A72C"
+             data-t1="Escuta" data-t2="e aprendizagem"
+             data-sub="objetivo" data-meta="nº 03 / 06 · correio de papel">
       <div class="selo-wrap"><article class="selo" style="--ac:#20514F">
         <header class="selo-top"><span>Tudo Quer Viver</span><span class="val">03</span></header>
         <div class="selo-body">
@@ -227,13 +249,14 @@
           <p>Explorar uma forma de relação pouco comum na cultura masculina — favorecendo a expressão de si e a abertura ao outro por meio da escrita epistolar.</p>
           <p class="hw typed" data-td=".9" data-step=".045">nem tudo precisa ser dito em voz alta</p>
         </div>
-        <footer class="selo-foot">objetivo</footer>
+        <footer class="selo-foot">correio de papel</footer>
       </article></div>
     </section>
 
     <!-- 04 · COMO FUNCIONA -->
-    <section class="slot" data-bg="#D4A72C" data-ac="#8A6A11"
-             data-cap="como funciona" data-tit="Aberto e contínuo">
+    <section class="slot" data-bg="#D4A72C" data-ac="#8A6A11" data-tc="#5B3A62"
+             data-t1="Aberto" data-t2="e contínuo"
+             data-sub="como funciona" data-meta="nº 04 / 06 · correio de papel">
       <div class="selo-wrap"><article class="selo" style="--ac:#8A6A11">
         <header class="selo-top"><span>Tudo Quer Viver</span><span class="val">04</span></header>
         <div class="selo-body">
@@ -250,21 +273,23 @@
     </section>
 
     <!-- 05 · DISCRIÇÃO -->
-    <section class="slot" data-bg="#5B3A62" data-ac="#43294A"
-             data-cap="discrição" data-tit="A privacidade é parte da proposta">
+    <section class="slot" data-bg="#5B3A62" data-ac="#43294A" data-tc="#C47C8A"
+             data-t1="A privacidade" data-t2="é a proposta"
+             data-sub="discrição" data-meta="nº 05 / 06 · correio de papel">
       <div class="selo-wrap"><article class="selo" style="--ac:#43294A">
         <header class="selo-top"><span>Tudo Quer Viver</span><span class="val">05</span></header>
         <div class="selo-body">
           <span class="carimbo">Confidencial</span>
           <p>Não há divulgação pública dos nomes envolvidos, nem publicidade sobre os participantes ou as correspondências. O processo preserva a privacidade como fundamento.</p>
         </div>
-        <footer class="selo-foot">discrição</footer>
+        <footer class="selo-foot">correio de papel</footer>
       </article></div>
     </section>
 
     <!-- 06 · PARTICIPAR -->
-    <section class="slot" data-bg="#8FA68F" data-ac="#4F6A50"
-             data-cap="participar" data-tit="Quer entrar na troca?">
+    <section class="slot" data-bg="#8FA68F" data-ac="#4F6A50" data-tc="#E07A47"
+             data-t1="Quer entrar" data-t2="na troca?"
+             data-sub="participar" data-meta="nº 06 / 06 · correio de papel">
       <div class="selo-wrap"><article class="selo" style="--ac:#4F6A50">
         <header class="selo-top"><span>Tudo Quer Viver</span><span class="val">06</span></header>
         <div class="selo-body">
@@ -280,16 +305,21 @@
 
   </div>
 
-  <div class="tit-bar">
-    <div class="clip"><span class="tit-cap" id="titCap">cartas entre homens</span></div>
-    <div class="clip"><span class="tit" id="tit">Tudo Quer Viver</span></div>
+  <div class="tit-layer">
+    <div class="tit-top"><div class="clip"><span class="tw1" id="tw1">Tudo</span></div></div>
+    <div class="tit-bot">
+      <div class="clip"><span class="tw2"   id="tw2">Quer Viver</span></div>
+      <div class="clip"><span class="tsub"  id="tsub">cartas entre homens</span></div>
+      <div class="clip"><span class="tmeta" id="tmeta">nº 01 / 06 · correio de papel</span></div>
+    </div>
   </div>
 
   <script>
   (function(){
     var rail=document.getElementById('rail');
     var bg=document.getElementById('bg');
-    var titCap=document.getElementById('titCap'), tit=document.getElementById('tit');
+    var tw1=document.getElementById('tw1'), tw2=document.getElementById('tw2'),
+        tsub=document.getElementById('tsub'), tmeta=document.getElementById('tmeta');
     var slots=[].slice.call(document.querySelectorAll('.slot'));
     var cur=-1;
 
@@ -329,11 +359,19 @@
     function activate(i){
       if(i===cur||!slots[i]) return;
       cur=i;
-      var s=slots[i];
-      slots.forEach(function(x,k){ x.classList.toggle('on',k===i); });
-      document.documentElement.style.setProperty('--bg', s.getAttribute('data-bg'));
-      slide(titCap, s.getAttribute('data-cap'), 0);
-      slide(tit,    s.getAttribute('data-tit'), 60);
+      var s=slots[i], root=document.documentElement.style;
+      /* above/below alimentam o deslocamento lateral que faz a trilha diagonal */
+      slots.forEach(function(x,k){
+        x.classList.toggle('on',    k===i);
+        x.classList.toggle('above', k<i);
+        x.classList.toggle('below', k>i);
+      });
+      root.setProperty('--bg', s.getAttribute('data-bg'));
+      root.setProperty('--tc', s.getAttribute('data-tc'));
+      slide(tw1,   s.getAttribute('data-t1'),   0);
+      slide(tw2,   s.getAttribute('data-t2'),   60);
+      slide(tsub,  s.getAttribute('data-sub'),  110);
+      slide(tmeta, s.getAttribute('data-meta'), 150);
     }
 
     /* detecção por posição: o slot mais próximo do centro do trilho vira o ativo.
@@ -357,7 +395,9 @@
     }, { passive:true });
     /* estado inicial sem animar (evita o 1º slide "do nada") */
     slots[0].classList.add('on'); cur=0;
+    slots.forEach(function(x,k){ if(k>0) x.classList.add('below'); });
     document.documentElement.style.setProperty('--bg', slots[0].getAttribute('data-bg'));
+    document.documentElement.style.setProperty('--tc', slots[0].getAttribute('data-tc'));
   })();
   </script>
 </body>
