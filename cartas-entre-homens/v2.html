@@ -104,7 +104,7 @@
 
   /* emblema da capa */
   .emblema{ font-family:var(--type); text-transform:uppercase; letter-spacing:.16em;
-    font-size:clamp(1.9rem,8.6vw,2.5rem); line-height:1.16; color:var(--ink); }
+    font-size:clamp(2.1rem,9.6vw,2.75rem); line-height:1.16; color:var(--ink); }
 
   /* "DIGITADO": as letras aparecem uma a uma (delays escalonados montados no JS).
      Ritmo por elemento: data-td (início) e data-step (intervalo entre letras). */
@@ -140,8 +140,10 @@
     opacity:0; pointer-events:none; animation:seal-halo 3.2s ease-out infinite; }
   @keyframes seal-halo{ 0%{ transform:scale(.94); opacity:.5; } 70%,100%{ transform:scale(1.12); opacity:0; } }
 
-  /* citação: desce p/ a área de baixo do selo e ganha peso (preto) */
-  .ps{ margin-top:auto; padding-top:14px; font-style:italic;
+  /* citação: ganha peso (preto). Sem margin-top:auto — na tela 06 ele comia todo o
+     espaço livre e empurrava a citação sozinha pro fundo, deixando um vão vazio
+     no meio do selo; agora ela segue no fluxo normal, centrada com o resto. */
+  .ps{ padding-top:14px; font-style:italic;
     font-size:clamp(.8rem,3.2vw,.9rem); line-height:1.55; color:var(--ink); }
   .ps cite{ display:block; font-style:normal; font-family:var(--type); font-size:8px;
     letter-spacing:.22em; text-transform:uppercase; color:var(--mute); margin-top:9px; }
@@ -195,8 +197,8 @@
         <header class="selo-top"><span>Tudo Quer Viver</span><span class="val">02</span></header>
         <div class="selo-body">
           <p class="tw typed" data-td=".3" data-step=".032">Um contato feito pela escrita.</p>
-          <p class="typed" data-td="1.25" data-step=".007">Uma experiência de troca de cartas entre homens que não se conhecem — mantendo contato exclusivamente por meio da escrita.</p>
-          <p class="typed" data-td="2.15" data-step=".007">A mediação é simples e direta: a coordenação apenas conecta os participantes, organiza os pares e facilita o início da correspondência.</p>
+          <p>Uma experiência de troca de cartas entre homens que não se conhecem — mantendo contato exclusivamente por meio da escrita.</p>
+          <p>A mediação é simples e direta: a coordenação apenas conecta os participantes, organiza os pares e facilita o início da correspondência.</p>
         </div>
         <footer class="selo-foot">o projeto</footer>
       </article></div>
@@ -321,15 +323,25 @@
       slide(tit,    s.getAttribute('data-tit'), 60);
     }
 
-    if('IntersectionObserver' in window){
-      var io=new IntersectionObserver(function(es){
-        /* o selo mais visível vira o ativo */
-        var best=null;
-        es.forEach(function(en){ if(en.isIntersecting&&(!best||en.intersectionRatio>best.intersectionRatio)) best=en; });
-        if(best) activate(slots.indexOf(best.target));
-      },{ root:rail, threshold:[.5,.75,.95] });
-      slots.forEach(function(s){ io.observe(s); });
+    /* detecção por posição: o slot mais próximo do centro do trilho vira o ativo.
+       (Trocado do IntersectionObserver com múltiplos thresholds — durante o snap
+       ele disparava várias vezes com leituras parciais e o "mais visível" oscilava
+       entre selos, fazendo o título do rodapé piscar/reiniciar o slide.) */
+    function nearest(){
+      var mid=rail.getBoundingClientRect().top+rail.clientHeight/2;
+      var bestI=0,bestD=Infinity;
+      slots.forEach(function(s,i){
+        var r=s.getBoundingClientRect();
+        var d=Math.abs((r.top+r.height/2)-mid);
+        if(d<bestD){ bestD=d; bestI=i; }
+      });
+      return bestI;
     }
+    var raf=null;
+    rail.addEventListener('scroll', function(){
+      if(raf) return;
+      raf=requestAnimationFrame(function(){ raf=null; activate(nearest()); });
+    }, { passive:true });
     /* estado inicial sem animar (evita o 1º slide "do nada") */
     slots[0].classList.add('on'); cur=0;
     document.documentElement.style.setProperty('--bg', slots[0].getAttribute('data-bg'));
