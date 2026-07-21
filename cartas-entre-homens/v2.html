@@ -46,8 +46,8 @@
   /* grão GERAL: uma camada fixa por cima de tudo (selo + fundo + título) —
      une a composição inteira numa mesma textura de filme, não só o fundo.
      Estática (sem transição/transform) → barata, não reintroduz o flicker. */
-  .noise{ position:fixed; inset:0; z-index:6; opacity:.05; pointer-events:none;
-    background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"); }
+  .noise{ position:fixed; inset:0; z-index:6; opacity:.16; pointer-events:none;
+    background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='linear' slope='2.2' intercept='-.35'/></feComponentTransfer></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"); }
 
   /* ── TRILHO: scroller interno (viewport estável) ── */
   .rail{ position:relative; z-index:1; height:100dvh; overflow-y:auto; -webkit-overflow-scrolling:touch;
