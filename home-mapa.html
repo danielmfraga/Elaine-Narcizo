@@ -589,6 +589,12 @@ body.frame-danca .bar .track{ visibility:hidden; }
 /* ── TRAVA Y: adentrou a seção (painel > 0) → vertical não troca de mundo ── */
 .mundo.lockY{ touch-action:pan-x; }
 
+/* ── TRAVA X: sobre um embarque (pframe) → o swipe lateral não troca de painel
+   (ex.: DançaDestino ⇄ Cartas entre Homens, vizinhos na Bilheteria). overflow
+   hidden bloqueia toque/wheel/teclado; o scrollTo() do chip (JS) continua
+   funcionando normal — é a única saída. ── */
+.mundo.lockX{ overflow-x:hidden; touch-action:pan-y; }
+
 /* ── CONTADOR DançaDestino (preenche o meio) ── */
 .clock-wrap{ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; justify-content:center; gap:16px; }
 .clock{ display:flex; gap:10px; }
@@ -1415,7 +1421,9 @@ body.in-frame .worlds-rail{ opacity:0; pointer-events:none; }
       e.preventDefault(); goToWorld(e.key==='ArrowDown'?cur+1:cur-1); return;
     }
     if(e.key==='ArrowRight'||e.key==='ArrowLeft'){
-      var m=mundos[cur], pi=getPanelIdx(m), n=getPanelCount(m);
+      var m=mundos[cur];
+      if(m.classList.contains('lockX')) return; /* sobre pframe: só sai pelo chip */
+      var pi=getPanelIdx(m), n=getPanelCount(m);
       var to=e.key==='ArrowRight'?Math.min(pi+1,n-1):Math.max(pi-1,0);
       m.scrollTo({ left:to*m.clientWidth, behavior:'smooth' });
     }
@@ -1437,6 +1445,7 @@ body.in-frame .worlds-rail{ opacity:0; pointer-events:none; }
     var isPlayer=!!(p&&p.querySelector&&p.querySelector('.sp-player')); /* tocador do rádio */
     var locked=pi>0&&!isFrame; /* iframe cuida do próprio Y; trava só os painéis comuns */
     mundos.forEach(function(x){ x.classList.toggle('lockY', x===m&&locked); });
+    mundos.forEach(function(x){ x.classList.toggle('lockX', x===m&&isFrame); }); /* sobre pframe: só sai pelo chip */
     /* X de saída (topo-esquerdo, espelho do ☰): sobre página embutida E sobre o tocador.
        Antes o tocador só ganhava o X depois de rolar a lista — no topo ficava sem saída. */
     backChip.classList.toggle('on', isFrame||isPlayer);
