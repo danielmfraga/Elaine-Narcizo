@@ -52,9 +52,11 @@
   .cv-paint{ position:absolute; bottom:-7%; left:33%; width:66%; height:auto; opacity:.92; z-index:2;
     transform:scaleY(-1); pointer-events:none; }   /* tinta forte sob a VELA (centro-baixo); flip p/ concentrar o borrão denso no rodapé */
   /* wordmark vertical = espinha na borda direita (lê de baixo p/ cima) */
+  /* reduzido de 92svh: no tamanho cheio o "D" (1ª letra, vira a ponta de baixo
+     depois do rotate) caía embaixo do #dd-fab, que fica fixo no canto. */
   .cv-wm{ position:absolute; right:1vw; top:50%; transform:translateY(-50%);
-    height:92svh; width:10.6svh; display:flex; align-items:center; justify-content:center; z-index:4; }
-  .cv-wm img{ width:92svh; max-width:none; transform:rotate(-90deg); }
+    height:78svh; width:9svh; display:flex; align-items:center; justify-content:center; z-index:4; }
+  .cv-wm img{ width:78svh; max-width:none; transform:rotate(-90deg); }
   /* hashtag vertical, fina, paralela à esquerda do wordmark (não encosta) */
   .cv-ht{ position:absolute; right:14svh; top:6%; height:30svh; width:2.2svh;
     display:flex; align-items:center; justify-content:center; z-index:4; }
@@ -184,9 +186,9 @@
   #dd-fab:not(.playing)::before, #dd-fab:not(.playing)::after{ animation:ripple 2.6s ease-out infinite; }
   #dd-fab:not(.playing)::after{ animation-delay:1.3s; }
   @keyframes ripple{ 0%{ transform:scale(1); opacity:.5; } 100%{ transform:scale(2.2); opacity:0; } }
-  /* estados por tela (setados via IntersectionObserver): capa = fantasma; C1/C5 sobem p/ não cair no lettering */
+  /* estado por tela (setado via IntersectionObserver): C1/C5 sobem p/ não cair no lettering.
+     Na capa o botão fica normal (igual às outras lâminas) — o lettering que cedeu espaço, ver .cv-wm. */
   #dd-fab.dd-up{ transform:translateY(-90px); }
-  #dd-fab.dd-ghost:not(.playing){ opacity:.35; }
   #dd-fab svg{ width:24px; height:24px; fill:var(--roxo-escuro); margin-left:2px; }
   #dd-fab .dd-eq{ display:none; align-items:flex-end; gap:3px; height:20px; }
   #dd-fab .dd-eq i{ display:block; width:4px; height:20px; border-radius:2px; background:var(--roxo-escuro);
@@ -377,7 +379,6 @@
       var fab=document.getElementById('dd-fab');
       function setFab(sec){
         if(!fab) return;
-        fab.classList.toggle('dd-ghost', sec.classList.contains('capa'));       /* pág 1: transparente */
         fab.classList.toggle('dd-up', sec.classList.contains('c1')||sec.classList.contains('c5')); /* pág 2 e 6: sobe */
       }
       var io=new IntersectionObserver(function(es){
