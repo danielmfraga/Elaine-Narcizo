@@ -53,8 +53,12 @@
     transform:scaleY(-1); pointer-events:none; }   /* tinta forte sob a VELA (centro-baixo); flip p/ concentrar o borrão denso no rodapé */
   /* wordmark vertical = espinha na borda direita (lê de baixo p/ cima) */
   /* reduzido de 92svh: no tamanho cheio o "D" (1ª letra, vira a ponta de baixo
-     depois do rotate) caía embaixo do #dd-fab, que fica fixo no canto. */
-  .cv-wm{ position:absolute; right:1vw; top:50%; transform:translateY(-50%);
+     depois do rotate) caía embaixo do #dd-fab, que fica fixo no canto.
+     Centralizado não na tela toda, mas no vão ACIMA do player: top calcula o
+     meio-do-caminho entre y=0 (menu, que fica na página-mãe) e o topo do
+     #dd-fab (58px de botão + 16px de vão até o rodapé = 74px). */
+  .cv-wm{ position:absolute; right:1vw;
+    top:calc((100svh - 74px - env(safe-area-inset-bottom,0px))/2); transform:translateY(-50%);
     height:78svh; width:9svh; display:flex; align-items:center; justify-content:center; z-index:4; }
   .cv-wm img{ width:78svh; max-width:none; transform:rotate(-90deg); }
   /* hashtag vertical, fina, paralela à esquerda do wordmark (não encosta) */
@@ -175,8 +179,9 @@
   .c7-star{ position:absolute; color:var(--branco); z-index:5; line-height:1; opacity:.9; }
 
   /* ── MINIPLAYER flutuante · "Rádio DançaDestino" (mesmo motor YouTube do rádio da home) ──
-     right:max(...) prende o botão à coluna de 540px em telas largas. */
-  #dd-fab{ position:fixed; right:max(14px, calc(50vw - 256px)); bottom:calc(16px + env(safe-area-inset-bottom,0px));
+     right:max(...) prende o botão à coluna de 540px em telas largas; +12px em cima do valor
+     antigo (14→26 / 256→244) pra descolar um pouco da borda e ficar mais perto da vela. */
+  #dd-fab{ position:fixed; right:max(26px, calc(50vw - 244px)); bottom:calc(16px + env(safe-area-inset-bottom,0px));
     width:58px; height:58px; border-radius:50%; background:var(--amarelo); border:0; cursor:pointer; z-index:80;
     display:flex; align-items:center; justify-content:center; box-shadow:0 10px 26px rgba(0,0,0,.45);
     transition:transform .4s cubic-bezier(.2,.7,.25,1), opacity .3s ease; }
@@ -199,7 +204,7 @@
   #dd-fab.playing .dd-eq{ display:flex; }
   @keyframes eq{ 0%,100%{ transform:scaleY(.3); } 50%{ transform:scaleY(1); } }
 
-  #dd-panel{ position:fixed; right:max(14px, calc(50vw - 256px)); bottom:calc(86px + env(safe-area-inset-bottom,0px));
+  #dd-panel{ position:fixed; right:max(26px, calc(50vw - 244px)); bottom:calc(86px + env(safe-area-inset-bottom,0px));
     width:min(92vw,340px); z-index:70; background:var(--roxo-escuro); border:2px solid var(--amarelo);
     border-radius:16px; padding:12px; box-shadow:0 26px 54px rgba(0,0,0,.5);
     opacity:0; pointer-events:none; translate:0 16px; transition:opacity .28s ease, translate .28s ease; }
