@@ -52,15 +52,16 @@
   .cv-paint{ position:absolute; bottom:-7%; left:33%; width:66%; height:auto; opacity:.92; z-index:2;
     transform:scaleY(-1); pointer-events:none; }   /* tinta forte sob a VELA (centro-baixo); flip p/ concentrar o borrão denso no rodapé */
   /* wordmark vertical = espinha na borda direita (lê de baixo p/ cima) */
-  /* reduzido de 92svh: no tamanho cheio o "D" (1ª letra, vira a ponta de baixo
-     depois do rotate) caía embaixo do #dd-fab, que fica fixo no canto.
+  /* 84svh (proporção mantida de 78→84, escala ~1.077 no wrapper de 9→9.7svh):
+     o "D" (1ª letra, vira a ponta de baixo depois do rotate) precisa de folga
+     do #dd-fab, que fica fixo no canto — por isso não estoura 100%.
      Centralizado não na tela toda, mas no vão ACIMA do player: top calcula o
      meio-do-caminho entre y=0 (menu, que fica na página-mãe) e o topo do
      #dd-fab (58px de botão + 16px de vão até o rodapé = 74px). */
   .cv-wm{ position:absolute; right:1vw;
     top:calc((100svh - 74px - env(safe-area-inset-bottom,0px))/2); transform:translateY(-50%);
-    height:78svh; width:9svh; display:flex; align-items:center; justify-content:center; z-index:4; }
-  .cv-wm img{ width:78svh; max-width:none; transform:rotate(-90deg); }
+    height:84svh; width:9.7svh; display:flex; align-items:center; justify-content:center; z-index:4; }
+  .cv-wm img{ width:84svh; max-width:none; transform:rotate(-90deg); }
   /* hashtag vertical, fina, paralela à esquerda do wordmark (não encosta) */
   .cv-ht{ position:absolute; right:14svh; top:6%; height:30svh; width:2.2svh;
     display:flex; align-items:center; justify-content:center; z-index:4; }
