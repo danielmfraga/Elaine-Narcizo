@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Elaine Narcizo</title>
+<meta name="description" content="Elaine Narcizo — educadora, arteterapeuta, pesquisadora. Tem muita vida acontecendo aqui." />
+<link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+/* ═════════════════════════════════════════════════════════════
+   ELAINE NARCIZO — HOME "FLUXO" (novo esqueleto)
+   Referência estrutural: houseofyellow.nl (pedido do Daniel).
+   Página ÚNICA de rolagem vertical NATIVA — zero gesto especial,
+   a resposta à baixa usabilidade da navegação 2D (home-mapa.html,
+   preservada como versão anterior).
+   Efeitos de passagem: telas-capa (sticky) que ficam PRESAS no
+   topo enquanto a próxima lâmina desliza POR CIMA (deck de
+   cartas), com a capa coberta escalando/escurecendo de leve.
+   Estrutura 1:1 com a referência, conteúdo nosso:
+     hero statement+reel · marquee · quem sou eu · EM CARTAZ
+     (bilheteria: DançaDestino/Cartas/PONTE como cards de obra)
+     · NO AR (rádio + contadores animados) · como eu trabalho
+     (3 cards de serviço) · CTA conectar · footer rico.
+   Vídeo: a referência é toda vídeo — os slots estão MARCADOS
+   (.vph com rótulo visível + comentários <!-- VÍDEO -->).
+   ═════════════════════════════════════════════════════════════ */
+:root{
+  --amarelo:#F5D731;      /* o amarelo da casa (já era o --amarelo do site) */
+  --ink:#0F0E0C;
+  --paper:#FAF8F3;
+  --white:#FFFFFF;
+  --mute:#6E6A60;
+  --line:rgba(15,14,12,.14);
+
+  --disp:"Archivo",sans-serif;      /* display: pesado e expandido */
+  --mono:"Space Mono",ui-monospace,monospace;
+  --ease:cubic-bezier(.22,.61,.36,1);
+
+  --pad:clamp(20px,5vw,64px);
+  --radius:clamp(18px,3.5vw,34px);  /* boca arredondada das lâminas que cobrem */
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+html,body{ background:var(--ink); }
+body{
+  font-family:var(--disp); font-size:17px; line-height:1.55; color:var(--ink);
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+h1,h2,h3{ margin:0; }
+p{ margin:0; text-wrap:pretty; }
+a{ color:inherit; text-decoration:none; }
+img{ display:block; max-width:100%; }
+button{ font:inherit; }
+
+/* tipografia display — caixa-alta, expandida, pesada (a voz da referência) */
+.giant{
+  font-family:var(--disp); font-weight:860; font-stretch:118%;
+  text-transform:uppercase; letter-spacing:-.015em; line-height:.92;
+  font-size:clamp(2.6rem,11.5vw,7.6rem); text-wrap:balance;
+}
+.big{
+  font-family:var(--disp); font-weight:820; font-stretch:115%;
+  text-transform:uppercase; letter-spacing:-.01em; line-height:.95;
+  font-size:clamp(1.9rem,7.4vw,4.4rem); text-wrap:balance;
+}
+.lead{ font-size:clamp(1.02rem,1rem + .5vw,1.3rem); font-weight:420; line-height:1.5; max-width:56ch; }
+.lead b{ font-weight:700; }
+/* índice de seção — o "[00]" da referência */
+.idx{
+  font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+  display:inline-flex; align-items:center; gap:10px;
+}
+.idx::after{ content:""; width:34px; height:1px; background:currentColor; opacity:.5; }
+
+/* ── HEADER fixo ── */
+.hdr{
+  position:fixed; top:0; left:0; right:0; z-index:80;
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:14px var(--pad);
+  transition:background .35s var(--ease), color .35s var(--ease), padding .35s var(--ease);
+  color:var(--ink);
+}
+.hdr.scrolled{ background:rgba(15,14,12,.9); color:var(--paper); backdrop-filter:blur(10px); padding:10px var(--pad); }
+/* menu aberto: header flutua sobre o overlay escuro → texto claro, sem fundo */
+.hdr.menu-open{ background:transparent; color:var(--paper); backdrop-filter:none; }
+.hdr .wordmark{ font-weight:820; font-stretch:118%; text-transform:uppercase; font-size:15px; letter-spacing:.02em; white-space:nowrap; }
+.hdr nav{ display:none; gap:26px; }
+.hdr nav a{ font-family:var(--mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase; opacity:.8; transition:opacity .2s; }
+.hdr nav a:hover{ opacity:1; }
+@media(min-width:960px){ .hdr nav{ display:flex; } }
+.burger{
+  width:44px; height:44px; border:0; border-radius:50%; cursor:pointer;
+  background:var(--ink); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
+  flex-shrink:0;
+}
+.hdr.scrolled .burger{ background:var(--amarelo); }
+.burger i{ display:block; width:16px; height:2px; background:var(--amarelo); transition:transform .3s var(--ease), opacity .3s, background .3s; }
+.hdr.scrolled .burger i{ background:var(--ink); }
+.burger.open i:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+.burger.open i:nth-child(2){ opacity:0; }
+.burger.open i:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+
+/* ── MENU overlay ── */
+.menu{
+  position:fixed; inset:0; z-index:75; background:var(--ink); color:var(--paper);
+  display:flex; flex-direction:column; justify-content:center; padding:0 var(--pad);
+  opacity:0; visibility:hidden; pointer-events:none; transition:opacity .38s var(--ease), visibility .38s;
+}
+.menu.open{ opacity:1; visibility:visible; pointer-events:auto; }
+.menu a.mi{
+  display:flex; align-items:baseline; gap:18px; padding:clamp(8px,1.6vh,16px) 0;
+  border-bottom:1px solid rgba(250,248,243,.08);
+  font-weight:820; font-stretch:115%; text-transform:uppercase; letter-spacing:-.01em;
+  font-size:clamp(1.9rem,7.5vw,4rem); line-height:1; color:rgba(250,248,243,.5);
+  opacity:0; transform:translateY(14px);
+  transition:transform .4s var(--ease), opacity .4s, color .2s; transition-delay:calc(var(--i)*45ms);
+}
+.menu.open a.mi{ opacity:1; transform:none; }
+.menu a.mi:hover{ color:var(--amarelo); }
+.menu a.mi small{ font-family:var(--mono); font-weight:400; font-size:11px; letter-spacing:.14em; color:rgba(250,248,243,.35); flex:0 0 30px; }
+.menu .mfoot{ margin-top:5vh; font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:rgba(250,248,243,.4); display:flex; gap:22px; flex-wrap:wrap; }
+.menu .mfoot a:hover{ color:var(--amarelo); }
+
+/* ── LOADER (uma vez por sessão) ── */
+.loader{
+  position:fixed; inset:0; z-index:100; background:var(--amarelo);
+  display:flex; align-items:center; justify-content:center;
+  transition:transform .7s cubic-bezier(.7,0,.3,1);
+}
+.loader.done{ transform:translateY(-101%); }
+.loader span{ font-weight:860; font-stretch:118%; text-transform:uppercase; font-size:clamp(1.4rem,6vw,3rem);
+  overflow:hidden; display:inline-block; }
+.loader span i{ display:inline-block; font-style:normal; transform:translateY(110%); animation:lup .7s var(--ease) .15s forwards; }
+@keyframes lup{ to{ transform:none; } }
+
+/* ═══ ESQUELETO: capas presas + lâminas que cobrem ═══ */
+main{ position:relative; }
+.cover{
+  position:sticky; top:0; min-height:100svh;
+  display:flex; flex-direction:column; justify-content:flex-end;
+  padding:calc(72px + 4vh) var(--pad) clamp(26px,5vh,56px);
+  overflow:hidden;
+  transform-origin:center top;
+  will-change:transform,filter;
+}
+.sheet{
+  position:relative; z-index:2;
+  border-radius:var(--radius) var(--radius) 0 0;
+  box-shadow:0 -18px 60px rgba(0,0,0,.35);
+  padding:clamp(44px,9vh,110px) var(--pad);
+}
+.y{ background:var(--amarelo); color:var(--ink); }
+.k{ background:var(--ink); color:var(--paper); }
+.w{ background:var(--paper); color:var(--ink); }
+
+/* ── slot de VÍDEO (marcação visível — a referência é toda vídeo) ── */
+.vph{
+  position:relative; overflow:hidden; border-radius:clamp(12px,2vw,22px);
+  background:var(--ink); aspect-ratio:16/9; width:100%;
+  display:flex; align-items:center; justify-content:center;
+}
+.vph::before{ content:""; position:absolute; inset:0; opacity:.16;
+  background:repeating-linear-gradient(-45deg, var(--amarelo) 0 2px, transparent 2px 14px); }
+.vph .play{
+  width:clamp(52px,8vw,74px); height:clamp(52px,8vw,74px); border-radius:50%;
+  background:var(--amarelo); display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  box-shadow:0 12px 34px rgba(0,0,0,.4);
+}
+.vph .play svg{ width:38%; height:38%; fill:var(--ink); margin-left:6%; }
+.vph .note{
+  position:absolute; left:12px; bottom:12px; right:12px;
+  font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--amarelo); opacity:.85; line-height:1.5;
+}
+.vph img.poster{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.45; }
+
+/* ── HERO ── */
+.c-hero{ z-index:1; justify-content:flex-end; gap:clamp(18px,3vh,30px); }
+.c-hero .hello{ font-family:var(--mono); font-size:13px; letter-spacing:.16em; text-transform:uppercase; display:flex; align-items:center; gap:10px; }
+.c-hero .hello i{ width:8px; height:8px; border-radius:50%; background:var(--ink); animation:blink 1.9s var(--ease) infinite; }
+@keyframes blink{ 0%,100%{ opacity:1; } 50%{ opacity:.25; } }
+.c-hero .giant em{ font-style:normal; -webkit-text-stroke:2px var(--ink); color:transparent; }
+.c-hero .sub{ max-width:52ch; font-weight:460; font-size:clamp(.98rem,.9rem + .5vw,1.22rem); }
+.c-hero .hero-media{ margin-top:clamp(4px,1vh,12px); }
+.c-hero .hero-media .vph{ aspect-ratio:auto; height:clamp(180px,30svh,340px); }
+.hint{ font-family:var(--mono); font-size:10px; letter-spacing:.2em; text-transform:uppercase; opacity:.6;
+  display:inline-flex; align-items:center; gap:8px; }
+.hint b{ animation:drop 1.8s var(--ease) infinite; font-weight:400; }
+@keyframes drop{ 0%,100%{ transform:translateY(0); opacity:.4; } 50%{ transform:translateY(5px); opacity:1; } }
+
+/* ── MARQUEE (letreiro) ── */
+.s-marquee{ padding:0; border-radius:var(--radius) var(--radius) 0 0; overflow:hidden; }
+.marq{ display:flex; overflow:hidden; padding:16px 0; }
+.marq .trk{ display:inline-flex; white-space:nowrap; animation:marq 30s linear infinite; }
+.marq span{ font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+  padding:0 28px; color:var(--amarelo); display:inline-flex; align-items:center; gap:10px; }
+.marq span i{ width:6px; height:6px; border-radius:50%; background:#FF5A4D; animation:blink 1.9s infinite; }
+@keyframes marq{ to{ transform:translateX(-50%); } }
+
+/* ── blocos de conteúdo ── */
+.wrap{ max-width:1200px; margin:0 auto; display:flex; flex-direction:column; gap:clamp(22px,4vh,44px); }
+.cols{ display:grid; gap:clamp(22px,4vw,56px); }
+@media(min-width:900px){ .cols.two{ grid-template-columns:1.1fr .9fr; align-items:start; } }
+.portrait{ border-radius:clamp(12px,2vw,22px); overflow:hidden; }
+.portrait img{ width:100%; height:100%; object-fit:cover; aspect-ratio:4/5; }
+.btnrow{ display:flex; gap:12px; flex-wrap:wrap; }
+.btn{
+  display:inline-flex; align-items:center; gap:10px; padding:15px 26px; border-radius:999px;
+  background:var(--ink); color:var(--amarelo); border:0; cursor:pointer;
+  font-family:var(--mono); font-size:12px; letter-spacing:.12em; text-transform:uppercase;
+  transition:gap .25s var(--ease), transform .25s var(--ease);
+}
+.btn:hover{ gap:15px; transform:translateY(-2px); }
+.btn.inv{ background:var(--amarelo); color:var(--ink); }
+.btn.ghost{ background:transparent; color:inherit; box-shadow:inset 0 0 0 1.5px currentColor; }
+
+/* ── EM CARTAZ: cards de obra (o "The works" da referência) ── */
+.work{ display:flex; flex-direction:column; gap:14px; padding:clamp(26px,5vh,48px) 0; border-top:1px solid var(--line); }
+.works .work:first-child{ border-top:0; padding-top:0; }
+.work .media{ position:relative; }
+.work h3{ font-weight:820; font-stretch:115%; text-transform:uppercase; letter-spacing:-.01em;
+  line-height:.95; font-size:clamp(1.7rem,6.4vw,3.6rem); }
+.work h3 em{ font-style:normal; color:transparent; -webkit-text-stroke:1.5px currentColor; }
+.work .meta{ display:flex; flex-wrap:wrap; gap:8px 10px; align-items:center; }
+.chip{ font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
+  padding:7px 13px; border-radius:999px; box-shadow:inset 0 0 0 1px var(--line); }
+.chip.hot{ background:var(--amarelo); box-shadow:none; color:var(--ink); }
+.work .stat{ font-family:var(--mono); font-size:12px; letter-spacing:.06em; color:var(--mute); }
+.work .go{
+  display:inline-flex; align-items:center; gap:10px; margin-top:4px;
+  font-family:var(--mono); font-size:12px; letter-spacing:.12em; text-transform:uppercase; font-weight:700;
+}
+.work .go .ar{ transition:transform .25s var(--ease); }
+.work .go:hover .ar{ transform:translateX(5px); }
+@media(min-width:900px){
+  .work{ display:grid; grid-template-columns:1.15fr .85fr; gap:clamp(22px,3.5vw,48px); align-items:center; }
+  .work .media{ grid-column:1; grid-row:1/7; }
+  .works .work:nth-child(even) .media{ grid-column:2; }
+  .works .work:nth-child(even) > :not(.media){ grid-column:1; }
+  .work > :not(.media){ grid-column:2; }
+}
+
+/* faixa de parcerias (o grid de 30 logos da referência) */
+.partners{ margin-top:clamp(30px,6vh,60px); padding-top:clamp(20px,3vh,32px); border-top:1px solid var(--line); }
+.partners .cap{ font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--mute); margin-bottom:14px; }
+.partners .marq{ padding:6px 0; }
+.partners .marq span{ color:var(--mute); font-size:12px; }
+
+/* ── NO AR (rádio): capa com vídeo real + contadores ── */
+.c-radio video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.5; }
+.c-radio::after{ content:""; position:absolute; inset:0; background:linear-gradient(to top, rgba(15,14,12,.82) 0%, rgba(15,14,12,.15) 55%); }
+.c-radio > *{ position:relative; z-index:2; }
+.live-tag{ display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--amarelo); }
+.live-tag i{ width:7px; height:7px; border-radius:50%; background:#FF5A4D; animation:blink 1.6s infinite; }
+.stats{ display:grid; grid-template-columns:repeat(2,1fr); gap:clamp(16px,3vw,28px); }
+@media(min-width:820px){ .stats{ grid-template-columns:repeat(4,1fr); } }
+.stat-b{ border-top:2px solid var(--ink); padding-top:14px; }
+.stat-b b{ display:block; font-weight:860; font-stretch:118%; font-size:clamp(2.2rem,8vw,4.2rem); line-height:1; font-variant-numeric:tabular-nums; }
+.stat-b span{ font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:rgba(15,14,12,.6); }
+.manif{ font-size:clamp(1.05rem,1rem + .6vw,1.4rem); font-weight:480; line-height:1.45; max-width:44ch; }
+.manif b{ font-weight:800; }
+
+/* ── COMO EU TRABALHO: 3 cards de serviço ── */
+.svc{ display:grid; gap:16px; }
+@media(min-width:900px){ .svc{ grid-template-columns:repeat(3,1fr); } }
+.svc a{
+  display:flex; flex-direction:column; gap:14px; padding:clamp(22px,3vw,32px);
+  border-radius:clamp(14px,2vw,22px); background:var(--white); box-shadow:inset 0 0 0 1px var(--line);
+  transition:transform .3s var(--ease), box-shadow .3s var(--ease);
+}
+.svc a:hover{ transform:translateY(-6px); box-shadow:inset 0 0 0 1.5px var(--ink), 0 22px 44px -22px rgba(0,0,0,.3); }
+.svc .n{ font-family:var(--mono); font-size:11px; letter-spacing:.12em; color:var(--mute); }
+.svc h3{ font-weight:800; font-stretch:112%; text-transform:uppercase; font-size:clamp(1.15rem,2vw,1.5rem); line-height:1.05; }
+.svc p{ font-size:.94rem; color:var(--mute); line-height:1.55; flex:1; }
+.svc .go{ font-family:var(--mono); font-size:11.5px; letter-spacing:.12em; text-transform:uppercase; font-weight:700; }
+
+/* ── CTA final ── */
+.c-cta{ justify-content:center; align-items:flex-start; gap:clamp(18px,3vh,28px); }
+.c-cta .tagline{ font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase; opacity:.7; }
+
+/* ── FOOTER ── */
+.ftr{ padding-bottom:clamp(26px,4vh,44px); }
+.ftr .grid{ display:grid; gap:clamp(26px,5vw,60px); }
+@media(min-width:900px){ .ftr .grid{ grid-template-columns:1.3fr 1fr 1fr; } }
+.ftr .cap{ font-family:var(--mono); font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:rgba(250,248,243,.4); margin-bottom:12px; }
+.ftr ul{ list-style:none; display:flex; flex-direction:column; gap:8px; }
+.ftr ul a{ opacity:.75; transition:opacity .2s, color .2s; }
+.ftr ul a:hover{ opacity:1; color:var(--amarelo); }
+.ftr .close{ margin-top:clamp(36px,7vh,72px); padding-top:22px; border-top:1px solid rgba(250,248,243,.12);
+  display:flex; flex-wrap:wrap; gap:12px 26px; align-items:baseline; justify-content:space-between; }
+.ftr .close .tag{ font-weight:820; font-stretch:115%; text-transform:uppercase; font-size:clamp(1.1rem,3.4vw,1.7rem); color:var(--amarelo); }
+.ftr .fine{ font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; color:rgba(250,248,243,.4); }
+
+/* ── revelação ao entrar (progressive enhancement) ──
+   .in .r cobre descendentes; .in.r cobre o elemento que é os dois ao
+   mesmo tempo (idx/h2 soltos observados direto pelo IO). */
+.r{ transition:opacity .7s var(--ease), transform .7s var(--ease); transition-delay:calc(var(--r,0)*90ms); }
+.js .r{ opacity:0; transform:translateY(26px); }
+.js .in .r, .js .in.r{ opacity:1; transform:none; }
+/* título que sobe por trás de uma máscara, palavra a palavra */
+.split .w-line{ display:inline-block; overflow:hidden; vertical-align:top; }
+.split .w-word{ display:inline-block; transition:transform .75s var(--ease); transition-delay:calc(var(--w)*60ms); }
+.js .split .w-word{ transform:translateY(112%); }
+.js .in .split .w-word, .js .in.split .w-word{ transform:none; }
+/* âncoras: folga pro header fixo */
+[id]{ scroll-margin-top:64px; }
+
+@media(prefers-reduced-motion:reduce){
+  *{ animation:none!important; transition:none!important; }
+  .js .r,.js .split .w-word{ opacity:1!important; transform:none!important; }
+  html{ scroll-behavior:auto; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div class="loader" id="loader" aria-hidden="true"><span><i>Elaine Narcizo</i></span></div>
+
+<!-- HEADER (nav da referência: 5 itens + redes; aqui: seções + redes no menu) -->
+<header class="hdr" id="hdr">
+  <a class="wordmark" href="#inicio">Elaine Narcizo</a>
+  <nav aria-label="Seções">
+    <a href="#quem">Quem sou eu</a>
+    <a href="#cartaz">Em cartaz</a>
+    <a href="#radio">Rádio</a>
+    <a href="#formacoes">Formações</a>
+    <a href="#conectar">Conectar</a>
+  </nav>
+  <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><i></i><i></i><i></i></button>
+</header>
+
+<!-- MENU overlay -->
+<div class="menu" id="menu" aria-hidden="true">
+  <a class="mi" style="--i:0" href="#inicio"><small>00</small>Início</a>
+  <a class="mi" style="--i:1" href="#quem"><small>01</small>Quem sou eu</a>
+  <a class="mi" style="--i:2" href="#cartaz"><small>02</small>Em cartaz</a>
+  <a class="mi" style="--i:3" href="#radio"><small>03</small>Rádio</a>
+  <a class="mi" style="--i:4" href="#formacoes"><small>04</small>Formações</a>
+  <a class="mi" style="--i:5" href="#conectar"><small>05</small>Conectar</a>
+  <div class="mfoot">
+    <a href="#" data-todo="instagram real">Instagram</a>
+    <a href="#" data-todo="youtube real">YouTube</a>
+    <a href="#" data-todo="whatsapp real">WhatsApp</a>
+  </div>
+</div>
+
+<main id="fluxo">
+
+  <!-- ══ HERO (capa presa · amarelo) — o "Welcome!" da referência ══ -->
+  <section class="cover c-hero y" id="inicio">
+    <span class="hello r" style="--r:0"><i></i> Olá! Você chegou.</span>
+    <h1 class="giant split r" style="--r:1">Tem muita <em>vida</em> acontecendo aqui.</h1>
+    <p class="sub r" style="--r:2">Educação, arteterapia e pesquisa que se movem na velocidade da vida —
+      da ideia ao encontro, e além. <b>Onde a escuta encontra o gesto.</b></p>
+
+    <!-- VÍDEO · REEL DE ABERTURA — sugestão: cortes rápidos de oficinas, dança,
+         ateliê e escuta (20–30s, loop, sem som). Na referência este é o coração
+         do hero. Trocar o .vph por <video autoplay muted loop playsinline>. -->
+    <div class="hero-media r" style="--r:3">
+      <div class="vph">
+        <span class="play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+        <span class="note">Vídeo aqui · reel de abertura — oficinas, dança, ateliê (20–30s, loop)</span>
+      </div>
+    </div>
+
+    <span class="hint r" style="--r:4">Role para descer <b>↓</b></span>
+  </section>
+
+  <!-- letreiro (nosso conteúdo do bar antigo) -->
+  <div class="sheet s-marquee k" aria-hidden="true">
+    <div class="marq"><div class="trk">
+      <span><i></i> Inscrições abertas — Repertórios Sensíveis para a Clínica · 2026</span>
+      <span>✦ Toda sexta, 20h — DançaDestino, um ritual para nosso tempo</span>
+      <span><i></i> Inscrições abertas — Repertórios Sensíveis para a Clínica · 2026</span>
+      <span>✦ Toda sexta, 20h — DançaDestino, um ritual para nosso tempo</span>
+    </div></div>
+  </div>
+
+  <!-- ══ QUEM SOU EU — o "Who are we?" da referência ══ -->
+  <div class="sheet w" id="quem">
+    <div class="wrap">
+      <span class="idx r" style="--r:0">[01] — Quem sou eu</span>
+      <div class="cols two">
+        <div style="display:flex;flex-direction:column;gap:clamp(18px,3vh,28px)">
+          <h2 class="big split r" style="--r:1">Educadora, arteterapeuta, pesquisadora.</h2>
+          <p class="lead r" style="--r:2">Confiança construída no encontro — não pela quantidade,
+            mas porque cada travessia é feita <b>com intenção</b>. Mestra em Serviço Social,
+            com o corpo, a arte e a escuta no centro do trabalho.</p>
+          <div class="btnrow r" style="--r:3">
+            <a class="btn" href="#conectar">Conectar <span>→</span></a>
+            <a class="btn ghost" href="#formacoes">Formações <span>→</span></a>
+          </div>
+        </div>
+        <div class="portrait r" style="--r:2">
+          <img src="assets/elaine-narcizo.jpeg" alt="Retrato de Elaine Narcizo" loading="lazy" style="object-position:64% 28%" />
+        </div>
+      </div>
+
+      <!-- VÍDEO · MANIFESTO PESSOAL — sugestão: Elaine à câmera, 40–60s,
+           "por que eu faço o que eu faço" (o vídeo-declaração da referência). -->
+      <div class="vph r" style="--r:1">
+        <span class="play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+        <span class="note">Vídeo aqui · manifesto pessoal — Elaine à câmera (40–60s)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ EM CARTAZ (capa presa · preto) — o "The works" da referência ══ -->
+  <section class="cover k" id="cartaz" style="justify-content:flex-end">
+    <div class="wrap" style="gap:16px">
+      <span class="idx r" style="--r:0;color:var(--amarelo)">[02] — Bilheteria</span>
+      <h2 class="giant split r" style="--r:1">Em <em style="color:transparent;-webkit-text-stroke:2px var(--amarelo)">cartaz</em></h2>
+      <p class="lead r" style="--r:2;max-width:44ch">Experiências participativas com bilheteria aberta.
+        Escolha seu embarque — cada obra tem sua própria casa dentro do site.</p>
+    </div>
+  </section>
+
+  <!-- as obras (Bilheteria integrada: DançaDestino e Cartas viram composição da própria home) -->
+  <div class="sheet w">
+    <div class="wrap">
+      <div class="works">
+
+        <!-- OBRA 1 · Dança Destino -->
+        <article class="work in-io">
+          <div class="media r" style="--r:0">
+            <!-- VÍDEO · TEASER DO RITUAL — sugestão: pessoas dançando em casas
+                 diferentes, cortadas no mesmo ritmo (15s, loop). Por ora, a arte
+                 da mão entra de pôster de fundo. -->
+            <div class="vph">
+              <img class="poster" src="assets/bg-mao.webp" alt="" aria-hidden="true" loading="lazy" />
+              <span class="play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+              <span class="note">Vídeo aqui · teaser do ritual — gente dançando onde estiver (15s)</span>
+            </div>
+          </div>
+          <span class="chip hot r" style="--r:1">Portão 01</span>
+          <h3 class="r" style="--r:2">Dança <em>Destino</em></h3>
+          <div class="meta r" style="--r:3">
+            <span class="chip">Ritual coletivo</span><span class="chip">Ao vivo</span><span class="chip">Vagas limitadas</span>
+          </div>
+          <p class="stat r" style="--r:4">Toda sexta · 20h · onde você estiver — semana 35 do ritual</p>
+          <a class="go r" style="--r:5" href="danca-destino/">Embarcar <span class="ar">→</span></a>
+        </article>
+
+        <!-- OBRA 2 · Cartas entre Homens -->
+        <article class="work in-io">
+          <div class="media r" style="--r:0">
+            <!-- VÍDEO/ANIMAÇÃO · sugestão: os selos da série ganhando vida
+                 (motion sutil dos selos trocando, 10–15s). Pôster: colagem. -->
+            <div class="vph">
+              <img class="poster" src="assets/bg-collage.webp" alt="" aria-hidden="true" loading="lazy" />
+              <span class="play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+              <span class="note">Vídeo aqui · animação da série de selos (10–15s)</span>
+            </div>
+          </div>
+          <span class="chip hot r" style="--r:1">Portão 02</span>
+          <h3 class="r" style="--r:2">Cartas entre <em>Homens</em></h3>
+          <div class="meta r" style="--r:3">
+            <span class="chip">Tudo Quer Viver</span><span class="chip">Temporada</span><span class="chip">Só pela escrita</span>
+          </div>
+          <p class="stat r" style="--r:4">Correspondência entre homens que não se conhecem — vagas abertas</p>
+          <a class="go r" style="--r:5" href="cartas-entre-homens/v2.html">Embarcar <span class="ar">→</span></a>
+        </article>
+
+        <!-- OBRA 3 · PONTE -->
+        <article class="work in-io">
+          <div class="media r" style="--r:0">
+            <div class="vph">
+              <img class="poster" src="assets/bg-green_bx.webp" alt="" aria-hidden="true" loading="lazy" />
+              <span class="play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+              <span class="note">Vídeo aqui (opcional) · travessia/caminho — ou manter só a arte</span>
+            </div>
+          </div>
+          <span class="chip hot r" style="--r:1">Percurso</span>
+          <h3 class="r" style="--r:2">PONTE — projeto <em>de vida</em></h3>
+          <div class="meta r" style="--r:3">
+            <span class="chip">Oficina interativa</span><span class="chip">Online</span><span class="chip">No seu tempo</span>
+          </div>
+          <p class="stat r" style="--r:4">Onde você está, o que deseja — e a ponte entre os dois. Três exercícios guiados.</p>
+          <a class="go r" style="--r:5" href="ui_kits/ponte/">Fazer o percurso <span class="ar">→</span></a>
+        </article>
+
+      </div>
+
+      <!-- a referência fecha "The works" com um grid de ~30 logos de clientes.
+           Aqui: faixa de contextos por onde o trabalho da Elaine circula —
+           TROCAR por logos reais (escolas, clínicas, instituições) quando houver. -->
+      <div class="partners in-io">
+        <p class="cap r" style="--r:0">Por onde o trabalho circula</p>
+        <div class="marq"><div class="trk">
+          <span>Clínicas</span><span>✦</span><span>Escolas</span><span>✦</span><span>Comunidades</span><span>✦</span>
+          <span>Grupos de estudo</span><span>✦</span><span>Ateliês</span><span>✦</span><span>Serviço Social</span><span>✦</span>
+          <span>Clínicas</span><span>✦</span><span>Escolas</span><span>✦</span><span>Comunidades</span><span>✦</span>
+          <span>Grupos de estudo</span><span>✦</span><span>Ateliês</span><span>✦</span><span>Serviço Social</span><span>✦</span>
+        </div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ NO AR (capa presa · vídeo REAL da rádio) — o "Beyond the Screen" ══ -->
+  <section class="cover k c-radio" id="radio">
+    <video src="assets/radio-capa.mp4" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
+    <div class="wrap" style="gap:14px">
+      <span class="live-tag r" style="--r:0"><i></i> No ar</span>
+      <h2 class="giant split r" style="--r:1">Rádio para <em style="color:transparent;-webkit-text-stroke:2px var(--amarelo)">teimosos</em></h2>
+      <p class="lead r" style="--r:2;max-width:40ch">Tinhosa, a rádio que acompanha as teimosias do mundo.</p>
+    </div>
+  </section>
+
+  <!-- números da rádio (os contadores animados da referência) -->
+  <div class="sheet y">
+    <div class="wrap">
+      <p class="manif in-io r" style="--r:0">Uma programação de podcasts, playlists e programas que
+        <b>escutam o mundo sem encerrá-lo em uma sentença</b> — fazendo companhia ao que nele
+        ainda insiste em viver.</p>
+      <div class="stats in-io">
+        <!-- números reais do projeto; ajustar quando os feeds crescerem -->
+        <div class="stat-b r" style="--r:0"><b data-count="17">0</b><span>Episódios no podcast</span></div>
+        <div class="stat-b r" style="--r:1"><b data-count="35">0</b><span>Semanas de ritual</span></div>
+        <div class="stat-b r" style="--r:2"><b data-count="2">0</b><span>Programas no ar</span></div>
+        <div class="stat-b r" style="--r:3"><b data-count="8">0</b><span>Cartazes do manifesto</span></div>
+      </div>
+      <div class="btnrow in-io">
+        <!-- pendência: a rádio ainda não tem página própria (o player mora no
+             esqueleto antigo). Sugestão: /radio/ standalone, mesmo padrão das áreas. -->
+        <a class="btn r" style="--r:0" href="#" data-todo="página própria da rádio">Sintonize <span>→</span></a>
+        <a class="btn ghost r" style="--r:1" href="#" data-todo="link do manifesto">Pequeno manifesto Tinhoso <span>→</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ COMO EU TRABALHO — o "How we roll" (3 cards de serviço) ══ -->
+  <div class="sheet w" id="formacoes">
+    <div class="wrap">
+      <span class="idx r in-io" style="--r:0">[03] — Como eu trabalho</span>
+      <h2 class="big split r in-io" style="--r:1">Escuto primeiro. Crio <em style="color:transparent;-webkit-text-stroke:1.5px currentColor">com</em> você.</h2>
+      <div class="svc in-io">
+        <a href="repertorios-sensiveis/" class="r" style="--r:0">
+          <span class="n">01</span>
+          <h3>Formações que passam pelo corpo</h3>
+          <p>Repertórios Sensíveis para a Clínica — formação baseada em arteterapia, focada em
+            experiências simbólicas e manejo clínico. Inscrições abertas.</p>
+          <span class="go">Explorar →</span>
+        </a>
+        <a href="ui_kits/ponte/" class="r" style="--r:1">
+          <span class="n">02</span>
+          <h3>Percursos que atravessam a vida</h3>
+          <p>Oficinas e travessias abertas para indivíduos, grupos, escolas e comunidades —
+            a PONTE é a primeira de uma série.</p>
+          <span class="go">Fazer o percurso →</span>
+        </a>
+        <a href="#" class="r" style="--r:2" data-todo="depoimentos: seção em construção">
+          <span class="n">03</span>
+          <h3>Quem viveu, conta</h3>
+          <p>Histórias de quem passou pelas formações, oficinas e encontros.
+            Depoimentos a receber — espaço em construção.</p>
+          <span class="go">Em breve</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CONECTAR (capa presa · amarelo) — o "Let's connect" ══ -->
+  <section class="cover c-cta y" id="conectar">
+    <span class="idx r" style="--r:0">[04] — Conectar</span>
+    <h2 class="giant split r" style="--r:1">Vamos <em>conversar</em>?</h2>
+    <p class="lead r" style="--r:2">Se você procura um encontro que una escuta, arte e movimento —
+      vamos fazer algo memorável.</p>
+    <span class="tagline r" style="--r:3">Feito para quem quer travessia.</span>
+    <div class="btnrow r" style="--r:4">
+      <a class="btn" href="#" data-todo="whatsapp real">Falar no WhatsApp <span>→</span></a>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER (endereço · contato · nav · fechamento) ══ -->
+  <footer class="sheet k ftr">
+    <div class="wrap">
+      <div class="grid">
+        <div>
+          <p class="cap">Elaine Narcizo</p>
+          <p style="opacity:.75;max-width:34ch">Educadora, arteterapeuta, pesquisadora.
+            Mestra em Serviço Social.</p>
+        </div>
+        <div>
+          <p class="cap">Contato</p>
+          <ul>
+            <li><a href="#" data-todo="whatsapp real">WhatsApp</a></li>
+            <li><a href="#" data-todo="email real">E-mail</a></li>
+            <li><a href="#" data-todo="instagram real">Instagram</a></li>
+            <li><a href="#" data-todo="youtube real">YouTube</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="cap">Navegar</p>
+          <ul>
+            <li><a href="#quem">Quem sou eu</a></li>
+            <li><a href="#cartaz">Em cartaz</a></li>
+            <li><a href="#radio">Rádio</a></li>
+            <li><a href="#formacoes">Formações</a></li>
+            <li><a href="repertorios-sensiveis/">Repertórios Sensíveis</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="close">
+        <span class="tag">Vamos tecer o futuro — gesto a gesto.</span>
+        <span class="fine">© 2026 Elaine Narcizo</span>
+      </div>
+    </div>
+  </footer>
+
+</main>
+
+<script>
+(function(){
+  document.documentElement.classList.add('js');
+
+  /* LOADER: uma vez por sessão, curto */
+  var loader=document.getElementById('loader');
+  try{
+    if(sessionStorage.getItem('en_fluxo_seen')){ loader.remove(); }
+    else{ sessionStorage.setItem('en_fluxo_seen','1');
+      setTimeout(function(){ loader.classList.add('done'); },950);
+      setTimeout(function(){ loader.remove(); },1800); }
+  }catch(e){ loader.remove(); }
+
+  /* HEADER: escurece ao rolar */
+  var hdr=document.getElementById('hdr');
+  addEventListener('scroll',function(){ hdr.classList.toggle('scrolled', scrollY>40); },{passive:true});
+
+  /* MENU overlay */
+  var burger=document.getElementById('burger'), menu=document.getElementById('menu');
+  function setMenu(open){
+    burger.classList.toggle('open',open); menu.classList.toggle('open',open);
+    hdr.classList.toggle('menu-open',open);
+    burger.setAttribute('aria-expanded',open); menu.setAttribute('aria-hidden',!open);
+  }
+  burger.addEventListener('click',function(){ setMenu(!menu.classList.contains('open')); });
+  menu.addEventListener('click',function(e){ if(e.target.closest('a')) setMenu(false); });
+  addEventListener('keydown',function(e){ if(e.key==='Escape') setMenu(false); });
+
+  /* TÍTULOS: quebra em palavras mascaradas (revelam subindo, escalonadas) */
+  document.querySelectorAll('.split').forEach(function(el){
+    var w=0;
+    el.innerHTML=el.innerHTML.split(/(<em[^>]*>.*?<\/em>)|(\s+)/g).filter(Boolean).map(function(part){
+      if(/^\s+$/.test(part)) return ' ';
+      return '<span class="w-line"><span class="w-word" style="--w:'+(w++)+'">'+part+'</span></span>';
+    }).join('');
+  });
+
+  /* REVELAÇÃO: capas e blocos .in-io ganham .in ao entrar */
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } });
+    },{ threshold:.22 });
+    document.querySelectorAll('.cover,.sheet .in-io,.sheet#quem .wrap').forEach(function(s){ io.observe(s); });
+
+    /* CONTADORES (os counters animados da referência) */
+    var cio=new IntersectionObserver(function(es){
+      es.forEach(function(en){
+        if(!en.isIntersecting) return; cio.unobserve(en.target);
+        var b=en.target, end=+b.getAttribute('data-count'), t0=null;
+        function tick(t){ if(!t0)t0=t; var p=Math.min((t-t0)/1100,1);
+          b.textContent=Math.round(end*(1-Math.pow(1-p,3)));
+          if(p<1) requestAnimationFrame(tick); }
+        requestAnimationFrame(tick);
+      });
+    },{ threshold:.6 });
+    document.querySelectorAll('[data-count]').forEach(function(b){ cio.observe(b); });
+  }else{
+    document.querySelectorAll('.cover,.in-io').forEach(function(s){ s.classList.add('in'); });
+    document.querySelectorAll('[data-count]').forEach(function(b){ b.textContent=b.getAttribute('data-count'); });
+  }
+
+  /* PASSAGEM: enquanto a próxima lâmina cobre uma capa presa, a capa
+     escala levemente e escurece (o "deck de cartas" da referência). */
+  var covers=[].slice.call(document.querySelectorAll('.cover')).map(function(c){
+    return { el:c, next:c.nextElementSibling };
+  }).filter(function(c){ return c.next; });
+  var vh=innerHeight, ticking=false;
+  addEventListener('resize',function(){ vh=innerHeight; },{passive:true});
+  function paint(){
+    ticking=false;
+    covers.forEach(function(c){
+      var top=c.next.getBoundingClientRect().top;
+      var p=Math.min(Math.max(1-top/vh,0),1);      /* 0 = ainda embaixo · 1 = cobriu */
+      if(p>0&&p<1.01){
+        c.el.style.transform='scale('+(1-p*.05).toFixed(4)+')';
+        c.el.style.filter='brightness('+(1-p*.35).toFixed(3)+')';
+      }
+    });
+  }
+  addEventListener('scroll',function(){ if(!ticking){ ticking=true; requestAnimationFrame(paint); } },{passive:true});
+  paint();
+})();
+</script>
+</body>
+</html>
