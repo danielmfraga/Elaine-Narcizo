@@ -21,7 +21,7 @@
    topo enquanto a próxima lâmina desliza POR CIMA (deck de
    cartas), com a capa coberta escalando/escurecendo de leve.
    Estrutura 1:1 com a referência, conteúdo nosso:
-     hero statement+reel · marquee · quem sou eu · EM CARTAZ
+     hero statement+reel · quem sou eu · EM CARTAZ
      (bilheteria: DançaDestino/Cartas/PONTE como cards de obra)
      · NO AR (rádio + contadores animados) · como eu trabalho
      (3 cards de serviço) · CTA conectar · footer rico.
@@ -192,8 +192,8 @@ main{ position:relative; }
 .hint b{ animation:drop 1.8s var(--ease) infinite; font-weight:400; }
 @keyframes drop{ 0%,100%{ transform:translateY(0); opacity:.4; } 50%{ transform:translateY(5px); opacity:1; } }
 
-/* ── MARQUEE (letreiro) ── */
-.s-marquee{ padding:0; border-radius:var(--radius) var(--radius) 0 0; overflow:hidden; }
+/* ── MARQUEE (texto rolante) — a lâmina-letreiro de ofertas saiu;
+   isto aqui serve a faixa de parcerias ("por onde o trabalho circula") ── */
 .marq{ display:flex; overflow:hidden; padding:16px 0; }
 .marq .trk{ display:inline-flex; white-space:nowrap; animation:marq 30s linear infinite; }
 .marq span{ font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase;
@@ -372,15 +372,8 @@ main{ position:relative; }
     <span class="hint r" style="--r:4">Role para descer <b>↓</b></span>
   </section>
 
-  <!-- letreiro (nosso conteúdo do bar antigo) -->
-  <div class="sheet s-marquee k" aria-hidden="true">
-    <div class="marq"><div class="trk">
-      <span><i></i> Inscrições abertas — Repertórios Sensíveis para a Clínica · 2026</span>
-      <span>✦ Toda sexta, 20h — DançaDestino, um ritual para nosso tempo</span>
-      <span><i></i> Inscrições abertas — Repertórios Sensíveis para a Clínica · 2026</span>
-      <span>✦ Toda sexta, 20h — DançaDestino, um ritual para nosso tempo</span>
-    </div></div>
-  </div>
+  <!-- (a lâmina-letreiro de "ofertas" que vinha aqui foi retirada a pedido;
+       o .marq segue vivo na faixa de parcerias, mais abaixo) -->
 
   <!-- ══ QUEM SOU EU — o "Who are we?" da referência ══ -->
   <div class="sheet w" id="quem">
