@@ -154,6 +154,12 @@ button{ font:inherit; }
 
 /* ═══ ESQUELETO: capas presas + lâminas que cobrem ═══ */
 main{ position:relative; }
+/* cada .scene = 1 capa presa + a(s) lâmina(s) que a cobrem. O wrapper
+   delimita o "raio de ação" do sticky (a capa só pode ficar grudada
+   dentro dos limites da própria cena) e isola o z-index (position:relative
+   cria um novo contexto de empilhamento) — sem isso, toda capa ficava
+   grudada até o fim da página e vazava por trás das cenas seguintes. */
+.scene{ position:relative; }
 .cover{
   position:sticky; top:0; min-height:100svh;
   display:flex; flex-direction:column; justify-content:flex-end;
@@ -388,6 +394,11 @@ main{ position:relative; }
 
 <main id="fluxo">
 
+  <!-- CENA 1: cada "cena" envolve 1 capa presa + a(s) lâmina(s) que a cobrem.
+       O wrapper delimita até onde a rolagem pode manter a capa grudada —
+       sem ele, a capa ficava grudada pelo resto da página inteira e vazava
+       por trás das cenas seguintes (bug relatado pelo Daniel, jul/2026). -->
+  <div class="scene">
   <!-- ══ HERO (capa presa · amarelo) — o "Welcome!" da referência ══ -->
   <section class="cover c-hero y" id="inicio">
     <span class="hello r" style="--r:0"><i></i> Olá! Você chegou.</span>
@@ -439,7 +450,10 @@ main{ position:relative; }
       </div>
     </div>
   </div>
+  </div><!-- /scene 1 -->
 
+  <!-- CENA 2 -->
+  <div class="scene">
   <!-- ══ EM CARTAZ (capa presa · preto) — o "The works" da referência ══ -->
   <section class="cover k" id="cartaz" style="justify-content:flex-end">
     <div class="wrap" style="gap:16px">
@@ -530,7 +544,10 @@ main{ position:relative; }
       </div>
     </div>
   </div>
+  </div><!-- /scene 2 -->
 
+  <!-- CENA 3 (rádio + números + como eu trabalho, até a próxima capa) -->
+  <div class="scene">
   <!-- ══ NO AR (capa presa · vídeo REAL da rádio) — o "Beyond the Screen" ══ -->
   <section class="cover k c-radio" id="radio">
     <video src="assets/radio-capa.mp4" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
@@ -593,7 +610,10 @@ main{ position:relative; }
       </div>
     </div>
   </div>
+  </div><!-- /scene 3 -->
 
+  <!-- CENA 4 -->
+  <div class="scene">
   <!-- ══ CONECTAR (capa presa · amarelo) — o "Let's connect" ══ -->
   <section class="cover c-cta y" id="conectar">
     <span class="idx r" style="--r:0">[04] — Conectar</span>
@@ -641,6 +661,7 @@ main{ position:relative; }
       </div>
     </div>
   </footer>
+  </div><!-- /scene 4 -->
 
 </main>
 
