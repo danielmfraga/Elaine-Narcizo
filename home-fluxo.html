@@ -88,7 +88,7 @@ button{ font:inherit; }
    sempre presente/fixo, ícones pretos depois de rolar) ── */
 .hdr{
   position:fixed; top:0; left:0; right:0; z-index:80;
-  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:16px;
   padding:10px var(--pad);
   background:transparent;
   transition:background .35s var(--ease), color .35s var(--ease), padding .35s var(--ease), box-shadow .35s var(--ease);
@@ -99,15 +99,17 @@ button{ font:inherit; }
 .hdr.menu-open{ background:transparent; color:var(--paper); box-shadow:none; }
 .hdr .wordmark{ display:flex; align-items:center; color:currentColor; flex-shrink:0; }
 .hdr .wordmark svg{ display:block; height:46px; width:auto; fill:currentColor; }
-.hdr-right{ display:flex; align-items:center; gap:18px; }
+/* redes: coluna do meio do grid → centralizadas entre logo e menu, como no mockup */
+.hdr-right{ display:flex; align-items:center; justify-content:center; gap:26px; }
 .hdr-ic{ display:flex; align-items:center; justify-content:center; width:20px; height:20px; flex-shrink:0; opacity:.85; transition:opacity .2s; }
 .hdr-ic:hover{ opacity:1; }
 .hdr-ic svg{ width:100%; height:100%; }
 .burger{
   border:0; background:none; cursor:pointer; color:currentColor;
   display:flex; align-items:center; gap:10px; padding:0; flex-shrink:0;
+  justify-self:end;
 }
-.burger .b-label{ font-family:var(--mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase; }
+.burger .b-label{ font-family:var(--disp); font-weight:560; font-stretch:100%; text-transform:none; font-size:16px; letter-spacing:0; }
 .burger .b-bars{ width:20px; height:14px; position:relative; }
 .burger .b-bars i{ display:block; position:absolute; left:0; width:20px; height:2px; background:currentColor; transition:transform .3s var(--ease), opacity .3s; }
 .burger .b-bars i:nth-child(1){ top:0; }
@@ -356,24 +358,17 @@ main{ position:relative; }
     </svg>
   </a>
   <div class="hdr-right">
-    <a class="hdr-ic" href="#" data-todo="linkedin real" aria-label="LinkedIn">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"/>
-        <rect x="7.3" y="10.1" width="1.7" height="6.4" rx="0.85" fill="currentColor"/>
-        <circle cx="8.15" cy="7.6" r="1.15" fill="currentColor"/>
-        <rect x="11.3" y="10.1" width="1.7" height="6.4" rx="0.85" fill="currentColor"/>
-        <rect x="15.5" y="12.6" width="1.7" height="3.9" rx="0.85" fill="currentColor"/>
-        <path d="M13 12.4c0-1.8,1.3-2.6,2.7-2.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-      </svg>
-    </a>
     <a class="hdr-ic" href="#" data-todo="instagram real" aria-label="Instagram">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none"/></svg>
     </a>
-    <button class="burger" id="burger" aria-label="Menu" aria-expanded="false">
-      <span class="b-label">Menu</span>
-      <span class="b-bars"><i></i><i></i><i></i></span>
-    </button>
+    <a class="hdr-ic" href="#" data-todo="spotify real" aria-label="Spotify">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9.3"/><path d="M7 9.6c3.6-1 7.2-.6 10 1.1M7.3 13c3-.8 5.9-.5 8.3.9M7.6 16.2c2.4-.6 4.7-.4 6.6.7"/></svg>
+    </a>
   </div>
+  <button class="burger" id="burger" aria-label="Menu" aria-expanded="false">
+    <span class="b-label">Menu</span>
+    <span class="b-bars"><i></i><i></i><i></i></span>
+  </button>
 </header>
 
 <!-- MENU overlay -->
