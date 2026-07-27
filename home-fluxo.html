@@ -243,9 +243,10 @@ main{ position:relative; }
 /* subtítulo fica colado no grupo botões+selo, mais apertado que o respiro
    padrão do .wrap entre blocos maiores da seção. */
 .quem-cta{ display:flex; flex-direction:column; gap:16px; }
-/* botões (coluna) + selo lado a lado, alinhados pela base — como na
-   referência, o selo não fica embaixo do bloco, fica ao lado dele. */
-.quem-cta-row{ display:flex; align-items:flex-end; gap:18px; flex-wrap:wrap; }
+/* botões (coluna) + selo lado a lado — o selo começa mais abaixo,
+   alinhado pelo topo com o 2º botão (Formações), não com o conjunto
+   inteiro (pedido do Daniel depois de ver no celular). */
+.quem-cta-row{ display:flex; align-items:flex-start; gap:18px; flex-wrap:wrap; }
 .btnrow{ display:flex; gap:12px; flex-wrap:wrap; }
 .btnrow.stack{ flex-direction:column; align-items:flex-start; }
 /* selo decorativo animado — 3 "estrelinhas" cintilando dentro do quadrado
@@ -255,10 +256,10 @@ main{ position:relative; }
    depois de ver print da referência lado a lado). */
 .sparkle{
   width:clamp(100px,30vw,148px); height:clamp(100px,30vw,148px);
-  flex-shrink:0;
+  flex-shrink:0; margin-top:clamp(48px,15vw,66px);
 }
 .sparkle svg{ width:100%; height:100%; display:block; }
-.sparkle .sq{ fill:none; stroke:var(--rosa); stroke-width:1.4; }
+.sparkle .sq{ fill:none; stroke:var(--ink); stroke-width:2.4; }
 /* movimento devagar de ponto a ponto (pedido do Daniel: nada de cintilar —
    as estrelas deslizam lentamente dentro do quadrado, 5 paradas num loop:
    posição original → canto inferior-esquerdo → meio (pausa) → canto
@@ -290,7 +291,7 @@ main{ position:relative; }
    Padding extra nas laterais pra rolagem parar ~5px antes de encostar
    na borda arredondada, em vez de ir até o corte do overflow:hidden. */
 .btn.marq{ width:clamp(150px,44vw,206px); padding-left:31px; padding-right:31px; overflow:hidden; justify-content:flex-start; }
-.btn.marq .track{ display:inline-flex; align-items:center; gap:16px; white-space:nowrap; animation:btnmarq 6s linear infinite; }
+.btn.marq .track{ display:inline-flex; align-items:center; gap:16px; white-space:nowrap; animation:btnmarq 11s linear infinite; }
 .btn.marq:hover .track{ animation-play-state:paused; }
 .btn.marq .spk{ font-style:normal; font-size:.85em; opacity:.7; }
 @keyframes btnmarq{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
@@ -490,7 +491,7 @@ main{ position:relative; }
       <p class="bio-aside r" style="--r:2">Hoje, meu trabalho é voltado principalmente para a arteterapia,
         a educação popular e a formação de equipes em instituições, empresas e prefeituras.</p>
 
-      <p class="bio split r" style="--r:2">Minha prática é orientada por uma pesquisa contínua
+      <p class="bio-aside r" style="--r:2">Minha prática é orientada por uma pesquisa contínua
         sobre arte, convivência, atenção, sensibilidade e alegria, temas que inspiram a forma como
         conduzo cada processo.</p>
 
