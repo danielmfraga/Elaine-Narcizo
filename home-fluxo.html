@@ -234,6 +234,10 @@ main{ position:relative; }
   letter-spacing:-.01em; line-height:1.08; text-wrap:pretty;
   font-size:clamp(1.55rem,5.6vw,2.9rem); max-width:26ch;
 }
+/* aside dentro do parágrafo-manchete: uma frase específica ("Hoje, meu
+   trabalho...") sai do corpo gigante/bold e entra menor e mais fina —
+   um respiro no meio do bloco pesado, pedido do Daniel. */
+.bio-aside{ font-size:clamp(1rem,.95rem + .5vw,1.25rem); font-weight:340; line-height:1.45; max-width:42ch; color:var(--mute); }
 .pitch{ font-size:clamp(1.02rem,1rem + .5vw,1.3rem); font-weight:460; line-height:1.5; max-width:42ch; }
 .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
 /* subtítulo fica colado no grupo botões+selo, mais apertado que o respiro
@@ -255,13 +259,21 @@ main{ position:relative; }
 }
 .sparkle svg{ width:100%; height:100%; display:block; }
 .sparkle .sq{ fill:none; stroke:var(--rosa); stroke-width:1.4; }
+/* movimento devagar de ponto a ponto (pedido do Daniel: nada de cintilar —
+   as estrelas deslizam lentamente dentro do quadrado, 5 paradas num loop:
+   posição original → canto inferior-esquerdo → meio (pausa) → canto
+   superior-direito → volta ao início). transform-box:fill-box faz o
+   translate/scale usar o centro da própria estrela como referência. */
 .sparkle .s1,.sparkle .s2,.sparkle .s3{ fill:none; stroke-width:1.7; transform-box:fill-box; transform-origin:center; }
-.sparkle .s1{ stroke:var(--amarelo); animation:twinkle 3.4s ease-in-out infinite; }
-.sparkle .s2{ stroke:var(--oliva); animation:twinkle 2.7s ease-in-out infinite .45s; }
-.sparkle .s3{ stroke:var(--lilas); animation:twinkle 3.1s ease-in-out infinite 1.05s; }
-@keyframes twinkle{
-  0%,100%{ transform:scale(.5) rotate(0deg); opacity:.3; }
-  50%{ transform:scale(1.2) rotate(10deg); opacity:1; }
+.sparkle .s1{ stroke:var(--amarelo); animation:drift 12s ease-in-out infinite; }
+.sparkle .s2{ stroke:var(--oliva); animation:drift 15s ease-in-out infinite 1.5s; }
+.sparkle .s3{ stroke:var(--lilas); animation:drift 13.5s ease-in-out infinite 3s; }
+@keyframes drift{
+  0%{ transform:translate(0,0) scale(1); }
+  22%{ transform:translate(-13px,15px) scale(.85); }
+  50%{ transform:translate(0,0) scale(1); }
+  78%{ transform:translate(14px,-14px) scale(1.15); }
+  100%{ transform:translate(0,0) scale(1); }
 }
 .btn{
   display:inline-flex; align-items:center; gap:10px; padding:15px 26px; border-radius:999px;
@@ -271,11 +283,13 @@ main{ position:relative; }
 }
 .btn:hover{ gap:15px; transform:translateY(-2px); }
 .btn.inv{ background:var(--amarelo); color:var(--ink); }
-.btn.ghost{ background:transparent; color:inherit; box-shadow:inset 0 0 0 1.5px currentColor; }
+.btn.ghost{ background:transparent; color:var(--ink); box-shadow:inset 0 0 0 1.5px currentColor; }
 /* botão "letreiro" (pedido do Daniel, ref. houseofyellow.nl): a label
    fica num carrossel horizontal infinito dentro do pill, separada por um
-   sparkle — por isso o botão ganha largura fixa em vez de abraçar o texto. */
-.btn.marq{ width:clamp(150px,44vw,206px); overflow:hidden; justify-content:flex-start; }
+   sparkle — por isso o botão ganha largura fixa em vez de abraçar o texto.
+   Padding extra nas laterais pra rolagem parar ~5px antes de encostar
+   na borda arredondada, em vez de ir até o corte do overflow:hidden. */
+.btn.marq{ width:clamp(150px,44vw,206px); padding-left:31px; padding-right:31px; overflow:hidden; justify-content:flex-start; }
 .btn.marq .track{ display:inline-flex; align-items:center; gap:16px; white-space:nowrap; animation:btnmarq 6s linear infinite; }
 .btn.marq:hover .track{ animation-play-state:paused; }
 .btn.marq .spk{ font-style:normal; font-size:.85em; opacity:.7; }
@@ -471,33 +485,36 @@ main{ position:relative; }
 
       <p class="bio split r" style="--r:1">Arteterapeuta, artista, assistente social e educadora popular.
         Há mais de 20 anos atuo nas áreas social, cultural e educativa, desenvolvendo projetos,
-        formando equipes e criando espaços de aprendizagem, convivência e transformação. Hoje, meu
-        trabalho é voltado principalmente para a arteterapia, a educação popular e a formação de equipes
-        em instituições, empresas e prefeituras. Minha prática é orientada por uma pesquisa contínua
+        formando equipes e criando espaços de aprendizagem, convivência e transformação.</p>
+
+      <p class="bio-aside r" style="--r:2">Hoje, meu trabalho é voltado principalmente para a arteterapia,
+        a educação popular e a formação de equipes em instituições, empresas e prefeituras.</p>
+
+      <p class="bio split r" style="--r:2">Minha prática é orientada por uma pesquisa contínua
         sobre arte, convivência, atenção, sensibilidade e alegria, temas que inspiram a forma como
         conduzo cada processo.</p>
 
       <div class="quem-cta">
-      <p class="pitch r" style="--r:2">Procurando uma parceria comprometida e profissional?
+      <p class="pitch r" style="--r:3">Procurando uma parceria comprometida e profissional?
         Vamos conversar.</p>
       <div class="quem-cta-row">
-      <div class="btnrow stack r" style="--r:3">
+      <div class="btnrow stack r" style="--r:4">
         <a class="btn marq" href="#radio">
           <span class="track" aria-hidden="true">
             <span>Sintonize</span><i class="spk">✦</i><span>Sintonize</span><i class="spk">✦</i><span>Sintonize</span><i class="spk">✦</i>
-            <span>Sintonize</span><i class="spk">✦</i><span>Sintonize</span><i class="spk">✦</i><span>Sintonize</span><i class="spk">✦</i>
+            <span>Sintonize</span><i class="spk">✦</i><span>Sintonize</span><i class="spk">✦</i>
           </span>
           <span class="sr-only">Sintonize</span>
         </a>
         <a class="btn ghost marq" href="#formacoes">
           <span class="track" aria-hidden="true">
-            <span>Formações</span><i class="spk">✦</i><span>Formações</span><i class="spk">✦</i>
+            <span>Formações</span><i class="spk">✦</i><span>Formações</span><i class="spk">✦</i><span>Formações</span><i class="spk">✦</i>
             <span>Formações</span><i class="spk">✦</i><span>Formações</span><i class="spk">✦</i>
           </span>
           <span class="sr-only">Formações</span>
         </a>
       </div>
-      <div class="sparkle r" style="--r:3" aria-hidden="true">
+      <div class="sparkle r" style="--r:4" aria-hidden="true">
         <svg viewBox="0 0 117.69 117.69" xmlns="http://www.w3.org/2000/svg">
           <rect class="sq" x=".25" y=".25" width="117.19" height="117.19" rx="17.23" ry="17.23"/>
           <path class="s1" d="M50.55,52.7c-.03-.12-.07-.25-.07-.37,0-.23-.25-.39-.17-.64,0-.01-.02-.04-.03-.05-.09-.1-.18-.19-.26-.29-.02-.02-.03-.06-.03-.09.02-.18-.09-.28-.21-.37-.12-.09-.25-.16-.3-.32,0-.03-.04-.06-.07-.07-.27-.08-.53-.19-.8-.21-1.15-.11-2.29-.19-3.44-.28-.06,0-.13,0-.19-.01-.11,0-.1-.05-.04-.12.16-.16.32-.31.47-.48.56-.6,1.11-1.21,1.68-1.8.23-.24.17-.54.21-.82,0-.03-.03-.06-.05-.09-.08-.11-.1-.22-.03-.36.08-.16.05-.22-.15-.26-.09-.02-.11-.05-.09-.14.02-.06-.02-.19-.04-.2-.14-.02-.24-.1-.36-.16-.19-.12-.41-.2-.6-.31-.15-.08-.28-.21-.48-.17-.03,0-.07-.03-.1-.05-.03-.02-.07-.07-.1-.07-.14,0-.27.02-.41.05-.14.03-.26.09-.41.04-.05-.02-.12.02-.17.06-.67.55-1.33,1.1-1.99,1.65-.26.22-.51.47-.77.7-.02.02-.06.03-.09.05,0-.03-.01-.07,0-.1.03-.29.07-.57.09-.86.02-.26.05-.53.06-.79,0-.2.18-2.64.03-3.31-.1-.44-.41-.16-.52-.2-.04-.01-.09-.08-.09-.11,0-.13-.04-.2-.18-.22-.05,0-.1-.03-.13-.06-.18-.2-.49-.08-.67-.28,0,0-.04.01-.06,0-.15-.03-.29.04-.44.06-.1.02-.21,0-.31-.02-.06,0-.13-.02-.19-.04-.22-.08-.41.19-.63.06,0,0-.01,0-.02,0-.1.1-.19.21-.3.28-.13.08-.25.16-.29.31,0,0-.01,0-.02,0-.18,0-.18.14-.19.26-.22,1.46-.48,2.91-.59,4.38,0,.04-.02.08-.03.11-.03-.03-.06-.05-.09-.08-.02-.03-.05-.06-.07-.08-.47-.6-.94-1.2-1.43-1.79-.24-.29-.46-.6-.84-.77-.24-.11-.53-.1-.73-.29,0,0-.01,0-.02,0-.16.02-.34-.03-.47.08-.11.09-.23.07-.33.04-.13-.04-.18,0-.22.12-.02.05-.08.1-.13.1-.11.01-.17.05-.18.17,0,.03-.04.08-.05.07-.24-.03-.26.11-.25.29,0,.07-.02.14-.02.21,0,.08-.02.14-.12.13-.11,0-.15.07-.13.17.01.09.06.2.02.27-.11.21.14.43-.03.63-.01.01.02.07.04.1.23.38.38.8.65,1.16.61.8,1.2,1.6,1.8,2.4.03.04.05.1.08.14-.05.02-.11.04-.16.04-.46.03-.92.06-1.38.1-1.11.09-2.22.2-3.33.29-.46.04-.86.2-1.16.56-.02.02-.05.04-.07.04-.2.03-.24.18-.27.33-.03.12-.05.24-.18.3-.08.04-.11.1-.01.16.13.09.17.22.2.37.03.12.15.23.02.36,0,0,.05.08.09.1.17.1.22.28.24.44,0,.1.02.15.1.21s.16.17.16.25c-.01.22.17.31.28.4.14.13.37.17.56.24.47.17.97.16,1.45.16.92,0,1.84-.03,2.76-.04.05,0,.1.01.14.02-.03.04-.05.08-.08.12-.71.82-1.43,1.64-2.14,2.46-.27.31-.51.66-.78.97-.09.1-.17.19-.15.33s.03.28,0,.42c-.01.05.05.12.08.18.01.04.03.1,0,.12-.09.1-.15.19-.02.3.04.04.07.09.1.14.07.11.2.2.15.37-.03.09.04.15.14.1.12-.06.21-.04.3.07.03.04.14.06.2.04.32-.11.6.2.91.08,0,0,.02,0,.02,0,.27.16.52.08.77-.04.56-.27,1.06-.64,1.54-1.03.61-.5,1.23-1,1.84-1.5.04-.04.09-.06.14-.09.02.06.04.12.05.18,0,.04,0,.07.01.11.07.61.13,1.22.22,1.82.21,1.37.27,1.56.77,2.67.04.08.07.17.19.12.16-.08.31,0,.45.05.06.02.13.02.19.03.04,0,.09-.01.12,0,.15.07.3.06.46.06.15,0,.29-.04.43-.09.29-.09.5-.3.66-.54.09-.14.19-.3.21-.46.06-.6.11-1.2.14-1.81.04-.72.05-1.44.07-2.16,0-.05.02-.09.03-.14.04.03.08.06.11.09.48.48.96.97,1.45,1.45.13.13.28.24.43.35.09.07.18.08.3.04.1-.03.23-.02.33.03.21.09.39.23.67.19.22-.03.46.07.69.12.28.06.5,0,.74-.12.22-.12.35-.32.52-.49.24-.24.2-.53.14-.81-.03-.12-.08-.21-.01-.34.03-.05,0-.16-.05-.22-.2-.29-.39-.59-.63-.84-.81-.87-1.64-1.73-2.47-2.6-.03-.03-.05-.08-.08-.12.04,0,.08-.02.12-.02,1-.04,2-.08,3-.12v.03c.65,0,1.29,0,1.94,0,.45,0,.9-.02,1.36-.03.22,0,.31-.24.5-.31,0,0,.02-.02.02-.04.03-.15.14-.22.28-.25.17-.04.21-.11.12-.26-.06-.11-.02-.13.07-.16.08-.02.14-.07.12-.17"/>
@@ -508,15 +525,8 @@ main{ position:relative; }
       </div><!-- /quem-cta-row -->
       </div><!-- /quem-cta -->
 
-      <div class="portrait r" style="--r:4">
+      <div class="portrait r" style="--r:5">
         <img src="assets/elaine-narcizo.jpeg" alt="Retrato de Elaine Narcizo" loading="lazy" style="object-position:64% 28%" />
-      </div>
-
-      <!-- VÍDEO · MANIFESTO PESSOAL — sugestão: Elaine à câmera, 40–60s,
-           "por que eu faço o que eu faço" (o vídeo-declaração da referência). -->
-      <div class="vph r" style="--r:5">
-        <span class="play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
-        <span class="note">Vídeo aqui · manifesto pessoal — Elaine à câmera (40–60s)</span>
       </div>
     </div>
   </div>
