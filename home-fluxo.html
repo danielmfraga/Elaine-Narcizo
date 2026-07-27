@@ -229,13 +229,26 @@ main{ position:relative; }
    é invisível, então não precisa contra-rotação nem agrupar no HTML. */
 .hero-aster .ha-1,.hero-aster .ha-2,.hero-aster .ha-3,.hero-aster .ha-4{
   transform-box:view-box; transform-origin:center;
-  animation:haOrbit 8s steps(8) infinite;
+  animation:haOrbit 8s cubic-bezier(.7,0,.3,1) infinite;
 }
 .hero-aster .ha-1{ fill:var(--oliva); }    /* quadro 1: topo */
 .hero-aster .ha-2{ fill:var(--amarelo); }  /* quadro 1: esquerda */
 .hero-aster .ha-3{ fill:var(--laranja); }  /* quadro 1: direita */
 .hero-aster .ha-4{ fill:var(--lilas); }    /* quadro 1: baixo */
-@keyframes haOrbit{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+/* cada passo = descansa na posição (0,5s) e DESLIZA até a próxima (0,5s).
+   O deslocamento tem que ser visível — não é a peça sumir e reaparecer
+   no lugar novo (era o que o steps() fazia). */
+@keyframes haOrbit{
+  0%,6.25%      { transform:rotate(0deg); }
+  12.5%,18.75%  { transform:rotate(45deg); }
+  25%,31.25%    { transform:rotate(90deg); }
+  37.5%,43.75%  { transform:rotate(135deg); }
+  50%,56.25%    { transform:rotate(180deg); }
+  62.5%,68.75%  { transform:rotate(225deg); }
+  75%,81.25%    { transform:rotate(270deg); }
+  87.5%,93.75%  { transform:rotate(315deg); }
+  100%          { transform:rotate(360deg); }
+}
 .hint{ font-family:var(--mono); font-size:10px; letter-spacing:.2em; text-transform:uppercase; opacity:.6;
   display:inline-flex; align-items:center; gap:8px; }
 .hint b{ animation:drop 1.8s var(--ease) infinite; font-weight:400; }
