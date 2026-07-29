@@ -1031,7 +1031,12 @@ main{ position:relative; }
   }
 
   /* PASSAGEM: enquanto a próxima lâmina cobre uma capa presa, a capa
-     escala levemente e escurece (o "deck de cartas" da referência). */
+     escurece (o "deck de cartas" da referência). Tinha um scale() aqui
+     também, mas como o transform-origin é "center top", encolher pela
+     base ABRIA UM VÃO PRETO entre a capa (que já tinha "subido"/encolhido)
+     e a lâmina de baixo chegando — o preto era o fundo do html/body
+     aparecendo por baixo. Tirado; só o escurecimento (filter, não mexe
+     na caixa) fica, sem esse risco de vão. */
   var covers=[].slice.call(document.querySelectorAll('.cover')).map(function(c){
     return { el:c, next:c.nextElementSibling };
   }).filter(function(c){ return c.next; });
@@ -1043,7 +1048,6 @@ main{ position:relative; }
       var top=c.next.getBoundingClientRect().top;
       var p=Math.min(Math.max(1-top/vh,0),1);      /* 0 = ainda embaixo · 1 = cobriu */
       if(p>0&&p<1.01){
-        c.el.style.transform='scale('+(1-p*.05).toFixed(4)+')';
         c.el.style.filter='brightness('+(1-p*.35).toFixed(3)+')';
       }
     });
