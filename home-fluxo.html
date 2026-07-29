@@ -1059,12 +1059,15 @@ main{ position:relative; }
        · lâmina: topo em vh*(1-p) → sobe vh por unidade de p
        · capa:   sobe lift(p), então a base fica em vh - lift(p)
        · sem vão  ⟺  lift(p) ≤ p*vh  pra TODO p
-     A curva é ease-out cúbico com amplitude 6% da tela (o Daniel pediu
-     -80% de velocidade: era .3, virou .06):
-       lift(p) = .06*vh*(1 - (1-p)³)
-     A lâmina sobe na velocidade do dedo (1*vh por unidade de p, é rolagem
-     nativa) — ou seja, ~5,5x mais rápido que a capa nesse ajuste, que é
-     justamente o que garante que ela sempre tapa em vez de abrir vão.
+     Curva final (pedido do Daniel: "sobe junto até uns 70% e depois para"):
+       q = min(p / .7, 1)                 ← progresso renormalizado no trecho
+       lift(p) = .06*vh * sen(q * π/2)    ← easeOutSine
+     Ou seja: sobe de forma quase constante durante os primeiros 70% da
+     passagem (é o "subir junto", perceptível em vez de gastar tudo no
+     comecinho), ASSENTA suave no fim do trecho e fica PARADA de 70% a 100%.
+     Amplitude segue 6% da tela (~45px em 745), o "bem pouquinho" calibrado.
+     Velocidade inicial = .06*(π/2)/.7 = .135*vh contra 1*vh da lâmina → a
+     lâmina é ~7,4x mais rápida, folga enorme sobre a regra do vão acima.
 
      ⚠️ TRAVA EXTRA (não remover): além da curva, o lift é limitado pelo
      `coberto` — o quanto a lâmina JÁ cobriu da capa, medido de verdade no
@@ -1097,7 +1100,8 @@ main{ position:relative; }
            (Foi assumir "a capa está presa" sem medir que gerou o bug do vão.) */
         var natTop=c.el.getBoundingClientRect().top+(c.lift||0);
         var coberto=(natTop+c.el.offsetHeight)-top;
-        var lift=Math.min(.06*vh*(1-Math.pow(1-p,3)), Math.max(0,coberto));
+        var q=Math.min(p/.7,1);                     /* sobe até 70% e congela */
+        var lift=Math.min(.06*vh*Math.sin(q*Math.PI/2), Math.max(0,coberto));
         c.lift=lift;
         c.el.style.transform='translate3d(0,'+(-lift).toFixed(2)+'px,0)';
         c.el.style.filter='brightness('+(1-p*.35).toFixed(3)+')';
