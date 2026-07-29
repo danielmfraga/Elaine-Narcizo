@@ -67,7 +67,17 @@ html{ scroll-behavior:smooth; overflow-anchor:none; } /* trava extra pro "abre n
 html,body{ background:var(--ink); }
 body{
   font-family:var(--disp); font-size:17px; line-height:1.55; color:var(--ink);
-  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  /* ⚠️ AQUI MORAVA O BUG DO VÃO (jul/2026). Era `overflow-x:hidden`, que é
+     o assassino clássico do position:sticky: quando um eixo é `hidden` e o
+     outro é `visible`, o navegador promove o outro pra `auto` — o <body>
+     vira um container de rolagem próprio, e as .cover sticky passam a se
+     ancorar num container que NÃO rola, ou seja nunca prendem. Sem prender,
+     a capa só rolava encostada na lâmina de baixo, sem sobreposição: qualquer
+     deslocamento na capa afastava as duas e abria o vão preto.
+     `clip` corta o transbordo igual, mas NÃO cria container de rolagem —
+     o sticky volta a funcionar. Requer Safari 16+/iOS 16+ (2022), ok.
+     NÃO trocar de volta por `hidden`. */
+  -webkit-font-smoothing:antialiased; overflow-x:clip;
 }
 h1,h2,h3{ margin:0; }
 p{ margin:0; text-wrap:pretty; }
@@ -1067,15 +1077,20 @@ main{ position:relative; }
       var top=c.next.getBoundingClientRect().top;
       var p=Math.min(Math.max(1-top/vh,0),1);      /* 0 = ainda embaixo · 1 = cobriu */
       if(p<=0){                                    /* de volta na capa: estado limpo */
-        c.el.style.transform=''; c.el.style.filter=''; return;
+        c.lift=0; c.el.style.transform=''; c.el.style.filter=''; return;
       }
       if(p<1.01){
-        /* offsetHeight = altura de LAYOUT da capa (imune ao transform que
-           aplicamos aqui, então não vira cálculo circular). Presa em top:0,
-           a base dela cai exatamente em offsetHeight — logo `coberto` é o
-           quanto a lâmina avançou por cima. */
-        var coberto=c.el.offsetHeight-top;
+        /* `coberto` = o quanto a lâmina JÁ avançou por cima da capa, medido
+           SEM PREMISSA NENHUMA sobre o sticky estar funcionando: pego a
+           posição atual da capa e desconto o lift que eu mesmo apliquei no
+           quadro anterior, obtendo a posição "natural" dela no layout.
+           Se por qualquer motivo ela não estiver presa, `coberto` dá 0 e o
+           lift é travado em 0 — sem sobreposição, sem deslocamento, sem vão.
+           (Foi assumir "a capa está presa" sem medir que gerou o bug do vão.) */
+        var natTop=c.el.getBoundingClientRect().top+(c.lift||0);
+        var coberto=(natTop+c.el.offsetHeight)-top;
         var lift=Math.min(.06*vh*(1-Math.pow(1-p,3)), Math.max(0,coberto));
+        c.lift=lift;
         c.el.style.transform='translate3d(0,'+(-lift).toFixed(2)+'px,0)';
         c.el.style.filter='brightness('+(1-p*.35).toFixed(3)+')';
       }
