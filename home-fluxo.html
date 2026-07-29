@@ -255,16 +255,17 @@ main{ position:relative; }
    Largura em `em` (relativa ao font-size do h1): voltou a crescer —
    o print de referência mostra o botão bem maior que a palavra "vida",
    inline ao lado de "aqui.", não um bloco embaixo.
-   Altura independente da largura: `aspect-ratio` mantém a proporção
-   original do vetor por padrão, mas --tw-btn-h (painel de ajuste) pode
-   sobrescrever pra esticar/comprimir sem mexer na largura. */
+   --tw-btn-y: deslocamento vertical (sobe/desce), não altura — o
+   Daniel corrigiu que "altura" foi um pedido impreciso, o que ele
+   queria mesmo era mover o botão no eixo vertical, tipo os nudges
+   do Olá/estrelas. */
 .btn-navegue{
   position:relative; display:inline-block; overflow:hidden; vertical-align:text-bottom;
-  width:var(--tw-btn-w, 2.3em); aspect-ratio:773.6/203; height:var(--tw-btn-h, auto);
-  margin-left:var(--tw-btn-ml, .22em);
+  width:var(--tw-btn-w, 2.3em); margin-left:var(--tw-btn-ml, .22em);
+  transform:translateY(var(--tw-btn-y, 0px));
   border-radius:5% / 19.1%; /* replica o rx=38.7 do SVG (rx/largura ≈5%, rx/altura≈19.1%) */
 }
-.btn-navegue svg{ display:block; width:100%; height:100%; }
+.btn-navegue svg{ display:block; width:100%; height:auto; }
 .btn-navegue .bn-bg{ fill:var(--white); }
 .btn-navegue .bn-word{ fill:var(--lilas); }
 .btn-navegue::after{
@@ -664,7 +665,7 @@ main{ position:relative; }
     </div>
 
     <h1 class="giant r" style="--r:2">Tem muita vida<br />acontecendo<br />aqui.<a class="btn-navegue" href="#quem" aria-label="Navegue">
-      <svg viewBox="0 0 773.6 203" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <svg viewBox="0 0 773.6 203" xmlns="http://www.w3.org/2000/svg">
         <rect class="bn-bg" width="773.6" height="203" rx="38.7" ry="38.7"/>
         <g transform="translate(45.3,40.7)">
           <path class="bn-word" d="M0,32.2h46.2c-.9,4.5-1.8,10.7-1.8,13.4s1.2,4,2.9,4,3.3-1.3,4.2-3.4c3.6-8.1,9.5-16.6,22.8-16.6s23.7,9.8,23.7,28.9-3,29.3,1.1,42.3h-45.5c2.1-15.4,3-27.4,3-34.4s-3.2-7.8-6.2-7.8-6.5,2.1-6.5,9.1.7,20.2,2.9,33.1H1.3c2.2-22.8,1.7-45.8-1.3-68.6Z"/>
@@ -1058,7 +1059,7 @@ main{ position:relative; }
     { key:'--tw-title-x',   label:'Bloco (título+botão) — deslocar lateral', unit:'px', min:-150, max:150, step:1, get:function(){ return 0; } },
     { key:'--tw-title-y',   label:'Bloco (título+botão) — sobe / desce',     unit:'px', min:-150, max:150, step:1, get:function(){ return 0; } },
     { key:'--tw-btn-w',     label:'Botão navegue — largura',       unit:'px', min:60,  max:420, step:2, get:function(){ return document.querySelector('.btn-navegue').getBoundingClientRect().width; } },
-    { key:'--tw-btn-h',     label:'Botão navegue — altura',        unit:'px', min:20,  max:220, step:1, get:function(){ return document.querySelector('.btn-navegue').getBoundingClientRect().height; } },
+    { key:'--tw-btn-y',     label:'Botão navegue — sobe / desce',  unit:'px', min:-100, max:100, step:1, get:function(){ return 0; } },
     { key:'--tw-btn-ml',    label:'Botão navegue — deslocar lateral', unit:'px', min:-80, max:80, step:1, get:function(){ return parseFloat(getComputedStyle(document.querySelector('.btn-navegue')).marginLeft); } },
     { key:'--tw-pad-bottom',label:'Bloco inteiro — sobe / desce',  unit:'px', min:20,  max:220, step:2, get:function(){ return parseFloat(getComputedStyle(document.querySelector('.c-hero')).paddingBottom); } },
     { key:'--tw-gap',       label:'Espaço Olá / estrelas / título',unit:'px', min:0,   max:70,  step:1, get:function(){ var s=getComputedStyle(document.querySelector('.c-hero')); return parseFloat(s.rowGap||s.gap); } }
