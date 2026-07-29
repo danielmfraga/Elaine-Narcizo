@@ -215,7 +215,15 @@ main{ position:relative; }
    garantir contraste do texto branco. Resolve a pendência #10 (vídeo
    placeholder). */
 .c-hero{
-  position:relative; z-index:1; justify-content:flex-end; gap:var(--tw-gap, clamp(14px,2.6vh,26px));
+  /* ⚠️ NÃO declarar `position` aqui. Tinha `position:relative`, que
+     sobrescrevia o `position:sticky` de `.cover` (mesma especificidade,
+     mas esta regra vem depois) — a capa NUNCA prendia, era a única assim
+     (a preta `.k` e a `.c-cta` não têm override e sempre prenderam). Era a
+     causa do vão: sem prender, a capa rolava encostada na lâmina e qualquer
+     deslocamento nela afastava as duas. O `position:relative` tinha entrado
+     só pra ancorar o vídeo/scrim absolutos — desnecessário, porque `sticky`
+     já é elemento posicionado e serve de bloco contenedor pra eles. */
+  z-index:1; justify-content:flex-end; gap:var(--tw-gap, clamp(14px,2.6vh,26px));
   color:var(--paper); background:var(--ink);
   /* mais respiro embaixo = empurra o bloco inteiro (saudação+asteriscos+
      título) pra cima, pedido do Daniel — some junto com a remoção do
