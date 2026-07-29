@@ -1041,13 +1041,21 @@ main{ position:relative; }
        · lâmina: topo em vh*(1-p) → sobe vh por unidade de p
        · capa:   sobe lift(p), então a base fica em vh - lift(p)
        · sem vão  ⟺  lift(p) ≤ p*vh  pra TODO p
-     A curva usada é ease-out cúbico com amplitude 30% da tela:
-       lift(p) = .3*vh*(1 - (1-p)³)
-     A velocidade inicial dela é .9*vh (ou seja, já entra abaixo do vh da
-     lâmina, com folga) e cai rápido: 58% do percurso acontece nos
-     primeiros 25% da rolagem, exatamente o "sobe rápido e depois reduz".
-     Mexer na amplitude (.3) é seguro até .33; acima disso a velocidade
-     inicial passa de vh e o vão volta. */
+     A curva é ease-out cúbico com amplitude 6% da tela (o Daniel pediu
+     -80% de velocidade: era .3, virou .06):
+       lift(p) = .06*vh*(1 - (1-p)³)
+     A lâmina sobe na velocidade do dedo (1*vh por unidade de p, é rolagem
+     nativa) — ou seja, ~5,5x mais rápido que a capa nesse ajuste, que é
+     justamente o que garante que ela sempre tapa em vez de abrir vão.
+
+     ⚠️ TRAVA EXTRA (não remover): além da curva, o lift é limitado pelo
+     `coberto` — o quanto a lâmina JÁ cobriu da capa, medido de verdade no
+     layout. Isso cobre um caso que a fórmula sozinha não cobria: no
+     celular, a capa tem 100svh (altura COM a barra de endereço) mas o
+     `innerHeight` cresce quando a barra recolhe ao rolar. Aí o `p` já
+     nasce > 0 sem ter rolado nada, a fórmula pedia lift > 0 e abria vão.
+     Com a trava, lift nunca passa do que já está coberto → vão impossível
+     em qualquer estado de viewport. */
   var covers=[].slice.call(document.querySelectorAll('.cover')).map(function(c){
     return { el:c, next:c.nextElementSibling };
   }).filter(function(c){ return c.next; });
@@ -1062,7 +1070,12 @@ main{ position:relative; }
         c.el.style.transform=''; c.el.style.filter=''; return;
       }
       if(p<1.01){
-        var lift=.3*vh*(1-Math.pow(1-p,3));
+        /* offsetHeight = altura de LAYOUT da capa (imune ao transform que
+           aplicamos aqui, então não vira cálculo circular). Presa em top:0,
+           a base dela cai exatamente em offsetHeight — logo `coberto` é o
+           quanto a lâmina avançou por cima. */
+        var coberto=c.el.offsetHeight-top;
+        var lift=Math.min(.06*vh*(1-Math.pow(1-p,3)), Math.max(0,coberto));
         c.el.style.transform='translate3d(0,'+(-lift).toFixed(2)+'px,0)';
         c.el.style.filter='brightness('+(1-p*.35).toFixed(3)+')';
       }
