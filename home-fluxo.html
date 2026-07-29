@@ -1030,13 +1030,24 @@ main{ position:relative; }
     document.querySelectorAll('[data-count]').forEach(function(b){ b.textContent=b.getAttribute('data-count'); });
   }
 
-  /* PASSAGEM: enquanto a próxima lâmina cobre uma capa presa, a capa
-     escurece (o "deck de cartas" da referência). Tinha um scale() aqui
-     também, mas como o transform-origin é "center top", encolher pela
-     base ABRIA UM VÃO PRETO entre a capa (que já tinha "subido"/encolhido)
-     e a lâmina de baixo chegando — o preto era o fundo do html/body
-     aparecendo por baixo. Tirado; só o escurecimento (filter, não mexe
-     na caixa) fica, sem esse risco de vão. */
+  /* ═══ PASSAGEM (o "deck de cartas" da referência houseofyellow.nl) ═══
+     Enquanto a próxima lâmina sobe por cima, a capa presa SOBE junto —
+     rápido no começo, desacelerando — e escurece.
+
+     ⚠️ A REGRA que evita o vão preto (bug que já aconteceu 2x aqui):
+     a capa NUNCA pode subir mais rápido que a lâmina que a cobre. Se
+     subir, a base da capa descola do topo da lâmina e o que aparece no
+     meio é o fundo do <body> (preto).
+       · lâmina: topo em vh*(1-p) → sobe vh por unidade de p
+       · capa:   sobe lift(p), então a base fica em vh - lift(p)
+       · sem vão  ⟺  lift(p) ≤ p*vh  pra TODO p
+     A curva usada é ease-out cúbico com amplitude 30% da tela:
+       lift(p) = .3*vh*(1 - (1-p)³)
+     A velocidade inicial dela é .9*vh (ou seja, já entra abaixo do vh da
+     lâmina, com folga) e cai rápido: 58% do percurso acontece nos
+     primeiros 25% da rolagem, exatamente o "sobe rápido e depois reduz".
+     Mexer na amplitude (.3) é seguro até .33; acima disso a velocidade
+     inicial passa de vh e o vão volta. */
   var covers=[].slice.call(document.querySelectorAll('.cover')).map(function(c){
     return { el:c, next:c.nextElementSibling };
   }).filter(function(c){ return c.next; });
@@ -1047,7 +1058,12 @@ main{ position:relative; }
     covers.forEach(function(c){
       var top=c.next.getBoundingClientRect().top;
       var p=Math.min(Math.max(1-top/vh,0),1);      /* 0 = ainda embaixo · 1 = cobriu */
-      if(p>0&&p<1.01){
+      if(p<=0){                                    /* de volta na capa: estado limpo */
+        c.el.style.transform=''; c.el.style.filter=''; return;
+      }
+      if(p<1.01){
+        var lift=.3*vh*(1-Math.pow(1-p,3));
+        c.el.style.transform='translate3d(0,'+(-lift).toFixed(2)+'px,0)';
         c.el.style.filter='brightness('+(1-p*.35).toFixed(3)+')';
       }
     });
