@@ -142,18 +142,6 @@ button{ font:inherit; }
 .menu .mfoot{ margin-top:5vh; font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:rgba(250,248,243,.4); display:flex; gap:22px; flex-wrap:wrap; }
 .menu .mfoot a:hover{ color:var(--amarelo); }
 
-/* ── LOADER (uma vez por sessão) ── */
-.loader{
-  position:fixed; inset:0; z-index:100; background:var(--amarelo);
-  display:flex; align-items:center; justify-content:center;
-  transition:transform .7s cubic-bezier(.7,0,.3,1);
-}
-.loader.done{ transform:translateY(-101%); }
-.loader span{ font-weight:860; font-stretch:118%; text-transform:uppercase; font-size:clamp(1.4rem,6vw,3rem);
-  overflow:hidden; display:inline-block; }
-.loader span i{ display:inline-block; font-style:normal; transform:translateY(110%); animation:lup .7s var(--ease) .15s forwards; }
-@keyframes lup{ to{ transform:none; } }
-
 /* ═══ ESQUELETO: capas presas + lâminas que cobrem ═══ */
 main{ position:relative; }
 /* cada .scene = 1 capa presa + a(s) lâmina(s) que a cobrem. O wrapper
@@ -224,12 +212,11 @@ main{ position:relative; }
   /* "traçado" tipo Photoshop: fio de ~1pt por cima do preenchimento pra
      engrossar a fonte fina sem trocar de peso. */
   -webkit-text-stroke:1px var(--paper); text-stroke:1px var(--paper);
-  /* !important: sem isso, ".js .in .r{transform:none}" (mais específico
-     — a classe .r cuida da revelação de entrada) apaga esse deslocamento
-     assim que a animação de entrada termina. Bug real que ficou invisível
-     até agora porque o padding-bottom do .c-hero também empurra o bloco
-     pra cima, mascarando a falta do translateY individual. */
-  transform:translateY(var(--tw-greet-y, -19px)) !important; /* calibrado no painel de ajuste, tela 390×745 */
+  /* perdeu a classe .r (o efeito de digitação letra-a-letra substitui o
+     fade de bloco genérico) — sem .r não tem mais o conflito de
+     especificidade com ".js .in .r{transform:none}", então não precisa
+     mais de !important aqui. */
+  transform:translateY(var(--tw-greet-y, -19px)); /* calibrado no painel de ajuste, tela 390×745 */
 }
 .c-hero .hero-aster{
   align-self:center; margin:clamp(2px,1vh,10px) 0;
@@ -565,25 +552,36 @@ main{ position:relative; }
 .r{ transition:opacity .7s var(--ease), transform .7s var(--ease); transition-delay:calc(var(--r,0)*90ms); }
 .js .r{ opacity:0; transform:translateY(26px); }
 .js .in .r, .js .in.r{ opacity:1; transform:none; }
-/* título que sobe por trás de uma máscara, palavra a palavra */
-.split .w-line{ display:inline-block; overflow:hidden; vertical-align:top; }
-.split .w-word{ display:inline-block; transition:transform .75s var(--ease); transition-delay:calc(var(--w)*60ms); }
-.js .split .w-word{ transform:translateY(112%); }
-.js .in .split .w-word, .js .in.split .w-word{ transform:none; }
+/* título que sobe por trás de uma máscara, palavra a palavra.
+   .wsplit = mesmo efeito, mas com o HTML das palavras já pré-montado
+   à mão (usado no título do Hero, que tem <br> e o botão SVG embutidos
+   — o JS de baixo faz isso automaticamente pra .split, mas ali quebraria
+   o botão: o regex corta em cima de espaços dentro das próprias tags). */
+.split .w-line,.wsplit .w-line{ display:inline-block; overflow:hidden; vertical-align:top; }
+.split .w-word,.wsplit .w-word{ display:inline-block; transition:transform .75s var(--ease); transition-delay:calc(var(--w)*60ms); }
+.js .split .w-word,.js .wsplit .w-word{ transform:translateY(112%); }
+.js .in .split .w-word,.js .in.split .w-word,.js .in .wsplit .w-word,.js .in.wsplit .w-word{ transform:none; }
+/* "Olá! Você chegou :)" — efeito de digitação: cada letra pipoca em
+   sequência (em vez de fade do bloco inteiro). */
+.hero-greet .tw-ch{ display:inline-block; }
+.js .hero-greet .tw-ch{ opacity:0; }
+.js .in .hero-greet .tw-ch{ opacity:1; transition:opacity .01s linear; transition-delay:calc(var(--i)*55ms); }
+.hero-greet::after{
+  content:"|"; display:inline-block; margin-left:.04em; animation:twCaret .8s steps(1) infinite;
+}
+@keyframes twCaret{ 50%{ opacity:0; } }
 /* âncoras: folga pro header fixo */
 [id]{ scroll-margin-top:64px; }
 
 @media(prefers-reduced-motion:reduce){
   *{ animation:none!important; transition:none!important; }
-  .js .r,.js .split .w-word{ opacity:1!important; transform:none!important; }
+  .js .r,.js .split .w-word,.js .wsplit .w-word,.js .hero-greet .tw-ch{ opacity:1!important; transform:none!important; }
   html{ scroll-behavior:auto; }
 }
 </style>
 </head>
 <body>
 
-<!-- LOADER -->
-<div class="loader" id="loader" aria-hidden="true"><span><i>Elaine Narcizo</i></span></div>
 
 <!-- HEADER (referência: logo · redes · palavra "menu" + hamburger; navegação de seções mora no overlay) -->
 <header class="hdr" id="hdr">
@@ -649,7 +647,7 @@ main{ position:relative; }
     </video>
     <div class="hero-scrim" aria-hidden="true"></div>
 
-    <span class="hero-greet r" style="--r:0">Olá! Você chegou. :)</span>
+    <span class="hero-greet"><span class="tw-ch" style="--i:0">O</span><span class="tw-ch" style="--i:1">l</span><span class="tw-ch" style="--i:2">á</span><span class="tw-ch" style="--i:3">!</span> <span class="tw-ch" style="--i:4">V</span><span class="tw-ch" style="--i:5">o</span><span class="tw-ch" style="--i:6">c</span><span class="tw-ch" style="--i:7">ê</span> <span class="tw-ch" style="--i:8">c</span><span class="tw-ch" style="--i:9">h</span><span class="tw-ch" style="--i:10">e</span><span class="tw-ch" style="--i:11">g</span><span class="tw-ch" style="--i:12">o</span><span class="tw-ch" style="--i:13">u</span><span class="tw-ch" style="--i:14">.</span> <span class="tw-ch" style="--i:15">:</span><span class="tw-ch" style="--i:16">)</span></span>
 
     <!-- cluster de 5 asteriscos (vetores do Daniel) — o "logo-herói" da capa,
          agora flutuando direto sobre o vídeo, entre a saudação e o título
@@ -664,7 +662,7 @@ main{ position:relative; }
       </svg>
     </div>
 
-    <h1 class="giant r" style="--r:2">Tem muita vida<br />acontecendo<br />aqui.<a class="btn-navegue" href="#quem" aria-label="Navegue">
+    <h1 class="giant r" style="--r:2"><span class="wsplit"><span class="w-line"><span class="w-word" style="--w:0">Tem</span></span> <span class="w-line"><span class="w-word" style="--w:1">muita</span></span> <span class="w-line"><span class="w-word" style="--w:2">vida</span></span><br /><span class="w-line"><span class="w-word" style="--w:3">acontecendo</span></span><br /><span class="w-line"><span class="w-word" style="--w:4">aqui.</span></span></span><a class="btn-navegue" href="#quem" aria-label="Navegue">
       <svg viewBox="0 0 773.6 203" xmlns="http://www.w3.org/2000/svg">
         <rect class="bn-bg" width="773.6" height="203" rx="38.7" ry="38.7"/>
         <g transform="translate(45.3,40.7)">
@@ -955,14 +953,11 @@ main{ position:relative; }
 (function(){
   document.documentElement.classList.add('js');
 
-  /* LOADER: uma vez por sessão, curto */
-  var loader=document.getElementById('loader');
-  try{
-    if(sessionStorage.getItem('en_fluxo_seen')){ loader.remove(); }
-    else{ sessionStorage.setItem('en_fluxo_seen','1');
-      setTimeout(function(){ loader.classList.add('done'); },950);
-      setTimeout(function(){ loader.remove(); },1800); }
-  }catch(e){ loader.remove(); }
+  /* SEMPRE abrir na capa: o navegador por padrão RESTAURA a posição de
+     rolagem de uma visita anterior (comum reclamarem "abre na página 2")
+     — isso desliga essa restauração automática e garante topo=topo. */
+  if('scrollRestoration' in history){ history.scrollRestoration='manual'; }
+  addEventListener('load',function(){ scrollTo(0,0); });
 
   /* HEADER: escurece ao rolar */
   var hdr=document.getElementById('hdr');
