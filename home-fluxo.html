@@ -224,16 +224,24 @@ main{ position:relative; }
   /* "traçado" tipo Photoshop: fio de ~1pt por cima do preenchimento pra
      engrossar a fonte fina sem trocar de peso. */
   -webkit-text-stroke:1px var(--paper); text-stroke:1px var(--paper);
+  transform:translateY(-70px); /* pedido do Daniel: sobe ~70px */
 }
-.c-hero .hero-aster{ align-self:center; margin:clamp(2px,1vh,10px) 0; }
-.c-hero .giant{ font-family:"Bebas Neue",var(--disp); font-weight:400; font-stretch:100%; letter-spacing:.005em; line-height:.94; }
+.c-hero .hero-aster{ align-self:center; margin:clamp(2px,1vh,10px) 0; transform:translateY(-50px); /* sobe ~50px */ }
+.c-hero .giant{
+  font-family:"Bebas Neue",var(--disp); font-weight:400; font-stretch:100%; letter-spacing:.005em; line-height:.94;
+  text-align:center; /* bloco título+botão centralizado, pedido do Daniel */
+  font-size:clamp(3rem,14vw,8.4rem); /* maior que o .giant padrão do site — "aumenta tudo junto" */
+}
 /* botão "navegue" — montado dos 2 vetores do Daniel (pílula branca +
    letreiro lilás), embutido no fim da última linha do título, colado
    pela base (baseline) nela. Efeito de onda: brilho diagonal varre o
-   botão a cada ~3.4s. */
+   botão a cada ~3.4s (aprovado do jeito que está — "tá bom assim").
+   Largura em `em` (não vw/px fixo): reduzida até bater com a largura
+   da palavra "vida" (linha 1) — assim escala junto quando o título
+   cresce, em vez de precisar recalibrar toda vez. */
 .btn-navegue{
   position:relative; display:inline-block; overflow:hidden; vertical-align:text-bottom;
-  width:clamp(190px,54vw,360px); margin-left:.22em;
+  width:1.4em; margin-left:.22em;
   border-radius:5% / 19.1%; /* replica o rx=38.7 do SVG (rx/largura ≈5%, rx/altura≈19.1%) */
 }
 .btn-navegue svg{ display:block; width:100%; height:auto; }
