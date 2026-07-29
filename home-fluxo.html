@@ -2,6 +2,16 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8" />
+<script>
+/* SEMPRE abrir na capa — o mais cedo possível, antes de qualquer coisa
+   carregar. A tentativa anterior corrigia isso só no fim do <body>
+   esperando o evento "load" (que só dispara depois do vídeo inteiro
+   baixar) — por isso dava pra ver a página 2 por um instante antes de
+   "descer" (na real, a lâmina branca recuando) de volta pra capa. Agora
+   roda síncrono, antes do navegador ter chance de restaurar a rolagem. */
+if('scrollRestoration' in history){ history.scrollRestoration='manual'; }
+scrollTo(0,0);
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Elaine Narcizo</title>
 <meta name="description" content="Elaine Narcizo — educadora, arteterapeuta, pesquisadora. Tem muita vida acontecendo aqui." />
@@ -53,7 +63,7 @@
   --radius:clamp(18px,3.5vw,34px);  /* boca arredondada das lâminas que cobrem */
 }
 *{ margin:0; padding:0; box-sizing:border-box; }
-html{ scroll-behavior:smooth; }
+html{ scroll-behavior:smooth; overflow-anchor:none; } /* trava extra pro "abre na página 2": impede o navegador de empurrar o scroll sozinho quando o vídeo/imagens do topo mudam de tamanho ao carregar */
 html,body{ background:var(--ink); }
 body{
   font-family:var(--disp); font-size:17px; line-height:1.55; color:var(--ink);
@@ -254,7 +264,18 @@ main{ position:relative; }
 }
 .btn-navegue svg{ display:block; width:100%; height:auto; }
 .btn-navegue .bn-bg{ fill:var(--white); }
-.btn-navegue .bn-word{ fill:var(--lilas); }
+/* palavra "navegue" muda de cor a cada respiração do cluster de
+   estrelas (8.6s) — 4 respirações = 1 volta completa pelas mesmas 4
+   cores do cluster (lilás/roxo → amarelo → oliva/verde → laranja),
+   começando em lilás igual já estava. */
+.btn-navegue .bn-word{ fill:var(--lilas); animation:bnColor 34.4s linear infinite; }
+@keyframes bnColor{
+  0%,2%  { fill:var(--lilas); }
+  25%    { fill:var(--amarelo); }
+  50%    { fill:var(--oliva); }
+  75%    { fill:var(--laranja); }
+  100%   { fill:var(--lilas); }
+}
 .btn-navegue::after{
   content:""; position:absolute; inset:0; pointer-events:none;
   background:linear-gradient(115deg, transparent 30%, rgba(255,255,255,.65) 48%, transparent 66%);
@@ -953,11 +974,11 @@ main{ position:relative; }
 (function(){
   document.documentElement.classList.add('js');
 
-  /* SEMPRE abrir na capa: o navegador por padrão RESTAURA a posição de
-     rolagem de uma visita anterior (comum reclamarem "abre na página 2")
-     — isso desliga essa restauração automática e garante topo=topo. */
-  if('scrollRestoration' in history){ history.scrollRestoration='manual'; }
-  addEventListener('load',function(){ scrollTo(0,0); });
+  /* segunda garantia (a primeira já roda no <head>, síncrona) — cobre o
+     caso de algo (vídeo carregando, layout shift) empurrar o scroll
+     depois disso. Sem esperar o "load" (que só dispara com o vídeo
+     inteiro baixado — tarde demais, dava tempo de ver a página 2). */
+  scrollTo(0,0);
 
   /* HEADER: escurece ao rolar */
   var hdr=document.getElementById('hdr');
