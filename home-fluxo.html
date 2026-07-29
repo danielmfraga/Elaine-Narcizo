@@ -207,12 +207,12 @@ main{ position:relative; }
    garantir contraste do texto branco. Resolve a pendência #10 (vídeo
    placeholder). */
 .c-hero{
-  position:relative; z-index:1; justify-content:flex-end; gap:clamp(14px,2.6vh,26px);
+  position:relative; z-index:1; justify-content:flex-end; gap:var(--tw-gap, clamp(14px,2.6vh,26px));
   color:var(--paper); background:var(--ink);
   /* mais respiro embaixo = empurra o bloco inteiro (saudação+asteriscos+
      título) pra cima, pedido do Daniel — some junto com a remoção do
      "role para descer". */
-  padding-bottom:clamp(52px,10vh,96px);
+  padding-bottom:var(--tw-pad-bottom, clamp(52px,10vh,96px));
 }
 .c-hero .hero-bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
 .c-hero .hero-scrim{ position:absolute; inset:0; z-index:0;
@@ -220,17 +220,17 @@ main{ position:relative; }
 .c-hero > *:not(.hero-bg):not(.hero-scrim){ position:relative; z-index:1; }
 .c-hero .hero-greet{
   font-family:"Amatic SC",cursive; font-weight:700; text-align:center; align-self:center;
-  font-size:clamp(2.6rem,10.8vw,4.1rem); line-height:1.05; letter-spacing:.01em;
+  font-size:var(--tw-greet-fs, clamp(2.6rem,10.8vw,4.1rem)); line-height:1.05; letter-spacing:.01em;
   /* "traçado" tipo Photoshop: fio de ~1pt por cima do preenchimento pra
      engrossar a fonte fina sem trocar de peso. */
   -webkit-text-stroke:1px var(--paper); text-stroke:1px var(--paper);
-  transform:translateY(-70px); /* pedido do Daniel: sobe ~70px */
+  transform:translateY(var(--tw-greet-y, -70px)); /* pedido do Daniel: sobe ~70px */
 }
-.c-hero .hero-aster{ align-self:center; margin:clamp(2px,1vh,10px) 0; transform:translateY(-50px); /* sobe ~50px */ }
+.c-hero .hero-aster{ align-self:center; margin:clamp(2px,1vh,10px) 0; transform:translateY(var(--tw-aster-y, -50px)); /* sobe ~50px */ }
 .c-hero .giant{
   font-family:"Bebas Neue",var(--disp); font-weight:400; font-stretch:100%; letter-spacing:.005em; line-height:.94;
   text-align:center; /* bloco título+botão centralizado, pedido do Daniel */
-  font-size:clamp(3rem,14vw,8.4rem); /* maior que o .giant padrão do site — "aumenta tudo junto" */
+  font-size:var(--tw-title-fs, clamp(3rem,14vw,8.4rem)); /* maior que o .giant padrão do site — "aumenta tudo junto" */
 }
 /* botão "navegue" — montado dos 2 vetores do Daniel (pílula branca +
    letreiro lilás), embutido no fim da última linha do título, colado
@@ -241,7 +241,7 @@ main{ position:relative; }
    cresce, em vez de precisar recalibrar toda vez. */
 .btn-navegue{
   position:relative; display:inline-block; overflow:hidden; vertical-align:text-bottom;
-  width:1.4em; margin-left:.22em;
+  width:var(--tw-btn-w, 1.4em); margin-left:var(--tw-btn-ml, .22em);
   border-radius:5% / 19.1%; /* replica o rx=38.7 do SVG (rx/largura ≈5%, rx/altura≈19.1%) */
 }
 .btn-navegue svg{ display:block; width:100%; height:auto; }
@@ -261,7 +261,7 @@ main{ position:relative; }
    da capa, tratado como as letras H-O-Y da referência: GRANDE, central,
    flutuando SOBRE o vídeo do hero (por isso o asterisco do meio é claro
    no vetor original — o fundo dele é o vídeo escuro, não o creme). */
-.hero-aster{ width:clamp(150px,26svh,240px); flex-shrink:0; position:relative; z-index:1; }
+.hero-aster{ width:var(--tw-aster-size, clamp(150px,26svh,240px)); flex-shrink:0; position:relative; z-index:1; }
 .hero-aster svg{ width:100%; height:auto; display:block; overflow:visible; }
 .hero-aster path{ fill-rule:nonzero; }
 .hero-aster .ha-c{ fill:#F6F4F4; }   /* o branco é o eixo: fica PARADO */
@@ -1013,6 +1013,130 @@ main{ position:relative; }
   }
   addEventListener('scroll',function(){ if(!ticking){ ticking=true; requestAnimationFrame(paint); } },{passive:true});
   paint();
+})();
+</script>
+
+<!-- ═══ MODO AJUSTE DA CAPA (só ativa com ?tweak=1 na URL) ═══
+     Painel de sliders pra calibrar posição/tamanho dos elementos do Hero
+     ao vivo (no celular real, com vídeo/fontes de verdade), em vez de
+     ida-e-volta verbal em pixels. Cada slider escreve numa CSS custom
+     property (--tw-*) que os estilos do Hero já leem via var(--tw-x,
+     valor-padrão) — sem tweak mode, o var() cai no padrão de sempre,
+     zero efeito pra quem visita o site normalmente. Pedido do Daniel,
+     jul/2026: "queria ajustar tipo no design". Botão "Copiar valores"
+     gera um texto com os números pra colar de volta no chat. -->
+<script>
+(function(){
+  if(new URLSearchParams(location.search).get('tweak')!=='1') return;
+
+  var CONTROLS=[
+    { key:'--tw-greet-y',   label:'Olá — sobe / desce',            unit:'px', min:-160, max:80,  step:1, get:function(){ return -70; } },
+    { key:'--tw-greet-fs',  label:'Olá — tamanho',                 unit:'px', min:20,  max:90,  step:1, get:function(){ return parseFloat(getComputedStyle(document.querySelector('.hero-greet')).fontSize); } },
+    { key:'--tw-aster-y',   label:'Estrelas — sobe / desce',       unit:'px', min:-160, max:80,  step:1, get:function(){ return -50; } },
+    { key:'--tw-aster-size',label:'Estrelas — tamanho',            unit:'px', min:80,  max:320, step:2, get:function(){ return document.querySelector('.hero-aster').getBoundingClientRect().width; } },
+    { key:'--tw-title-fs',  label:'Título — tamanho',              unit:'px', min:32,  max:180, step:1, get:function(){ return parseFloat(getComputedStyle(document.querySelector('.c-hero .giant')).fontSize); } },
+    { key:'--tw-btn-w',     label:'Botão navegue — largura',       unit:'px', min:60,  max:420, step:2, get:function(){ return document.querySelector('.btn-navegue').getBoundingClientRect().width; } },
+    { key:'--tw-btn-ml',    label:'Botão navegue — deslocar lateral', unit:'px', min:-80, max:80, step:1, get:function(){ return parseFloat(getComputedStyle(document.querySelector('.btn-navegue')).marginLeft); } },
+    { key:'--tw-pad-bottom',label:'Bloco inteiro — sobe / desce',  unit:'px', min:20,  max:220, step:2, get:function(){ return parseFloat(getComputedStyle(document.querySelector('.c-hero')).paddingBottom); } },
+    { key:'--tw-gap',       label:'Espaço Olá / estrelas / título',unit:'px', min:0,   max:70,  step:1, get:function(){ var s=getComputedStyle(document.querySelector('.c-hero')); return parseFloat(s.rowGap||s.gap); } }
+  ];
+  var STORE_KEY='en_tweak_v1';
+
+  function buildPanel(){
+    var root=document.documentElement;
+    var saved={};
+    try{ saved=JSON.parse(localStorage.getItem(STORE_KEY)||'{}'); }catch(e){}
+    function persist(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(saved)); }catch(e){} }
+    function apply(c,val){ root.style.setProperty(c.key, val+c.unit); }
+
+    var wrap=document.createElement('div');
+    wrap.id='twPanel';
+    wrap.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:9999;font-family:system-ui,-apple-system,sans-serif;font-size:13px;color:#fff;';
+
+    var open=!!saved.__open;
+    var head=document.createElement('div');
+    head.textContent='🎛️ Ajustes da capa — toque pra '+(open?'fechar':'abrir');
+    head.style.cssText='background:#0F0E0C;padding:12px 14px;cursor:pointer;font-weight:600;';
+
+    var body=document.createElement('div');
+    body.style.cssText='background:rgba(15,14,12,.97);max-height:62vh;overflow:auto;padding:14px;display:'+(open?'block':'none')+';';
+
+    head.onclick=function(){
+      open=!open;
+      body.style.display=open?'block':'none';
+      head.textContent='🎛️ Ajustes da capa — toque pra '+(open?'fechar':'abrir');
+      saved.__open=open; persist();
+    };
+
+    var out=document.createElement('textarea');
+
+    CONTROLS.forEach(function(c){
+      var row=document.createElement('div');
+      row.style.cssText='margin-bottom:16px;';
+      var lab=document.createElement('div');
+      lab.style.cssText='display:flex;justify-content:space-between;margin-bottom:5px;gap:8px;';
+      var lname=document.createElement('span'); lname.textContent=c.label;
+      var lval=document.createElement('span'); lval.style.cssText='opacity:.65;flex-shrink:0;';
+      lab.appendChild(lname); lab.appendChild(lval);
+
+      var input=document.createElement('input');
+      input.type='range'; input.min=c.min; input.max=c.max; input.step=c.step;
+      input.style.cssText='width:100%;';
+
+      var startVal=(saved[c.key]!=null)?saved[c.key]:Math.round(c.get());
+      input.value=startVal;
+      lval.textContent=startVal+c.unit;
+      apply(c,startVal);
+
+      input.oninput=function(){
+        var v=+input.value;
+        lval.textContent=v+c.unit;
+        apply(c,v);
+        saved[c.key]=v;
+        persist();
+      };
+
+      row.appendChild(lab); row.appendChild(input);
+      body.appendChild(row);
+    });
+
+    var actions=document.createElement('div');
+    actions.style.cssText='display:flex;gap:8px;margin-top:4px;flex-wrap:wrap;';
+
+    var btnCopy=document.createElement('button');
+    btnCopy.textContent='Copiar valores';
+    btnCopy.style.cssText='flex:1;min-width:140px;padding:12px;border:0;border-radius:8px;background:#F5D731;color:#0F0E0C;font-weight:700;';
+    btnCopy.onclick=function(){
+      var lines=CONTROLS.map(function(c){ return c.label+': '+(root.style.getPropertyValue(c.key)||'(padrão)'); });
+      lines.unshift('Tela: '+innerWidth+'×'+innerHeight+'px');
+      var text=lines.join('\n');
+      if(navigator.clipboard){ navigator.clipboard.writeText(text).catch(function(){}); }
+      out.value=text; out.style.display='block';
+      btnCopy.textContent='Copiado! ✓';
+      setTimeout(function(){ btnCopy.textContent='Copiar valores'; },1600);
+    };
+
+    var btnReset=document.createElement('button');
+    btnReset.textContent='Resetar';
+    btnReset.style.cssText='padding:12px 18px;border:0;border-radius:8px;background:#333;color:#fff;';
+    btnReset.onclick=function(){
+      CONTROLS.forEach(function(c){ root.style.removeProperty(c.key); });
+      try{ localStorage.removeItem(STORE_KEY); }catch(e){}
+      location.reload();
+    };
+
+    actions.appendChild(btnCopy); actions.appendChild(btnReset);
+    body.appendChild(actions);
+
+    out.readOnly=true;
+    out.style.cssText='width:100%;margin-top:10px;height:150px;display:none;background:#111;color:#7CFC7C;font-family:ui-monospace,monospace;font-size:11px;padding:8px;border:0;border-radius:8px;';
+    body.appendChild(out);
+
+    wrap.appendChild(head); wrap.appendChild(body);
+    document.body.appendChild(wrap);
+  }
+
+  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', buildPanel); } else { buildPanel(); }
 })();
 </script>
 </body>
