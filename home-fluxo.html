@@ -220,7 +220,7 @@ main{ position:relative; }
 .c-hero > *:not(.hero-bg):not(.hero-scrim){ position:relative; z-index:1; }
 .c-hero .hero-greet{
   font-family:"Amatic SC",cursive; font-weight:700; text-align:center; align-self:center;
-  font-size:var(--tw-greet-fs, clamp(2.6rem,10.8vw,4.1rem)); line-height:1.05; letter-spacing:.01em;
+  font-size:var(--tw-greet-fs, clamp(2.6rem,12.3vw,4.3rem)); line-height:1.05; letter-spacing:.01em;
   /* "traçado" tipo Photoshop: fio de ~1pt por cima do preenchimento pra
      engrossar a fonte fina sem trocar de peso. */
   -webkit-text-stroke:1px var(--paper); text-stroke:1px var(--paper);
@@ -229,16 +229,16 @@ main{ position:relative; }
      assim que a animação de entrada termina. Bug real que ficou invisível
      até agora porque o padding-bottom do .c-hero também empurra o bloco
      pra cima, mascarando a falta do translateY individual. */
-  transform:translateY(var(--tw-greet-y, -70px)) !important; /* pedido do Daniel: sobe ~70px */
+  transform:translateY(var(--tw-greet-y, -19px)) !important; /* calibrado no painel de ajuste, tela 390×745 */
 }
 .c-hero .hero-aster{
   align-self:center; margin:clamp(2px,1vh,10px) 0;
-  transform:translateY(var(--tw-aster-y, -50px)) !important; /* sobe ~50px — mesmo motivo do !important acima */
+  transform:translateY(var(--tw-aster-y, -1px)) !important; /* calibrado no painel — mesmo motivo do !important acima */
 }
 .c-hero .giant{
   font-family:"Bebas Neue",var(--disp); font-weight:400; font-stretch:100%; letter-spacing:.005em; line-height:.94;
   text-align:var(--tw-title-align, left); /* voltou pra esquerda — o print de referência do Daniel mostra o bloco alinhado à esquerda, não centralizado */
-  font-size:var(--tw-title-fs, clamp(3rem,14vw,8.4rem));
+  font-size:var(--tw-title-fs, clamp(3rem,16.9vw,8.4rem));
   /* bloco título+botão inteiro — desloca junto (o botão é filho do h1,
      anda automaticamente com o texto). Controles independentes de X/Y
      pro painel de ajuste (--tw-title-x/--tw-title-y).
@@ -246,23 +246,23 @@ main{ position:relative; }
      entrada) e, depois de revelado, ".js .in .r{transform:none}" tem
      mais especificidade (0,3,0) que este seletor (0,2,0) e apagava
      o deslocamento assim que a animação de entrada terminava. */
-  transform:translate(var(--tw-title-x, 0px), var(--tw-title-y, 0px)) !important;
+  transform:translate(var(--tw-title-x, 13px), var(--tw-title-y, 7px)) !important; /* calibrado no painel */
 }
 /* botão "navegue" — montado dos 2 vetores do Daniel (pílula branca +
    letreiro lilás), embutido no fim da última linha do título, colado
    pela base (baseline) nela. Efeito de onda: brilho diagonal varre o
    botão a cada ~3.4s (aprovado do jeito que está — "tá bom assim").
-   Largura em `em` (relativa ao font-size do h1): voltou a crescer —
-   o print de referência mostra o botão bem maior que a palavra "vida",
-   inline ao lado de "aqui.", não um bloco embaixo.
+   Largura em `em` (relativa ao font-size do h1) — 2.85em calibrado no
+   painel (188px medido com título a 66px: 188/66≈2.85) — continua
+   escalando junto quando o título cresce.
    --tw-btn-y: deslocamento vertical (sobe/desce), não altura — o
    Daniel corrigiu que "altura" foi um pedido impreciso, o que ele
    queria mesmo era mover o botão no eixo vertical, tipo os nudges
    do Olá/estrelas. */
 .btn-navegue{
   position:relative; display:inline-block; overflow:hidden; vertical-align:text-bottom;
-  width:var(--tw-btn-w, 2.3em); margin-left:var(--tw-btn-ml, .22em);
-  transform:translateY(var(--tw-btn-y, 0px));
+  width:var(--tw-btn-w, 2.85em); margin-left:var(--tw-btn-ml, .212em);
+  transform:translateY(var(--tw-btn-y, -19px));
   border-radius:5% / 19.1%; /* replica o rx=38.7 do SVG (rx/largura ≈5%, rx/altura≈19.1%) */
 }
 .btn-navegue svg{ display:block; width:100%; height:auto; }
@@ -282,7 +282,7 @@ main{ position:relative; }
    da capa, tratado como as letras H-O-Y da referência: GRANDE, central,
    flutuando SOBRE o vídeo do hero (por isso o asterisco do meio é claro
    no vetor original — o fundo dele é o vídeo escuro, não o creme). */
-.hero-aster{ width:var(--tw-aster-size, clamp(150px,26svh,240px)); flex-shrink:0; position:relative; z-index:1; }
+.hero-aster{ width:var(--tw-aster-size, clamp(150px,25.2svh,240px)); flex-shrink:0; position:relative; z-index:1; } /* calibrado no painel: 188px medido em 745px de altura */
 .hero-aster svg{ width:100%; height:auto; display:block; overflow:visible; }
 .hero-aster path{ fill-rule:nonzero; }
 .hero-aster .ha-c{ fill:#F6F4F4; }   /* o branco é o eixo: fica PARADO */
@@ -1050,16 +1050,23 @@ main{ position:relative; }
 (function(){
   if(new URLSearchParams(location.search).get('tweak')!=='1') return;
 
+  /* lê o translateX/Y REAL do transform computado (em vez de número
+     fixo) — assim o slider sempre abre no valor certo mesmo depois
+     que a gente muda o padrão no CSS (evita o painel "esquecer" de
+     acompanhar uma calibração anterior). */
+  function txOf(el){ var m=getComputedStyle(el).transform; if(m==='none') return 0; var p=m.match(/matrix\(([^)]+)\)/); return p?parseFloat(p[1].split(',')[4]):0; }
+  function tyOf(el){ var m=getComputedStyle(el).transform; if(m==='none') return 0; var p=m.match(/matrix\(([^)]+)\)/); return p?parseFloat(p[1].split(',')[5]):0; }
+
   var CONTROLS=[
-    { key:'--tw-greet-y',   label:'Olá — sobe / desce',            unit:'px', min:-160, max:80,  step:1, get:function(){ return -70; } },
+    { key:'--tw-greet-y',   label:'Olá — sobe / desce',            unit:'px', min:-160, max:80,  step:1, get:function(){ return tyOf(document.querySelector('.hero-greet')); } },
     { key:'--tw-greet-fs',  label:'Olá — tamanho',                 unit:'px', min:20,  max:90,  step:1, get:function(){ return parseFloat(getComputedStyle(document.querySelector('.hero-greet')).fontSize); } },
-    { key:'--tw-aster-y',   label:'Estrelas — sobe / desce',       unit:'px', min:-160, max:80,  step:1, get:function(){ return -50; } },
+    { key:'--tw-aster-y',   label:'Estrelas — sobe / desce',       unit:'px', min:-160, max:80,  step:1, get:function(){ return tyOf(document.querySelector('.hero-aster')); } },
     { key:'--tw-aster-size',label:'Estrelas — tamanho',            unit:'px', min:80,  max:320, step:2, get:function(){ return document.querySelector('.hero-aster').getBoundingClientRect().width; } },
     { key:'--tw-title-fs',  label:'Título — tamanho',              unit:'px', min:32,  max:180, step:1, get:function(){ return parseFloat(getComputedStyle(document.querySelector('.c-hero .giant')).fontSize); } },
-    { key:'--tw-title-x',   label:'Bloco (título+botão) — deslocar lateral', unit:'px', min:-150, max:150, step:1, get:function(){ return 0; } },
-    { key:'--tw-title-y',   label:'Bloco (título+botão) — sobe / desce',     unit:'px', min:-150, max:150, step:1, get:function(){ return 0; } },
+    { key:'--tw-title-x',   label:'Bloco (título+botão) — deslocar lateral', unit:'px', min:-150, max:150, step:1, get:function(){ return txOf(document.querySelector('.c-hero .giant')); } },
+    { key:'--tw-title-y',   label:'Bloco (título+botão) — sobe / desce',     unit:'px', min:-150, max:150, step:1, get:function(){ return tyOf(document.querySelector('.c-hero .giant')); } },
     { key:'--tw-btn-w',     label:'Botão navegue — largura',       unit:'px', min:60,  max:420, step:2, get:function(){ return document.querySelector('.btn-navegue').getBoundingClientRect().width; } },
-    { key:'--tw-btn-y',     label:'Botão navegue — sobe / desce',  unit:'px', min:-100, max:100, step:1, get:function(){ return 0; } },
+    { key:'--tw-btn-y',     label:'Botão navegue — sobe / desce',  unit:'px', min:-100, max:100, step:1, get:function(){ return tyOf(document.querySelector('.btn-navegue')); } },
     { key:'--tw-btn-ml',    label:'Botão navegue — deslocar lateral', unit:'px', min:-80, max:80, step:1, get:function(){ return parseFloat(getComputedStyle(document.querySelector('.btn-navegue')).marginLeft); } },
     { key:'--tw-pad-bottom',label:'Bloco inteiro — sobe / desce',  unit:'px', min:20,  max:220, step:2, get:function(){ return parseFloat(getComputedStyle(document.querySelector('.c-hero')).paddingBottom); } },
     { key:'--tw-gap',       label:'Espaço Olá / estrelas / título',unit:'px', min:0,   max:70,  step:1, get:function(){ var s=getComputedStyle(document.querySelector('.c-hero')); return parseFloat(s.rowGap||s.gap); } }
