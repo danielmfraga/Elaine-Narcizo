@@ -9,8 +9,22 @@
    baixar) — por isso dava pra ver a página 2 por um instante antes de
    "descer" (na real, a lâmina branca recuando) de volta pra capa. Agora
    roda síncrono, antes do navegador ter chance de restaurar a rolagem. */
-if('scrollRestoration' in history){ history.scrollRestoration='manual'; }
-scrollTo(0,0);
+/* ⚠️ Só força o topo numa visita NOVA. Se o usuário está VOLTANDO (botão
+   voltar do navegador, ex.: saiu pra página do player e voltou), deixa o
+   navegador restaurar a posição — senão ele cai no topo em vez de voltar
+   pra caixa onde estava. Pedido do Daniel; era um efeito colateral do fix
+   do "abre na página 2". */
+var enVoltou=(function(){
+  try{
+    var e=performance.getEntriesByType('navigation')[0];
+    if(e&&e.type) return e.type==='back_forward';
+    return performance.navigation&&performance.navigation.type===2;  /* fallback antigo */
+  }catch(err){ return false; }
+})();
+if(!enVoltou){
+  if('scrollRestoration' in history){ history.scrollRestoration='manual'; }
+  scrollTo(0,0);
+}
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Elaine Narcizo</title>
@@ -51,6 +65,7 @@ scrollTo(0,0);
   --laranja:#F2A25A;
   --oliva:#BBC24C;
   --lilas:#B9A7DC;         /* mesmo lilás já testado na Bilheteria */
+  --roxo:#6C4BB6;          /* roxo da Rádio Tinhosa — veio junto com a seção da home-mapa, é a cor da identidade dela (botão Sintonize, aba do manifesto) */
   --mute:#6E6A60;
   --line:rgba(15,14,12,.14);
 
@@ -207,6 +222,85 @@ main{ position:relative; }
 .y{ background:var(--amarelo); color:var(--ink); }
 .k{ background:var(--ink); color:var(--paper); }
 .w{ background:var(--paper); color:var(--ink); }
+
+/* ═══ RÁDIO TINHOSA — capa trazida da home-mapa (ago/2026) ═══
+   Lá ela era um "mundo" com painéis laterais (navegação 2D); aqui virou uma
+   lâmina normal da rolagem vertical. Layout, conteúdo e interações mantidos;
+   o que mudou foi só o necessário pra encaixar nesta página:
+     · cantos arredondados (herda de .sheet) + overflow:hidden pro vídeo respeitar a curva
+     · tipografia da casa (Archivo) no lugar da serif da página antiga
+     · o "Sintonize" não desliza mais pro painel ao lado (não existe aqui) */
+.s-radio{
+  position:relative; overflow:hidden; isolation:isolate;
+  min-height:100svh; padding:0; display:flex; flex-direction:column;
+  background:radial-gradient(ellipse 88% 52% at 50% 72%, #f4e9e1 0%, var(--paper) 68%);
+}
+.s-radio .radio-video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; pointer-events:none;
+  transform:translateX(-15px); }  /* cola o vídeo na aba lateral (= largura dela) */
+.s-radio::after{ content:''; position:absolute; inset:0; z-index:1; pointer-events:none; background:rgba(255,255,255,.14); }
+.s-radio .radio-inner{ position:relative; z-index:2; flex:1; display:flex; align-items:center; justify-content:center; padding:0 var(--pad); }
+/* botão SINTONIZE — chamada principal, pulsante */
+.btn-tune{
+  position:relative; z-index:1; display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  background:var(--roxo); color:#fff; text-decoration:none;
+  border-radius:999px; padding:16px 32px;
+  font-family:var(--mono); font-size:13px; font-weight:700; letter-spacing:.16em; text-transform:uppercase;
+  transform:translateY(80px);   /* desce p/ não cair sobre o texto que vem DENTRO do vídeo */
+  transition:background .18s var(--ease), box-shadow .18s var(--ease);
+  animation:tune-glow 2.2s var(--ease) infinite;
+}
+.btn-tune .ar{ transition:transform .3s var(--ease); }
+.btn-tune:hover .ar{ transform:translateX(4px); }
+.btn-tune:active,.btn-tune:focus-visible{ background:var(--oliva); box-shadow:0 6px 18px rgba(187,194,76,.55); animation:none; }
+.btn-tune:active::before,.btn-tune:active::after{ animation:none; opacity:0; }
+.btn-tune::before,.btn-tune::after{
+  content:''; position:absolute; inset:0; border-radius:999px;
+  border:2px solid var(--roxo); opacity:0; pointer-events:none;
+  animation:tune-ripple 2.2s ease-out infinite;
+}
+.btn-tune::after{ animation-delay:1.1s; }
+@keyframes tune-glow{
+  0%,100%{ box-shadow:0 8px 22px rgba(108,75,182,.34); }
+  50%{ box-shadow:0 10px 30px rgba(108,75,182,.62); }
+}
+@keyframes tune-ripple{ 0%{ transform:scale(1); opacity:.5; } 100%{ transform:scale(1.45); opacity:0; } }
+/* aba lateral que abre o manifesto — texto na vertical, lendo de baixo p/ cima */
+.tinhosa-tab{
+  position:absolute; top:0; right:0; bottom:0; width:30px; z-index:3;
+  background:var(--roxo); border:0; padding:0; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  writing-mode:vertical-rl; transform:rotate(180deg);
+  box-shadow:5px 0 16px rgba(0,0,0,.20);   /* x positivo: o rotate inverte o eixo, na tela cai p/ a esquerda */
+  white-space:nowrap; color:#fff; font-family:var(--mono);
+  font-size:10px; font-weight:600; letter-spacing:.18em; text-transform:uppercase;
+}
+.tt-txt{ display:block; animation:tin-drift 4.5s var(--ease) infinite; }
+@keyframes tin-drift{ 0%,100%{ transform:translateY(0); opacity:.82; } 50%{ transform:translateY(14px); opacity:1; } }
+/* tela do Pequeno Manifesto Tinhoso */
+.tinhosa-manifesto{
+  position:absolute; inset:0; z-index:6; background:var(--paper);
+  overflow-y:auto; -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain; touch-action:pan-y;   /* rola aqui dentro, não arrasta a página */
+  opacity:0; visibility:hidden; pointer-events:none;
+  transition:opacity .32s var(--ease), visibility .32s;
+}
+.tinhosa-manifesto.open{ opacity:1; visibility:visible; pointer-events:auto; }
+.tinhosa-manifesto .btn-tune{ transform:none; }
+.tm-close{
+  position:sticky; top:12px; display:block; margin:12px 12px 0 auto;
+  width:34px; height:34px; border-radius:50%; border:0; cursor:pointer;
+  background:var(--roxo); color:#fff; font-size:13px; line-height:1; z-index:2;
+}
+.tm-inner{ padding:4px clamp(20px,6vw,40px) 52px; max-width:560px; margin:0 auto; }
+.tm-lead{ font-size:clamp(1.05rem,4.6vw,1.35rem); line-height:1.35; font-weight:500; color:var(--ink); margin-bottom:30px; }
+.tm-title{ font-weight:820; font-stretch:112%; font-size:clamp(1.5rem,7vw,2.1rem); line-height:1.1; color:var(--roxo); margin-bottom:14px; }
+.tm-cap{ font-family:var(--mono); font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--mute); margin-bottom:16px; }
+.tm-list{ list-style:none; margin:0 0 26px; padding:0; }
+.tm-list li{ font-size:clamp(1rem,4.2vw,1.14rem); line-height:1.5; color:rgba(15,14,12,.78);
+  padding:7px 0 7px 16px; border-left:2px solid var(--line); }
+.tm-sub{ font-size:clamp(1rem,4.4vw,1.2rem); font-weight:700; color:var(--ink); margin:6px 0 10px; }
+.tm-body{ font-size:clamp(.92rem,3.9vw,1.05rem); line-height:1.6; color:rgba(15,14,12,.78); margin-bottom:34px; }
+@media(prefers-reduced-motion:reduce){ .btn-tune,.btn-tune::before,.btn-tune::after,.tt-txt{ animation:none; } }
 
 /* ── slot de VÍDEO (marcação visível — a referência é toda vídeo) ── */
 .vph{
@@ -746,7 +840,9 @@ main{ position:relative; }
        o .marq segue vivo na faixa de parcerias, mais abaixo) -->
 
   <!-- ══ QUEM SOU EU — o "Who are we?" da referência ══ -->
-  <div class="sheet w" id="quem">
+  <!-- `pin`: esta lâmina também PRENDE, pra Rádio subir por cima dela com o
+       mesmo efeito da transição capa→aqui (ver o CSS de .sheet.pin) -->
+  <div class="sheet w pin" id="quem">
     <div class="wrap">
       <span class="idx r" style="--r:0">[01] — Quem sou eu</span>
 
@@ -795,6 +891,75 @@ main{ position:relative; }
 
       <div class="portrait r" style="--r:5">
         <img src="assets/elaine-narcizo.jpeg" alt="Retrato de Elaine Narcizo" loading="lazy" style="object-position:64% 28%" />
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ RÁDIO TINHOSA — seção trazida da home-mapa (ago/2026) ══
+       Sobe por cima do "Quem sou eu" (que está com .pin), com a mesma
+       transição/parallax da capa. Conteúdo, links e interações preservados;
+       adaptado só o que não existe nesta página (painel lateral → rolagem). -->
+  <section class="sheet w s-radio" id="radio">
+    <video class="radio-video" src="assets/radio-capa.mp4"
+           autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
+    <div class="radio-inner">
+      <a class="btn-tune" href="#" data-todo="página/player da rádio">Sintonize <span class="ar">→</span></a>
+    </div>
+
+    <!-- aba lateral: abre o manifesto -->
+    <button class="tinhosa-tab" id="tinhosaTab" aria-label="Abrir o Pequeno manifesto Tinhoso"><span class="tt-txt">Pequeno manifesto Tinhoso</span></button>
+
+    <!-- tela do Pequeno Manifesto Tinhoso -->
+    <div class="tinhosa-manifesto" id="tinhosaManifesto" aria-hidden="true">
+      <button class="tm-close" aria-label="Fechar o manifesto">✕</button>
+      <div class="tm-inner">
+        <p class="tm-lead">Tinhosa, a rádio que acompanha as teimosias do mundo.</p>
+
+        <h3 class="tm-title">Pequeno manifesto Tinhoso</h3>
+        <p class="tm-cap">Ficamos ao lado da:</p>
+
+        <ul class="tm-list">
+          <li>Teimosia da alegria e de tudo que vibra</li>
+          <li>Dos caminhos improváveis</li>
+          <li>Teimosia dos ovos, das lagartas, crisálidas e borboletas</li>
+          <li>Dos sonhos daqueles que perderam</li>
+          <li>Teimosia da imaginação no coração de tudo que sonha: pedras, pássaros, meninas</li>
+          <li>Dos peixes brilhantes no céu da Amazônia</li>
+        </ul>
+
+        <ul class="tm-list">
+          <li>Teimosia das pessoas delicadas</li>
+          <li>Teimosia das pessoas bondosas</li>
+          <li>Teimosia da esperança e seu vento incessante</li>
+          <li>Das travestis e seus sorrisos</li>
+          <li>Teimosia das belezas que nascem do chão, entre as mãos</li>
+          <li>Das portas nos livros</li>
+          <li>Teimosia daquilo que é incerto e também aberto</li>
+          <li>Teimosia das amizades improváveis e dos amores difíceis</li>
+          <li>Teimosia do conviver, que é a forma mais cabal de teimosia política.</li>
+        </ul>
+
+        <h4 class="tm-sub">O que você encontra na Rádio Tinhosa:</h4>
+        <p class="tm-body">Uma programação de podcasts, playlists e programas que escutam o mundo sem encerrá-lo em uma sentença, observando e fazendo companhia ao que nele ainda insiste em viver.</p>
+
+        <a class="btn-tune" href="#" data-todo="página/player da rádio">Sintonize <span class="ar">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- números da rádio (contadores animados) — vieram junto do esboço que a
+       seção real substituiu, pra não perder conteúdo já escrito -->
+  <div class="sheet w">
+    <div class="wrap">
+      <p class="manif in-io r" style="--r:0">Uma programação de podcasts, playlists e programas que
+        <b>escutam o mundo sem encerrá-lo em uma sentença</b> — fazendo companhia ao que nele
+        ainda insiste em viver.</p>
+      <div class="stats in-io">
+        <!-- números reais do projeto; ajustar quando os feeds crescerem -->
+        <div class="stat-b r" style="--r:0"><b data-count="17">0</b><span>Episódios no podcast</span></div>
+        <div class="stat-b r" style="--r:1"><b data-count="35">0</b><span>Semanas de ritual</span></div>
+        <div class="stat-b r" style="--r:2"><b data-count="2">0</b><span>Programas no ar</span></div>
+        <div class="stat-b r" style="--r:3"><b data-count="8">0</b><span>Cartazes do manifesto</span></div>
       </div>
     </div>
   </div>
@@ -892,41 +1057,9 @@ main{ position:relative; }
       </div>
     </div>
   </div>
-  </div><!-- /scene 2 -->
-
-  <!-- CENA 3 (rádio + números + como eu trabalho, até a próxima capa) -->
-  <div class="scene">
-  <!-- ══ NO AR (capa presa · vídeo REAL da rádio) — o "Beyond the Screen" ══ -->
-  <section class="cover k c-radio" id="radio">
-    <video src="assets/radio-capa.mp4" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
-    <div class="wrap" style="gap:14px">
-      <span class="live-tag r" style="--r:0"><i></i> No ar</span>
-      <h2 class="giant split r" style="--r:1">Rádio para <em style="color:transparent;-webkit-text-stroke:2px var(--amarelo)">teimosos</em></h2>
-      <p class="lead r" style="--r:2;max-width:40ch">Tinhosa, a rádio que acompanha as teimosias do mundo.</p>
-    </div>
-  </section>
-
-  <!-- números da rádio (os contadores animados da referência) -->
-  <div class="sheet w">
-    <div class="wrap">
-      <p class="manif in-io r" style="--r:0">Uma programação de podcasts, playlists e programas que
-        <b>escutam o mundo sem encerrá-lo em uma sentença</b> — fazendo companhia ao que nele
-        ainda insiste em viver.</p>
-      <div class="stats in-io">
-        <!-- números reais do projeto; ajustar quando os feeds crescerem -->
-        <div class="stat-b r" style="--r:0"><b data-count="17">0</b><span>Episódios no podcast</span></div>
-        <div class="stat-b r" style="--r:1"><b data-count="35">0</b><span>Semanas de ritual</span></div>
-        <div class="stat-b r" style="--r:2"><b data-count="2">0</b><span>Programas no ar</span></div>
-        <div class="stat-b r" style="--r:3"><b data-count="8">0</b><span>Cartazes do manifesto</span></div>
-      </div>
-      <div class="btnrow in-io">
-        <!-- pendência: a rádio ainda não tem página própria (o player mora no
-             esqueleto antigo). Sugestão: /radio/ standalone, mesmo padrão das áreas. -->
-        <a class="btn r" style="--r:0" href="#" data-todo="página própria da rádio">Sintonize <span>→</span></a>
-        <a class="btn ghost r" style="--r:1" href="#" data-todo="link do manifesto">Pequeno manifesto Tinhoso <span>→</span></a>
-      </div>
-    </div>
-  </div>
+  <!-- o esboço "Rádio para teimosos" que morava aqui foi SUBSTITUÍDO pela
+       seção real da Rádio Tinhosa (agora logo após a foto, na cena 1). Os
+       números/contadores dela foram preservados e movidos junto. -->
 
   <!-- ══ COMO EU TRABALHO — o "How we roll" (3 cards de serviço) ══ -->
   <div class="sheet w" id="formacoes">
@@ -1020,8 +1153,37 @@ main{ position:relative; }
   /* segunda garantia (a primeira já roda no <head>, síncrona) — cobre o
      caso de algo (vídeo carregando, layout shift) empurrar o scroll
      depois disso. Sem esperar o "load" (que só dispara com o vídeo
-     inteiro baixado — tarde demais, dava tempo de ver a página 2). */
-  scrollTo(0,0);
+     inteiro baixado — tarde demais, dava tempo de ver a página 2).
+     Respeita a mesma guarda do <head>: se está VOLTANDO, não força o topo. */
+  if(!window.enVoltou) scrollTo(0,0);
+
+  /* ── RÁDIO TINHOSA ──────────────────────────────────────────────
+     Vídeo da capa mais lento SEM reexportar o arquivo (0.5 = 10s viram
+     ~20s). Só mudar RV_RATE pra calibrar (menor = mais lento). */
+  var radioVid=document.querySelector('.radio-video');
+  if(radioVid){
+    var RV_RATE=0.5;
+    radioVid.playbackRate=RV_RATE;
+    radioVid.addEventListener('loadedmetadata',function(){ radioVid.playbackRate=RV_RATE; });
+  }
+
+  /* a aba lateral abre/fecha o Pequeno Manifesto */
+  var tinTab=document.getElementById('tinhosaTab'), tinMan=document.getElementById('tinhosaManifesto');
+  if(tinTab&&tinMan){
+    var tinHide=function(){
+      tinMan.classList.remove('open'); tinMan.setAttribute('aria-hidden','true'); tinMan.scrollTop=0;
+    };
+    tinTab.addEventListener('click',function(){
+      tinMan.classList.add('open'); tinMan.setAttribute('aria-hidden','false');
+    });
+    var tinX=tinMan.querySelector('.tm-close');
+    if(tinX) tinX.addEventListener('click',tinHide);
+    /* o Sintonize de dentro do manifesto fecha atrás de si ao navegar */
+    var tinGo=tinMan.querySelector('.btn-tune');
+    if(tinGo) tinGo.addEventListener('click',function(){ setTimeout(tinHide,450); });
+    /* Esc fecha, como o menu principal */
+    addEventListener('keydown',function(e){ if(e.key==='Escape'&&tinMan.classList.contains('open')) tinHide(); });
+  }
 
   /* HEADER: escurece ao rolar */
   var hdr=document.getElementById('hdr');
