@@ -268,12 +268,22 @@ main{ position:relative; }
      IGUAIS. Transform / will-change / border-radius / isolation não mudam
      a cor. (Foi a hipótese da 3ª tentativa — estava errada.)
 
-   ⚠️ Sobrou UMA coisa medível clareando o vídeo: o **véu branco** logo
-   abaixo. Ele vinha da home-mapa, onde o próprio comentário admite que só
-   existia pra proteger um texto escuro **que não existe mais**. É puro
-   clareamento decorativo — por isso agora nasce em **0** (`--tw-radio-veu`).
-   Junto vão `--tw-radio-sat`/`--tw-radio-con`, pro Daniel calibrar vivacidade
-   ao vivo no painel `?tweak=1` em vez de eu chutar uma 4ª vez.
+   ⚠️ A CAUSA (confirmada pelo Daniel: "ficou tudo bom"): o **véu branco**
+   logo abaixo. É uma sobra histórica, e o git conta a história inteira:
+     · `3ffc6cc` a capa da Rádio ganha o vídeo de fundo, e junto um véu
+       FORTE — `linear-gradient` de 90% de branco no topo, 45% no meio,
+       92% embaixo — com o comentário "véu de leitura: o texto é quase
+       preto sobre papel branco, segura o contraste".
+     · `5f23e51` (19/jul/2026) o texto escuro **saiu** da capa (sobrou só o
+       botão, que tem contraste próprio). Em vez de apagar o véu, ele foi
+       só ABAIXADO pra um `rgba(255,255,255,.14)` chapado.
+   Ou seja: os 14% eram o resto de uma camada que já não tinha função —
+   ninguém notou porque sozinha ela é sutil. Agora nasce em **0**.
+   `--tw-radio-sat`/`--tw-radio-con` (1.12/1.08) são a calibragem que o
+   Daniel fez ao vivo no `?tweak=1` depois disso.
+   ⚠️ **A home-mapa continua com os 14%** (é a versão preservada, não mexer).
+   Então esta capa hoje está DE PROPÓSITO mais viva que o "original" — foi
+   escolha do Daniel, não um desvio a corrigir.
 
    POSIÇÃO continua por layout puro (`left`/`top`/`object-position`), não por
    transform — não porque a cor dependa disso (não depende, ver acima), mas
@@ -285,7 +295,7 @@ main{ position:relative; }
    o `object-fit:cover` com +14% de zoom contra a referência. */
 .s-radio .radio-video{ position:absolute; left:-30px; top:var(--tw-radio-y,-10px); width:100%; height:calc(100% + 20px);
   object-fit:cover; object-position:var(--tw-radio-x,50%) 50%; z-index:0; pointer-events:none;
-  filter:saturate(var(--tw-radio-sat,1)) contrast(var(--tw-radio-con,1)); }
+  filter:saturate(var(--tw-radio-sat,1.12)) contrast(var(--tw-radio-con,1.08)); }
 /* véu branco: agora 0 por padrão (era .14, herdado da home-mapa) */
 .s-radio::after{ content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
   background:rgba(255,255,255,var(--tw-radio-veu,0)); }
@@ -1509,13 +1519,13 @@ main{ position:relative; }
     { key:'--tw-radio-y',     label:'Rádio — vídeo, sobe/desce',     unit:'px', min:-20, max:0,  step:1,  get:function(){ return -10; } },
     { key:'--tw-radio-btn-y', label:'Rádio — botão Sintonize, sobe/desce', unit:'px', min:-60, max:200,step:1, get:function(){ return 140; } },
     { key:'--tw-tab-bottom',  label:'Rádio — aba do manifesto, sobe/desce',unit:'px', min:0,   max:120,step:2, get:function(){ return 0; } },
-    /* 🎨 VIVACIDADE do vídeo — os 3 controles da saga do "vídeo lavado".
-       O diagnóstico (diag-video.html) descartou arquivo, faixa e container;
-       o véu era a única camada clareando de verdade, e agora nasce em 0.
-       Se ainda faltar vida, é aqui que se resolve — sem eu chutar de novo. */
+    /* 🎨 VIVACIDADE do vídeo — fim da saga do "vídeo lavado". Véu em 0 (era
+       uma sobra de uma camada de leitura que perdeu a função — ver o
+       comentário grande no CSS de .s-radio) + saturação/contraste que o
+       Daniel calibrou aqui mesmo e aprovou ("ficou tudo bom"). */
     { key:'--tw-radio-veu',   label:'Rádio — véu branco por cima',   unit:'',  min:0,   max:.2, step:.01,get:function(){ return 0; } },
-    { key:'--tw-radio-sat',   label:'Rádio — saturação do vídeo',    unit:'',  min:.8,  max:1.6,step:.02,get:function(){ return 1; } },
-    { key:'--tw-radio-con',   label:'Rádio — contraste do vídeo',    unit:'',  min:.8,  max:1.4,step:.02,get:function(){ return 1; } }
+    { key:'--tw-radio-sat',   label:'Rádio — saturação do vídeo',    unit:'',  min:.8,  max:1.6,step:.02,get:function(){ return 1.12; } },
+    { key:'--tw-radio-con',   label:'Rádio — contraste do vídeo',    unit:'',  min:.8,  max:1.4,step:.02,get:function(){ return 1.08; } }
   ];
   var STORE_KEY='en_tweak_v1';
 
