@@ -241,29 +241,27 @@ main{ position:relative; }
   min-height:100svh; padding:0; display:flex; flex-direction:column;
   background:radial-gradient(ellipse 88% 52% at 50% 72%, #f4e9e1 0%, var(--paper) 68%);
 }
-/* ENQUADRAMENTO do vídeo — calibrável no painel de ajuste (?tweak=1):
-   --tw-radio-x   = viés horizontal do recorte (object-position). Medi um
-                    frame do vídeo (ffmpeg): a tela do celular é bem mais
-                    "alta" que o vídeo (9:16 já é estreito, e a caixa ainda
-                    ganha +14vh de sobra pro parallax vertical), então o
-                    corte automático (cover, centralizado) já morde a
-                    palavra "TINHOSA" pela direita ANTES da aba entrar.
-                    74% desloca a janela de corte pra direita o suficiente
-                    pra mostrar a palavra inteira, sacrificando um pouco
-                    da ilustração à esquerda (o casulo/galho, mais tolerante
-                    a corte que uma palavra).
-   --tw-radio-scale = zoom do wrapper (não do vídeo — ver por quê abaixo). */
+/* ENQUADRAMENTO do vídeo — reproduz o original (home-mapa.html): lá é
+   `object-fit:cover` (sem viés, 50% 50%) + `transform:translateX(-30px)`
+   pra "colar" o vídeo na aba lateral de 30px (o recorte desliza 30px pra
+   ESQUERDA, revelando 30px do fundo à direita — onde a aba se apoia — em
+   vez de cortar a ilustração por baixo dela). Nenhum zoom no original.
+   Aqui não dá pra repetir com `transform`: essa propriedade em `.radio-video`
+   é escrita a cada quadro pelo paint() (parallax vertical). Equivalente sem
+   conflito: `left:-30px` no lugar do transform (mesmo efeito de deslocar a
+   caixa, já que a largura continua 100% — a matemática do cover não muda).
+   --tw-radio-x/--tw-radio-scale calibráveis no painel (?tweak=1) só por
+   segurança; o padrão agora é o valor do original, não estimativa de frame. */
 .s-radio .radio-video-wrap{
   position:absolute; inset:0; overflow:hidden; z-index:0; pointer-events:none;
-  transform:scale(var(--tw-radio-scale,.95));
+  transform:scale(var(--tw-radio-scale,1));
 }
-/* o vídeo leva 14vh de SOBRA de altura, igual ao vídeo da capa — é ela que
-   ele consome ao deslizar no parallax sem descobrir a base. object-position
-   (não transform!) faz o viés horizontal: transform aqui é só do paint(),
-   escrito a cada quadro — colocar deslocamento estático nele seria
-   sobrescrito no próximo scroll. */
-.s-radio .radio-video{ position:absolute; left:0; top:0; width:100%; height:calc(100% + 14vh);
-  object-fit:cover; object-position:var(--tw-radio-x,74%) 50%; z-index:0; pointer-events:none; will-change:transform; }
+/* o vídeo leva 14vh de SOBRA de altura (recurso novo daqui, pro parallax
+   vertical consumir sem descobrir a base — o original é estático, sem
+   parallax). object-position controla só o viés horizontal calibrável;
+   left:-30px é o "cola na aba" fixo, equivalente ao translateX do original. */
+.s-radio .radio-video{ position:absolute; left:-30px; top:0; width:100%; height:calc(100% + 14vh);
+  object-fit:cover; object-position:var(--tw-radio-x,50%) 50%; z-index:0; pointer-events:none; will-change:transform; }
 .s-radio::after{ content:''; position:absolute; inset:0; z-index:1; pointer-events:none; background:rgba(255,255,255,.14); }
 .s-radio .radio-inner{ position:relative; z-index:2; flex:1; display:flex; align-items:center; justify-content:center; padding:0 var(--pad); }
 /* botão SINTONIZE — chamada principal, pulsante */
@@ -275,10 +273,11 @@ main{ position:relative; }
   transition:background .18s var(--ease), box-shadow .18s var(--ease);
   animation:tune-glow 2.2s var(--ease) infinite;
 }
-/* posição vertical do botão SÓ na capa da rádio — calibrável no painel
-   (estava fixo em 80px pra baixo, "acavalado"; --tw-radio-btn-y é o novo
-   deslocamento, bem menor/pra cima) */
-.s-radio .radio-inner .btn-tune{ transform:translateY(var(--tw-radio-btn-y,10px)); }
+/* posição vertical do botão SÓ na capa da rádio — o original usa
+   translateY(80px) fixo (desce o botão pra não cair sobre o texto "TINHOSA"
+   que vem escrito DENTRO do vídeo); reproduzido aqui como padrão, calibrável
+   no painel se a moldura calibrada `--tw-radio-x`/`--tw-radio-scale` mudar. */
+.s-radio .radio-inner .btn-tune{ transform:translateY(var(--tw-radio-btn-y,80px)); }
 .btn-tune .ar{ transition:transform .3s var(--ease); }
 .btn-tune:hover .ar{ transform:translateX(4px); }
 .btn-tune:active,.btn-tune:focus-visible{ background:var(--oliva); box-shadow:0 6px 18px rgba(187,194,76,.55); animation:none; }
@@ -294,11 +293,12 @@ main{ position:relative; }
   50%{ box-shadow:0 10px 30px rgba(108,75,182,.62); }
 }
 @keyframes tune-ripple{ 0%{ transform:scale(1); opacity:.5; } 100%{ transform:scale(1.45); opacity:0; } }
-/* aba lateral que abre o manifesto — texto na vertical, lendo de baixo p/ cima */
+/* aba lateral que abre o manifesto — texto na vertical, lendo de baixo p/ cima.
+   bottom:0 reproduz o original (a aba ocupa a altura inteira da capa); a
+   .sheet só arredonda os cantos de CIMA (--radius ... 0 0), então não há
+   canto arredondado embaixo pra "escapar" — bottom:0 é seguro aqui. */
 .tinhosa-tab{
-  /* bottom calibrável no painel: "fica um pouco mais pra cima" — não corre
-     mais até o pixel final da capa */
-  position:absolute; top:0; right:0; bottom:var(--tw-tab-bottom,24px); width:30px; z-index:3;
+  position:absolute; top:0; right:0; bottom:var(--tw-tab-bottom,0px); width:30px; z-index:3;
   background:var(--roxo); border:0; padding:0; cursor:pointer;
   display:flex; align-items:center; justify-content:center;
   writing-mode:vertical-rl; transform:rotate(180deg);
@@ -1474,12 +1474,14 @@ main{ position:relative; }
     { key:'--tw-btn-ml',    label:'Botão navegue — deslocar lateral', unit:'px', min:-80, max:80, step:1, get:function(){ return parseFloat(getComputedStyle(document.querySelector('.btn-navegue')).marginLeft); } },
     { key:'--tw-pad-bottom',label:'Bloco inteiro — sobe / desce',  unit:'px', min:20,  max:220, step:2, get:function(){ return parseFloat(getComputedStyle(document.querySelector('.c-hero')).paddingBottom); } },
     { key:'--tw-gap',       label:'Espaço Olá / estrelas / título',unit:'px', min:0,   max:70,  step:1, get:function(){ var s=getComputedStyle(document.querySelector('.c-hero')); return parseFloat(s.rowGap||s.gap); } },
-    /* Rádio Tinhosa — enquadramento do vídeo, calibrado só por leitura de
-       frame (ffmpeg), nunca visto ao vivo no navegador. Ajustar aqui. */
-    { key:'--tw-radio-x',     label:'Rádio — vídeo, viés horizontal',unit:'%', min:40, max:100, step:1,  get:function(){ return 74; } },
-    { key:'--tw-radio-scale', label:'Rádio — vídeo, zoom',           unit:'',  min:.7, max:1.15,step:.01,get:function(){ return .95; } },
-    { key:'--tw-radio-btn-y', label:'Rádio — botão Sintonize, sobe/desce', unit:'px', min:-60, max:80, step:1, get:function(){ return 10; } },
-    { key:'--tw-tab-bottom',  label:'Rádio — aba do manifesto, sobe/desce',unit:'px', min:0,   max:120,step:2, get:function(){ return 24; } }
+    /* Rádio Tinhosa — enquadramento do vídeo. Padrão agora reproduz o
+       original (home-mapa.html): sem viés horizontal extra, sem zoom,
+       botão 80px abaixo do centro, aba full-height. Ajustar aqui só se
+       o Daniel pedir recalibração depois de ver ao vivo. */
+    { key:'--tw-radio-x',     label:'Rádio — vídeo, viés horizontal',unit:'%', min:20, max:80,  step:1,  get:function(){ return 50; } },
+    { key:'--tw-radio-scale', label:'Rádio — vídeo, zoom',           unit:'',  min:.7, max:1.15,step:.01,get:function(){ return 1; } },
+    { key:'--tw-radio-btn-y', label:'Rádio — botão Sintonize, sobe/desce', unit:'px', min:-60, max:100,step:1, get:function(){ return 80; } },
+    { key:'--tw-tab-bottom',  label:'Rádio — aba do manifesto, sobe/desce',unit:'px', min:0,   max:120,step:2, get:function(){ return 0; } }
   ];
   var STORE_KEY='en_tweak_v1';
 
