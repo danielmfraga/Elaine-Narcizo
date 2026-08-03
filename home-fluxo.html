@@ -3,28 +3,22 @@
 <head>
 <meta charset="utf-8" />
 <script>
-/* SEMPRE abrir na capa — o mais cedo possível, antes de qualquer coisa
-   carregar. A tentativa anterior corrigia isso só no fim do <body>
-   esperando o evento "load" (que só dispara depois do vídeo inteiro
-   baixar) — por isso dava pra ver a página 2 por um instante antes de
-   "descer" (na real, a lâmina branca recuando) de volta pra capa. Agora
-   roda síncrono, antes do navegador ter chance de restaurar a rolagem. */
-/* ⚠️ Só força o topo numa visita NOVA. Se o usuário está VOLTANDO (botão
-   voltar do navegador, ex.: saiu pra página do player e voltou), deixa o
-   navegador restaurar a posição — senão ele cai no topo em vez de voltar
-   pra caixa onde estava. Pedido do Daniel; era um efeito colateral do fix
-   do "abre na página 2". */
-var enVoltou=(function(){
+/* SEMPRE abrir na capa numa visita NOVA — o mais cedo possível, síncrono,
+   antes de qualquer coisa carregar (esperar o "load" só dispara depois do
+   vídeo inteiro baixar — tarde demais, dava pra ver a página 2).
+   VOLTANDO (botão voltar/avançar do navegador — ex.: o visitante foi pra
+   página do player e voltou), NÃO forçamos o topo: a posição salva no
+   pagehide é restaurada pelo script no fim do <body>. O scrollRestoration
+   fica 'manual' sempre: a restauração é NOSSA, previsível nos 2 casos. */
+window.enVoltou=(function(){
   try{
     var e=performance.getEntriesByType('navigation')[0];
     if(e&&e.type) return e.type==='back_forward';
-    return performance.navigation&&performance.navigation.type===2;  /* fallback antigo */
+    return !!(performance.navigation&&performance.navigation.type===2);
   }catch(err){ return false; }
 })();
-if(!enVoltou){
-  if('scrollRestoration' in history){ history.scrollRestoration='manual'; }
-  scrollTo(0,0);
-}
+if('scrollRestoration' in history){ history.scrollRestoration='manual'; }
+if(!window.enVoltou) scrollTo(0,0);
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Elaine Narcizo</title>
@@ -65,7 +59,7 @@ if(!enVoltou){
   --laranja:#F2A25A;
   --oliva:#BBC24C;
   --lilas:#B9A7DC;         /* mesmo lilás já testado na Bilheteria */
-  --roxo:#6C4BB6;          /* roxo da Rádio Tinhosa — veio junto com a seção da home-mapa, é a cor da identidade dela (botão Sintonize, aba do manifesto) */
+  --roxo:#6C4BB6;          /* roxo da Rádio Tinhosa — cor de identidade dela (Sintonize, aba do manifesto), veio junto da home-mapa */
   --mute:#6E6A60;
   --line:rgba(15,14,12,.14);
 
@@ -199,44 +193,45 @@ main{ position:relative; }
   box-shadow:0 -18px 60px rgba(0,0,0,.35);
   padding:clamp(44px,9vh,110px) var(--pad);
 }
-/* ── LÂMINA QUE TAMBÉM PRENDE (o padrão de transição, reutilizável) ──
-   Uma `.sheet` normal só sobe por cima da capa e segue embora. Com `.pin`
-   ela passa a fazer TAMBÉM o papel de capa da transição seguinte: fica
-   presa enquanto a próxima lâmina sobe por cima dela, exatamente como a
-   capa do topo faz. Reaproveita o mesmo `paint()`, a mesma curva e a mesma
-   trava anti-vão — nada duplicado.
-   Prende por `bottom:0` (e não `top:0` como as .cover): esta lâmina é mais
-   ALTA que a tela, e o que precisa ficar visível na transição é o FIM dela
-   (onde está a foto), não o começo.
-   ⚠️ Especificidade: tem que ser `.sheet.pin` (0,2,0) pra vencer o
-   `position:relative` de `.sheet` (0,1,0). Se virar só `.pin`, empata e
-   PERDE por vir antes no arquivo — foi exatamente esse tipo de empate que
-   quebrou o sticky da capa (ver .c-hero). */
-.sheet.pin{ position:sticky; bottom:0; }
-/* a foto assume o papel do vídeo da capa: desliza dentro do próprio quadro
-   enquanto a lâmina de baixo sobe. Mesma exigência do vídeo — precisa de
-   SOBRA de altura, senão a base dela descobre e abre vão dentro da moldura.
-   Sobra 14vh, casada com a amplitude .091 do paint(). */
+/* ═══ O PADRÃO DE TRANSIÇÃO, REUTILIZÁVEL (.pin) ═══════════════════════
+   RECEITA pra repetir o efeito capa→Quem-sou-eu em QUALQUER transição:
+     1. classe `pin` na seção que fica POR BAIXO;
+     2. a seção que sobe por cima vem logo DEPOIS dela, na MESMA .scene;
+     3. (opcional, o parallax interno) a mídia da seção de baixo precisa de
+        14vh de SOBRA de altura e entrar no seletor de bg do paint() — hoje:
+        `.hero-bg` (vídeo da capa) e `.pin .portrait img` (foto do Quem sou eu).
+   COMO PRENDE: sticky pelo TOPO, com `--pin-top` calculado por JS
+   (min(0, alturaDaTela − alturaDaSeção)). Numa capa de 100svh isso dá 0 —
+   idêntico às .cover. Numa lâmina mais ALTA que a tela dá um top NEGATIVO:
+   ela rola normal até o FIM dela encostar no rodapé da tela, e SÓ AÍ prende.
+   ⚠️ NUNCA prender com `bottom:0`: sticky por baixo prende CEDO — o elemento
+   gruda no rodapé da tela assim que a cena entra e COBRE a seção anterior
+   (foi o bug que soterrou a capa e fez o site "abrir na seção 1", ago/2026).
+   ⚠️ Precisa ser `.sheet.pin` (0,2,0) pra vencer `.sheet{position:relative}`
+   (0,1,0) — só `.pin` empataria e perderia por vir antes no arquivo. */
+.sheet.pin{ position:sticky; top:var(--pin-top,0px); }
+/* a foto do Quem-sou-eu no papel do vídeo da capa: desliza dentro da própria
+   moldura (mesma exigência do vídeo — SOBRA de 14vh, casada com a amplitude
+   .091 do paint(), senão a base descobre e abre vão dentro do quadro) */
 .sheet.pin .portrait{ position:relative; aspect-ratio:4/5; }
 .sheet.pin .portrait img{ position:absolute; left:0; top:0; width:100%; height:calc(100% + 14vh); aspect-ratio:auto; will-change:transform; }
+
 .y{ background:var(--amarelo); color:var(--ink); }
 .k{ background:var(--ink); color:var(--paper); }
 .w{ background:var(--paper); color:var(--ink); }
 
 /* ═══ RÁDIO TINHOSA — capa trazida da home-mapa (ago/2026) ═══
-   Lá ela era um "mundo" com painéis laterais (navegação 2D); aqui virou uma
-   lâmina normal da rolagem vertical. Layout, conteúdo e interações mantidos;
-   o que mudou foi só o necessário pra encaixar nesta página:
-     · cantos arredondados (herda de .sheet) + overflow:hidden pro vídeo respeitar a curva
-     · tipografia da casa (Archivo) no lugar da serif da página antiga
-     · o "Sintonize" não desliza mais pro painel ao lado (não existe aqui) */
+   Lá era um "mundo" de navegação 2D; aqui é uma lâmina da rolagem vertical.
+   Layout, conteúdo e interações preservados; adaptado só o necessário:
+   cantos arredondados (herda de .sheet), tipografia da casa, e o Sintonize
+   não desliza mais pro painel lateral (não existe aqui — destino pendente). */
 .s-radio{
   position:relative; overflow:hidden; isolation:isolate;
   min-height:100svh; padding:0; display:flex; flex-direction:column;
   background:radial-gradient(ellipse 88% 52% at 50% 72%, #f4e9e1 0%, var(--paper) 68%);
 }
 .s-radio .radio-video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; pointer-events:none;
-  transform:translateX(-15px); }  /* cola o vídeo na aba lateral (= largura dela) */
+  transform:translateX(-15px); }  /* cola o vídeo na aba lateral; a faixa que sobra à direita fica sob a aba (30px) */
 .s-radio::after{ content:''; position:absolute; inset:0; z-index:1; pointer-events:none; background:rgba(255,255,255,.14); }
 .s-radio .radio-inner{ position:relative; z-index:2; flex:1; display:flex; align-items:center; justify-content:center; padding:0 var(--pad); }
 /* botão SINTONIZE — chamada principal, pulsante */
@@ -270,7 +265,7 @@ main{ position:relative; }
   background:var(--roxo); border:0; padding:0; cursor:pointer;
   display:flex; align-items:center; justify-content:center;
   writing-mode:vertical-rl; transform:rotate(180deg);
-  box-shadow:5px 0 16px rgba(0,0,0,.20);   /* x positivo: o rotate inverte o eixo, na tela cai p/ a esquerda */
+  box-shadow:5px 0 16px rgba(0,0,0,.20);   /* x positivo: o rotate inverte o eixo, na tela a sombra cai p/ a esquerda */
   white-space:nowrap; color:#fff; font-family:var(--mono);
   font-size:10px; font-weight:600; letter-spacing:.18em; text-transform:uppercase;
 }
@@ -840,8 +835,8 @@ main{ position:relative; }
        o .marq segue vivo na faixa de parcerias, mais abaixo) -->
 
   <!-- ══ QUEM SOU EU — o "Who are we?" da referência ══ -->
-  <!-- `pin`: esta lâmina também PRENDE, pra Rádio subir por cima dela com o
-       mesmo efeito da transição capa→aqui (ver o CSS de .sheet.pin) -->
+  <!-- `pin`: esta lâmina prende quando o FIM dela chega na tela, e a Rádio
+       sobe por cima com a mesma transição da capa (ver receita em .pin) -->
   <div class="sheet w pin" id="quem">
     <div class="wrap">
       <span class="idx r" style="--r:0">[01] — Quem sou eu</span>
@@ -896,9 +891,9 @@ main{ position:relative; }
   </div>
 
   <!-- ══ RÁDIO TINHOSA — seção trazida da home-mapa (ago/2026) ══
-       Sobe por cima do "Quem sou eu" (que está com .pin), com a mesma
-       transição/parallax da capa. Conteúdo, links e interações preservados;
-       adaptado só o que não existe nesta página (painel lateral → rolagem). -->
+       Sobe por cima do "Quem sou eu" (pinado) com a transição padrão.
+       Sem classes .r de propósito, igual à original: a capa da rádio não
+       depende da revelação por scroll pra ficar visível. -->
   <section class="sheet w s-radio" id="radio">
     <video class="radio-video" src="assets/radio-capa.mp4"
            autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
@@ -947,8 +942,8 @@ main{ position:relative; }
     </div>
   </section>
 
-  <!-- números da rádio (contadores animados) — vieram junto do esboço que a
-       seção real substituiu, pra não perder conteúdo já escrito -->
+  <!-- números da rádio (contadores animados) — preservados do esboço que a
+       seção real substituiu -->
   <div class="sheet w">
     <div class="wrap">
       <p class="manif in-io r" style="--r:0">Uma programação de podcasts, playlists e programas que
@@ -1057,9 +1052,9 @@ main{ position:relative; }
       </div>
     </div>
   </div>
-  <!-- o esboço "Rádio para teimosos" que morava aqui foi SUBSTITUÍDO pela
-       seção real da Rádio Tinhosa (agora logo após a foto, na cena 1). Os
-       números/contadores dela foram preservados e movidos junto. -->
+  <!-- o esboço "Rádio para teimosos" que abria a antiga cena 3 foi SUBSTITUÍDO
+       pela seção real da Rádio Tinhosa (cena 1, logo após a foto). Os
+       contadores foram preservados lá. "Como eu trabalho" segue nesta cena. -->
 
   <!-- ══ COMO EU TRABALHO — o "How we roll" (3 cards de serviço) ══ -->
   <div class="sheet w" id="formacoes">
@@ -1091,9 +1086,9 @@ main{ position:relative; }
       </div>
     </div>
   </div>
-  </div><!-- /scene 3 -->
+  </div><!-- /scene 2 -->
 
-  <!-- CENA 4 -->
+  <!-- CENA 3 -->
   <div class="scene">
   <!-- ══ CONECTAR (capa presa · amarelo) — o "Let's connect" ══ -->
   <section class="cover c-cta y" id="conectar">
@@ -1142,7 +1137,7 @@ main{ position:relative; }
       </div>
     </div>
   </footer>
-  </div><!-- /scene 4 -->
+  </div><!-- /scene 3 -->
 
 </main>
 
@@ -1150,38 +1145,54 @@ main{ position:relative; }
 (function(){
   document.documentElement.classList.add('js');
 
-  /* segunda garantia (a primeira já roda no <head>, síncrona) — cobre o
-     caso de algo (vídeo carregando, layout shift) empurrar o scroll
-     depois disso. Sem esperar o "load" (que só dispara com o vídeo
-     inteiro baixado — tarde demais, dava tempo de ver a página 2).
-     Respeita a mesma guarda do <head>: se está VOLTANDO, não força o topo. */
-  if(!window.enVoltou) scrollTo(0,0);
+  /* visita NOVA: segunda garantia de topo (a primeira roda síncrona no
+     <head>) — cobre layout shift do vídeo carregando empurrar o scroll.
+     VOLTANDO (back/forward): restauramos nós a posição salva no pagehide,
+     porque o scrollRestoration está 'manual' (pedido do Daniel: voltar da
+     página do player tem que cair onde estava, não no topo). */
+  if(window.enVoltou){
+    var enY=+(function(){ try{ return sessionStorage.getItem('en_scroll'); }catch(e){ return 0; } })()||0;
+    if(enY>0){ scrollTo(0,enY); addEventListener('load',function(){ scrollTo(0,enY); }); }
+  }else{
+    scrollTo(0,0);
+  }
+  addEventListener('pagehide',function(){ try{ sessionStorage.setItem('en_scroll', scrollY); }catch(e){} });
 
-  /* ── RÁDIO TINHOSA ──────────────────────────────────────────────
-     Vídeo da capa mais lento SEM reexportar o arquivo (0.5 = 10s viram
-     ~20s). Só mudar RV_RATE pra calibrar (menor = mais lento). */
+  /* PIN (o padrão de transição — ver receita no CSS de .pin): calcula o
+     top do sticky de cada lâmina .pin = min(0, tela − altura da lâmina).
+     Lâmina mais alta que a tela ⇒ top negativo ⇒ ela rola normal e SÓ
+     prende quando o fim dela encosta no rodapé. Recalcula em resize e
+     quando a própria lâmina muda de tamanho (fontes/imagens chegando). */
+  function setPins(){
+    document.querySelectorAll('.sheet.pin').forEach(function(el){
+      el.style.setProperty('--pin-top', Math.min(0, innerHeight-el.offsetHeight)+'px');
+    });
+  }
+  setPins();
+  addEventListener('resize', setPins, {passive:true});
+  addEventListener('load', setPins);
+  if('ResizeObserver' in window){
+    var pinRO=new ResizeObserver(setPins);
+    document.querySelectorAll('.sheet.pin').forEach(function(el){ pinRO.observe(el); });
+  }
+
+  /* ── RÁDIO TINHOSA ──
+     vídeo da capa mais lento SEM reexportar (0.5 = 10s viram ~20s) */
   var radioVid=document.querySelector('.radio-video');
   if(radioVid){
     var RV_RATE=0.5;
     radioVid.playbackRate=RV_RATE;
     radioVid.addEventListener('loadedmetadata',function(){ radioVid.playbackRate=RV_RATE; });
   }
-
-  /* a aba lateral abre/fecha o Pequeno Manifesto */
+  /* a aba lateral abre/fecha o Pequeno Manifesto (Esc também fecha) */
   var tinTab=document.getElementById('tinhosaTab'), tinMan=document.getElementById('tinhosaManifesto');
   if(tinTab&&tinMan){
-    var tinHide=function(){
-      tinMan.classList.remove('open'); tinMan.setAttribute('aria-hidden','true'); tinMan.scrollTop=0;
-    };
-    tinTab.addEventListener('click',function(){
-      tinMan.classList.add('open'); tinMan.setAttribute('aria-hidden','false');
-    });
+    var tinHide=function(){ tinMan.classList.remove('open'); tinMan.setAttribute('aria-hidden','true'); tinMan.scrollTop=0; };
+    tinTab.addEventListener('click',function(){ tinMan.classList.add('open'); tinMan.setAttribute('aria-hidden','false'); });
     var tinX=tinMan.querySelector('.tm-close');
     if(tinX) tinX.addEventListener('click',tinHide);
-    /* o Sintonize de dentro do manifesto fecha atrás de si ao navegar */
     var tinGo=tinMan.querySelector('.btn-tune');
     if(tinGo) tinGo.addEventListener('click',function(){ setTimeout(tinHide,450); });
-    /* Esc fecha, como o menu principal */
     addEventListener('keydown',function(e){ if(e.key==='Escape'&&tinMan.classList.contains('open')) tinHide(); });
   }
 
@@ -1264,11 +1275,10 @@ main{ position:relative; }
      nasce > 0 sem ter rolado nada, a fórmula pedia lift > 0 e abria vão.
      Com a trava, lift nunca passa do que já está coberto → vão impossível
      em qualquer estado de viewport. */
-  /* `.sheet.pin` entra junto com as `.cover`: é a lâmina que também prende
-     pra próxima subir por cima dela (ver o CSS de .sheet.pin). O `bg` é o
-     elemento que faz o parallax dentro dela — o vídeo na capa, a foto na
-     lâmina. Fica inerte enquanto não houver um elemento depois (o filter
-     de `next` cuida disso), então nada quebra antes da próxima seção existir. */
+  /* `.sheet.pin` entra junto com as `.cover`: é o mesmo papel (a seção de
+     baixo da transição). O `bg` é quem faz o parallax interno — o vídeo na
+     capa, a foto no Quem-sou-eu. Sem elemento seguinte, o filter de `next`
+     descarta e nada roda (seguro adicionar .pin antes da próxima existir). */
   var covers=[].slice.call(document.querySelectorAll('.cover,.sheet.pin')).map(function(c){
     return { el:c, next:c.nextElementSibling, bg:c.querySelector('.hero-bg,.portrait img') };
   }).filter(function(c){ return c.next; });
