@@ -259,9 +259,15 @@ main{ position:relative; }
 /* o vídeo leva 14vh de SOBRA de altura (recurso novo daqui, pro parallax
    vertical consumir sem descobrir a base — o original é estático, sem
    parallax). object-position controla só o viés horizontal calibrável;
-   left:-30px é o "cola na aba" fixo, equivalente ao translateX do original. */
-.s-radio .radio-video{ position:absolute; left:-30px; top:0; width:100%; height:calc(100% + 14vh);
-  object-fit:cover; object-position:var(--tw-radio-x,50%) 50%; z-index:0; pointer-events:none; will-change:transform; }
+   left:-30px é o "cola na aba" fixo, equivalente ao translateX do original.
+   --tw-radio-y: pedido do Daniel "sobe uns 10px" — consome um pouco da
+   sobra de 14vh (que sobra de sobejo pro parallax) sem descobrir a base.
+   ⚠️ SEM will-change aqui de propósito: o paint() nunca mais escreve
+   transform nesse elemento (`noLift` pula o bloco inteiro, ver JS) — manter
+   will-change sem uso real só mantinha a camada de composição ativa à toa
+   (suspeita da causa do vídeo "fosco"). */
+.s-radio .radio-video{ position:absolute; left:-30px; top:var(--tw-radio-y,-10px); width:100%; height:calc(100% + 14vh);
+  object-fit:cover; object-position:var(--tw-radio-x,50%) 50%; z-index:0; pointer-events:none; }
 .s-radio::after{ content:''; position:absolute; inset:0; z-index:1; pointer-events:none; background:rgba(255,255,255,.14); }
 .s-radio .radio-inner{ position:relative; z-index:2; flex:1; display:flex; align-items:center; justify-content:center; padding:0 var(--pad); }
 /* botão SINTONIZE — chamada principal, pulsante */
@@ -273,11 +279,10 @@ main{ position:relative; }
   transition:background .18s var(--ease), box-shadow .18s var(--ease);
   animation:tune-glow 2.2s var(--ease) infinite;
 }
-/* posição vertical do botão SÓ na capa da rádio — o original usa
-   translateY(80px) fixo (desce o botão pra não cair sobre o texto "TINHOSA"
-   que vem escrito DENTRO do vídeo); reproduzido aqui como padrão, calibrável
-   no painel se a moldura calibrada `--tw-radio-x`/`--tw-radio-scale` mudar. */
-.s-radio .radio-inner .btn-tune{ transform:translateY(var(--tw-radio-btn-y,80px)); }
+/* posição vertical do botão SÓ na capa da rádio — o original usa 80px;
+   o Daniel pediu mais 60px de descida vendo ao vivo (140px), calibrável
+   no painel se ainda não bater exato com a referência. */
+.s-radio .radio-inner .btn-tune{ transform:translateY(var(--tw-radio-btn-y,140px)); }
 .btn-tune .ar{ transition:transform .3s var(--ease); }
 .btn-tune:hover .ar{ transform:translateX(4px); }
 .btn-tune:active,.btn-tune:focus-visible{ background:var(--oliva); box-shadow:0 6px 18px rgba(187,194,76,.55); animation:none; }
@@ -1435,13 +1440,19 @@ main{ position:relative; }
            14vh no CSS do bg — são um PAR: mexeu numa, mexe na outra ou o
            vão volta por dentro da capa. Some com `noLift` (ver acima):
            enquanto a Rádio está "parada", o vídeo por dentro dela também
-           não se move — só a PRÓXIMA seção (subaba) tem parallax vivo. */
-        if(c.bg){
-          var vlift=0;
-          if(!c.noLift){
-            var qv=Math.min(p/.55,1);
-            vlift=.091*vh*(qv*qv*(3-2*qv));
-          }
+           não se move — só a PRÓXIMA seção (subaba) tem parallax vivo.
+           ⚠️ `noLift` pula o bloco INTEIRO (nem escreve transform:none) —
+           não só zera o valor. O vídeo da Rádio fica com o `transform`
+           estático do CSS (nenhum), igual ao original, sem o JS tocar nele
+           a cada scroll da página inteira. Suspeita: manter um vídeo em
+           `will-change:transform` + reescrita contínua (mesmo pra 0) mantém
+           ele numa camada de composição ativa o tempo todo, e o Safari/iOS
+           às vezes aplica um tratamento de cor mais "achatado" nessa camada
+           pra vídeo com gama ampla — tirar essa reescrita é a aposta pro
+           vídeo "fosco" reportado pelo Daniel. */
+        if(c.bg && !c.noLift){
+          var qv=Math.min(p/.55,1);
+          var vlift=.091*vh*(qv*qv*(3-2*qv));
           c.bg.style.transform='translate3d(0,'+(-vlift).toFixed(2)+'px,0)';
         }
       }
@@ -1485,13 +1496,13 @@ main{ position:relative; }
     { key:'--tw-btn-ml',    label:'Botão navegue — deslocar lateral', unit:'px', min:-80, max:80, step:1, get:function(){ return parseFloat(getComputedStyle(document.querySelector('.btn-navegue')).marginLeft); } },
     { key:'--tw-pad-bottom',label:'Bloco inteiro — sobe / desce',  unit:'px', min:20,  max:220, step:2, get:function(){ return parseFloat(getComputedStyle(document.querySelector('.c-hero')).paddingBottom); } },
     { key:'--tw-gap',       label:'Espaço Olá / estrelas / título',unit:'px', min:0,   max:70,  step:1, get:function(){ var s=getComputedStyle(document.querySelector('.c-hero')); return parseFloat(s.rowGap||s.gap); } },
-    /* Rádio Tinhosa — enquadramento do vídeo. Padrão agora reproduz o
-       original (home-mapa.html): sem viés horizontal extra, sem zoom,
-       botão 80px abaixo do centro, aba full-height. Ajustar aqui só se
-       o Daniel pedir recalibração depois de ver ao vivo. */
+    /* Rádio Tinhosa — enquadramento do vídeo. Padrão parte do original
+       (home-mapa.html) + ajustes que o Daniel pediu vendo ao vivo no
+       celular: vídeo 10px mais alto, botão 60px mais abaixo. */
     { key:'--tw-radio-x',     label:'Rádio — vídeo, viés horizontal',unit:'%', min:20, max:80,  step:1,  get:function(){ return 50; } },
+    { key:'--tw-radio-y',     label:'Rádio — vídeo, sobe/desce',     unit:'px', min:-60, max:60, step:1,  get:function(){ return -10; } },
     { key:'--tw-radio-scale', label:'Rádio — vídeo, zoom',           unit:'',  min:.7, max:1.15,step:.01,get:function(){ return 1; } },
-    { key:'--tw-radio-btn-y', label:'Rádio — botão Sintonize, sobe/desce', unit:'px', min:-60, max:100,step:1, get:function(){ return 80; } },
+    { key:'--tw-radio-btn-y', label:'Rádio — botão Sintonize, sobe/desce', unit:'px', min:-60, max:200,step:1, get:function(){ return 140; } },
     { key:'--tw-tab-bottom',  label:'Rádio — aba do manifesto, sobe/desce',unit:'px', min:0,   max:120,step:2, get:function(){ return 0; } }
   ];
   var STORE_KEY='en_tweak_v1';
