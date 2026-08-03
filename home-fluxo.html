@@ -230,12 +230,12 @@ main{ position:relative; }
      "role para descer". */
   padding-bottom:var(--tw-pad-bottom, clamp(52px,10vh,96px));
 }
-/* O vídeo é de propósito MAIS ALTO que a capa (100% + 10vh), ancorado pelo
+/* O vídeo é de propósito MAIS ALTO que a capa (100% + 14vh), ancorado pelo
    topo. Essa sobra é o que ele consome ao deslizar no parallax (ver paint()):
-   ele sobe até 7vh e a base dele nunca descobre a base da capa — sem isso o
-   vão preto voltaria, agora POR DENTRO da capa. Sobra 10vh > amplitude 7vh
-   = 43% de folga. Se mexer na amplitude do parallax, mexer nesta sobra junto. */
-.c-hero .hero-bg{ position:absolute; left:0; top:0; width:100%; height:calc(100% + 10vh); object-fit:cover; z-index:0; will-change:transform; }
+   ele sobe até 9.1vh e a base dele nunca descobre a base da capa — sem isso o
+   vão preto voltaria, agora POR DENTRO da capa. Sobra 14vh > amplitude 9.1vh
+   = 54% de folga. Se mexer na amplitude do parallax, mexer nesta sobra junto. */
+.c-hero .hero-bg{ position:absolute; left:0; top:0; width:100%; height:calc(100% + 14vh); object-fit:cover; z-index:0; will-change:transform; }
 .c-hero .hero-scrim{ position:absolute; inset:0; z-index:0;
   background:linear-gradient(180deg, rgba(15,14,12,0) 0%, rgba(15,14,12,.12) 50%, rgba(15,14,12,.58) 100%); }
 .c-hero > *:not(.hero-bg):not(.hero-scrim){ position:relative; z-index:1; }
@@ -1124,10 +1124,14 @@ main{ position:relative; }
            orgânica, sem o "travamento" que a curva anterior dava (aquela
            chegava com velocidade zero mas aceleração ainda cortando seco).
            Depois de 55% o vídeo fica parado e só a lâmina continua.
-           ⚠️ Amplitude .07 casada com a sobra de 10vh no CSS do .hero-bg. */
+           Amplitude subiu .07 → .091 (+30%, pedido do Daniel: "deslizar um
+           pouco mais rápido antes de parar"). No pico a lâmina ainda é 4x
+           mais rápida que o vídeo, então não chega a competir com ela.
+           ⚠️ Amplitude .091 casada com a sobra de 14vh no CSS do .hero-bg —
+           são um PAR: mexeu numa, mexe na outra ou o vão volta por dentro. */
         if(c.bg){
           var qv=Math.min(p/.55,1);
-          var vlift=.07*vh*(qv*qv*(3-2*qv));
+          var vlift=.091*vh*(qv*qv*(3-2*qv));
           c.bg.style.transform='translate3d(0,'+(-vlift).toFixed(2)+'px,0)';
         }
       }
