@@ -221,6 +221,11 @@ main{ position:relative; }
    ⚠️ Precisa ser `.sheet.pin` (0,2,0) pra vencer `.sheet{position:relative}`
    (0,1,0) — só `.pin` empataria e perderia por vir antes no arquivo. */
 .sheet.pin{ position:sticky; top:var(--pin-top,0px); will-change:transform; }
+/* pin ESTÁTICO (data-static): trava e nada dentro se mexe — o paint() nem a
+   inclui. Sem transform pra otimizar, `will-change` só manteria uma camada
+   de composição ligada à toa, e é isso que estraga a cor de vídeo dentro
+   dela (ver a REGRA DE OURO DA COR na seção da Rádio). */
+.sheet.pin[data-static]{ will-change:auto; }
 /* a foto do Quem-sou-eu no papel do vídeo da capa: desliza dentro da própria
    moldura (mesma exigência do vídeo — SOBRA de 14vh, casada com a amplitude
    .091 do paint(), senão a base descobre e abre vão dentro do quadro) */
@@ -241,32 +246,35 @@ main{ position:relative; }
   min-height:100svh; padding:0; display:flex; flex-direction:column;
   background:radial-gradient(ellipse 88% 52% at 50% 72%, #f4e9e1 0%, var(--paper) 68%);
 }
-/* ENQUADRAMENTO do vídeo — reproduz o original (home-mapa.html): lá é
-   `object-fit:cover` (sem viés, 50% 50%) + `transform:translateX(-30px)`
-   pra "colar" o vídeo na aba lateral de 30px (o recorte desliza 30px pra
-   ESQUERDA, revelando 30px do fundo à direita — onde a aba se apoia — em
-   vez de cortar a ilustração por baixo dela). Nenhum zoom no original.
-   Aqui não dá pra repetir com `transform`: essa propriedade em `.radio-video`
-   é escrita a cada quadro pelo paint() (parallax vertical). Equivalente sem
-   conflito: `left:-30px` no lugar do transform (mesmo efeito de deslocar a
-   caixa, já que a largura continua 100% — a matemática do cover não muda).
-   --tw-radio-x/--tw-radio-scale calibráveis no painel (?tweak=1) só por
-   segurança; o padrão agora é o valor do original, não estimativa de frame. */
-.s-radio .radio-video-wrap{
-  position:absolute; inset:0; overflow:hidden; z-index:0; pointer-events:none;
-  transform:scale(var(--tw-radio-scale,1));
-}
-/* o vídeo leva 14vh de SOBRA de altura (recurso novo daqui, pro parallax
-   vertical consumir sem descobrir a base — o original é estático, sem
-   parallax). object-position controla só o viés horizontal calibrável;
-   left:-30px é o "cola na aba" fixo, equivalente ao translateX do original.
-   --tw-radio-y: pedido do Daniel "sobe uns 10px" — consome um pouco da
-   sobra de 14vh (que sobra de sobejo pro parallax) sem descobrir a base.
-   ⚠️ SEM will-change aqui de propósito: o paint() nunca mais escreve
-   transform nesse elemento (`noLift` pula o bloco inteiro, ver JS) — manter
-   will-change sem uso real só mantinha a camada de composição ativa à toa
-   (suspeita da causa do vídeo "fosco"). */
-.s-radio .radio-video{ position:absolute; left:-30px; top:var(--tw-radio-y,-10px); width:100%; height:calc(100% + 14vh);
+/* 🎨 ENQUADRAMENTO do vídeo — e a REGRA DE OURO DA COR (ago/2026) ═════════
+   O `radio-capa.mp4` é `yuv420p(tv, bt709)` — **limited range** (luma 16-235).
+   Quem exibe precisa EXPANDIR isso pra 0-255. O Safari/iOS faz certo no
+   caminho NATIVO de vídeo, mas quando o vídeo é obrigado a ser rasterizado
+   dentro da textura de um ancestral composto, esse caminho muda e a
+   expansão se perde: pretos viram cinza, brancos param antes do branco →
+   **exatamente o "sem vida / opaco / meio morto" que o Daniel reportou 3x.**
+   (Descartado antes de chegar aqui: arquivo idêntico ao da home-mapa — 1 só
+   commit, nunca reencodado; overlays medidos ao vivo, iguais aos do original;
+   e o vídeo é constante em cor do 1º ao último frame, conferido por mosaico
+   de frames no ffmpeg. Só sobrou o caminho de renderização.)
+   ⚠️ **NÃO reintroduzir NADA que force camada de composição em volta deste
+   vídeo** — nem `transform` nele ou em ancestral (inclusive `scale(1)`, que
+   parece inofensivo e não é), nem `will-change`, nem `filter`, nem `opacity`
+   animada por cima. Foi essa pilha que matou a cor:
+     · wrapper `.radio-video-wrap` com `transform:scale()`   ← REMOVIDO
+     · `.sheet.pin{will-change:transform}` na seção          ← agora não pega em [data-static]
+     · `translate3d()` escrito na seção a cada quadro        ← paint() nem roda mais aqui
+     · `.pin-dim` (will-change:opacity) por cima do vídeo    ← não é mais criada aqui
+   Posicionamento é tudo por LAYOUT puro (`left`/`top`/`object-position`),
+   nunca por transform. O original resolve o "cola na aba" com
+   `transform:translateX(-30px)`; aqui é `left:-30px` — mesma matemática de
+   cover (a largura continua 100%), sem custar uma camada.
+   A SOBRA de altura é só a folga do nudge `--tw-radio-y` (20px): a sobra de
+   14vh que existia aqui era pro parallax, que nesta seção está desligado
+   (data-static) — e ela ainda deixava o `object-fit:cover` com MAIS zoom que
+   o original (caixa mais alta ⇒ mais ampliação), outra diferença visível
+   contra a referência. */
+.s-radio .radio-video{ position:absolute; left:-30px; top:var(--tw-radio-y,-10px); width:100%; height:calc(100% + 20px);
   object-fit:cover; object-position:var(--tw-radio-x,50%) 50%; z-index:0; pointer-events:none; }
 .s-radio::after{ content:''; position:absolute; inset:0; z-index:1; pointer-events:none; background:rgba(255,255,255,.14); }
 .s-radio .radio-inner{ position:relative; z-index:2; flex:1; display:flex; align-items:center; justify-content:center; padding:0 var(--pad); }
@@ -950,16 +958,17 @@ main{ position:relative; }
        depende da revelação por scroll pra ficar visível. -->
   <!-- data-static: pedido do Daniel — nesta transição (Rádio→subaba) só a
        subaba se move; a Rádio fica parada, sem o "sobe junto" que a capa e
-       o Quem-sou-eu têm (ver a flag `noLift` no paint()). -->
+       o Quem-sou-eu têm. O paint() IGNORA seções com esse atributo (o pino
+       é 100% CSS); é isso que mantém o vídeo fora de camada de composição
+       e com a cor certa — ver a REGRA DE OURO DA COR no CSS. -->
   <section class="sheet w s-radio pin" id="radio" data-static="1">
-    <!-- o wrapper leva o ENQUADRAMENTO ESTÁTICO (framing/escala calibráveis
-         no painel de ajuste); o <video> em si recebe SÓ o parallax dinâmico
-         do paint() — são coisas diferentes e não podem dividir a mesma
-         propriedade `transform`, por isso separadas em 2 elementos. -->
-    <div class="radio-video-wrap">
-      <video class="radio-video" src="assets/radio-capa.mp4"
-             autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
-    </div>
+    <!-- ⚠️ O <video> é filho DIRETO da seção, sem wrapper — igual ao original.
+         Qualquer elemento intermediário com `transform` (mesmo scale(1))
+         força o vídeo a ser rasterizado na textura do ancestral e o Safari
+         perde a expansão de limited-range → cor lavada. Ver a REGRA DE OURO
+         DA COR no CSS de .s-radio .radio-video. -->
+    <video class="radio-video" src="assets/radio-capa.mp4"
+           autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
     <div class="radio-inner">
       <a class="btn-tune" href="radio/">Sintonize <span class="ar">→</span></a>
     </div>
@@ -1342,22 +1351,27 @@ main{ position:relative; }
      em qualquer estado de viewport. */
   /* `.sheet.pin` entra junto com as `.cover`: é o mesmo papel (a seção de
      baixo da transição). O `bg` é quem faz o parallax interno — o vídeo na
-     capa, a foto no Quem-sou-eu, o vídeo da Rádio. Sem elemento seguinte, o
-     filter de `next` descarta e nada roda (seguro adicionar .pin antes da
-     próxima existir). `noLift`: seção que TRAVA mas não sobe sozinha nessa
-     transição (só a de cima se move) — pedido do Daniel pra Rádio→subaba,
-     via `data-static` no HTML. `dim` é a camada de escurecimento (ver CSS
-     de .pin-dim — substituiu o filter por ser bem mais barato). */
+     capa, a foto no Quem-sou-eu. Sem elemento seguinte, o filter de `next`
+     descarta e nada roda (seguro adicionar .pin antes da próxima existir).
+     `dim` é a camada de escurecimento (ver CSS de .pin-dim — substituiu o
+     filter por ser bem mais barato).
+     ⚠️ `data-static` fica de FORA daqui (pedido do Daniel pra Rádio→subaba:
+     a seção trava e SÓ a de cima se move). Antes ela entrava e recebia
+     "zero" em tudo — transform translate3d(0,0,0) a cada quadro, dim em 0,
+     parallax em 0. Zero escrito ainda é escrita: mantinha a seção como
+     camada de composição permanente com uma camada `.pin-dim` por cima, e
+     era isso que lavava a cor do vídeo dentro dela (REGRA DE OURO DA COR,
+     no CSS da .s-radio). O pino é 100% CSS (position:sticky) — uma seção
+     estática não precisa de UMA LINHA de JS. */
   var covers=[].slice.call(document.querySelectorAll('.cover,.sheet.pin')).filter(function(el){
-    return el.nextElementSibling;
+    return el.nextElementSibling && !el.hasAttribute('data-static');
   }).map(function(el){
     var dim=document.createElement('div');
     dim.className='pin-dim'; dim.setAttribute('aria-hidden','true');
     el.appendChild(dim);
     return {
       el:el, next:el.nextElementSibling, dim:dim,
-      bg:el.querySelector('.hero-bg,.radio-video,.portrait img'),
-      noLift:el.hasAttribute('data-static')
+      bg:el.querySelector('.hero-bg,.portrait img')
     };
   });
   var vh=innerHeight, ticking=false;
@@ -1390,67 +1404,45 @@ main{ position:relative; }
         return;
       }
       if(p<1.01){
-        var lift=0;
-        if(!c.noLift){
-          /* ═══ PASSAGEM (o "deck de cartas" da referência houseofyellow.nl) ═══
-             Enquanto a próxima lâmina sobe por cima, a capa presa SOBE
-             junto — rápido no começo, desacelerando.
-             ⚠️ A REGRA que evita o vão preto (bug que já aconteceu 2x aqui):
-             a capa NUNCA pode subir mais rápido que a lâmina que a cobre.
-             Se subir, a base da capa descola do topo da lâmina e o que
-             aparece no meio é o fundo do <body> (preto).
-               · lâmina: topo em vh*(1-p) → sobe vh por unidade de p
-               · capa:   sobe lift(p), então a base fica em vh - lift(p)
-               · sem vão  ⟺  lift(p) ≤ p*vh  pra TODO p
-             Curva (pedido do Daniel: "sobe junto até uns 70% e depois para"):
-               q = min(p / .7, 1)                 ← progresso renormalizado
-               lift(p) = .06*vh * sen(q * π/2)    ← easeOutSine
-             Amplitude 6% da tela (~45px em 745). Velocidade inicial =
-             .06*(π/2)/.7 = .135*vh contra 1*vh da lâmina → a lâmina é
-             ~7,4x mais rápida, folga enorme sobre a regra do vão.
-             ⚠️ TRAVA EXTRA (não remover): `coberto` — o quanto a lâmina JÁ
-             cobriu, medido de verdade no layout (fase 1), SEM PREMISSA
-             nenhuma sobre o sticky estar funcionando. Cobre o caso da barra
-             de endereço do celular recolhendo (innerHeight cresce, p nasce
-             >0 sem ter rolado nada) E o caso de `noLift` nem se aplica
-             (sticky quebrado ⇒ coberto=0 ⇒ lift trava em 0 de qualquer jeito). */
-          var coberto=(r.natTop+r.h)-top;
-          var q=Math.min(p/.7,1);
-          lift=Math.min(.06*vh*Math.sin(q*Math.PI/2), Math.max(0,coberto));
-        }
+        /* ═══ PASSAGEM (o "deck de cartas" da referência houseofyellow.nl) ═══
+           Enquanto a próxima lâmina sobe por cima, a capa presa SOBE
+           junto — rápido no começo, desacelerando.
+           ⚠️ A REGRA que evita o vão preto (bug que já aconteceu 2x aqui):
+           a capa NUNCA pode subir mais rápido que a lâmina que a cobre.
+           Se subir, a base da capa descola do topo da lâmina e o que
+           aparece no meio é o fundo do <body> (preto).
+             · lâmina: topo em vh*(1-p) → sobe vh por unidade de p
+             · capa:   sobe lift(p), então a base fica em vh - lift(p)
+             · sem vão  ⟺  lift(p) ≤ p*vh  pra TODO p
+           Curva (pedido do Daniel: "sobe junto até uns 70% e depois para"):
+             q = min(p / .7, 1)                 ← progresso renormalizado
+             lift(p) = .06*vh * sen(q * π/2)    ← easeOutSine
+           Amplitude 6% da tela (~45px em 745). Velocidade inicial =
+           .06*(π/2)/.7 = .135*vh contra 1*vh da lâmina → a lâmina é
+           ~7,4x mais rápida, folga enorme sobre a regra do vão.
+           ⚠️ TRAVA EXTRA (não remover): `coberto` — o quanto a lâmina JÁ
+           cobriu, medido de verdade no layout (fase 1), SEM PREMISSA
+           nenhuma sobre o sticky estar funcionando. Cobre o caso da barra
+           de endereço do celular recolhendo (innerHeight cresce, p nasce
+           >0 sem ter rolado nada) e o de sticky quebrado (coberto=0 ⇒ lift
+           trava em 0 sozinho). */
+        var coberto=(r.natTop+r.h)-top;
+        var q=Math.min(p/.7,1);
+        var lift=Math.min(.06*vh*Math.sin(q*Math.PI/2), Math.max(0,coberto));
         c.lift=lift;
         c.el.style.transform='translate3d(0,'+(-lift).toFixed(2)+'px,0)';
-        /* `noLift` = trava DE VERDADE (pedido do Daniel: "dar a trancadinha"),
-           não só o bloco inteiro — o escurecimento e o parallax do vídeo por
-           dentro dele PARAM junto, senão o botão (parte do bloco, sem
-           transform próprio) fica parado enquanto o vídeo desliza sozinho
-           (dessincroniza os dois) e o véu preto progressivo (dim) soma com o
-           véu branco estático da capa, deixando o vídeo "fosco" mesmo com o
-           bloco visualmente parado. Só quando NÃO é noLift (capa/quem, que
-           saem de cena de verdade) o escurecimento faz sentido. */
-        c.dim.style.opacity=c.noLift?'0':(p*.35).toFixed(3);
+        c.dim.style.opacity=(p*.35).toFixed(3);
 
         /* ── PARALLAX DO VÍDEO/FOTO (pedido do Daniel) ──
-           Desliza POR DENTRO da capa, além do movimento dela (quando tem):
-           some os dois e o bg anda ~7vh enquanto a lâmina anda 100vh — é
-           isso que dá a leitura de profundidade (a lâmina "revela" o bg
-           deslizando atrás). Curva = smoothstep q²(3-2q), normalizada em
-           55%: velocidade E aceleração nascem e terminam em zero → parada
+           Desliza POR DENTRO da capa, além do movimento dela: some os dois
+           e o bg anda ~7vh enquanto a lâmina anda 100vh — é isso que dá a
+           leitura de profundidade (a lâmina "revela" o bg deslizando
+           atrás). Curva = smoothstep q²(3-2q), normalizada em 55%:
+           velocidade E aceleração nascem e terminam em zero → parada
            orgânica, sem travamento. Amplitude .091 casada com a sobra de
            14vh no CSS do bg — são um PAR: mexeu numa, mexe na outra ou o
-           vão volta por dentro da capa. Some com `noLift` (ver acima):
-           enquanto a Rádio está "parada", o vídeo por dentro dela também
-           não se move — só a PRÓXIMA seção (subaba) tem parallax vivo.
-           ⚠️ `noLift` pula o bloco INTEIRO (nem escreve transform:none) —
-           não só zera o valor. O vídeo da Rádio fica com o `transform`
-           estático do CSS (nenhum), igual ao original, sem o JS tocar nele
-           a cada scroll da página inteira. Suspeita: manter um vídeo em
-           `will-change:transform` + reescrita contínua (mesmo pra 0) mantém
-           ele numa camada de composição ativa o tempo todo, e o Safari/iOS
-           às vezes aplica um tratamento de cor mais "achatado" nessa camada
-           pra vídeo com gama ampla — tirar essa reescrita é a aposta pro
-           vídeo "fosco" reportado pelo Daniel. */
-        if(c.bg && !c.noLift){
+           vão volta por dentro da capa. */
+        if(c.bg){
           var qv=Math.min(p/.55,1);
           var vlift=.091*vh*(qv*qv*(3-2*qv));
           c.bg.style.transform='translate3d(0,'+(-vlift).toFixed(2)+'px,0)';
@@ -1500,8 +1492,10 @@ main{ position:relative; }
        (home-mapa.html) + ajustes que o Daniel pediu vendo ao vivo no
        celular: vídeo 10px mais alto, botão 60px mais abaixo. */
     { key:'--tw-radio-x',     label:'Rádio — vídeo, viés horizontal',unit:'%', min:20, max:80,  step:1,  get:function(){ return 50; } },
-    { key:'--tw-radio-y',     label:'Rádio — vídeo, sobe/desce',     unit:'px', min:-60, max:60, step:1,  get:function(){ return -10; } },
-    { key:'--tw-radio-scale', label:'Rádio — vídeo, zoom',           unit:'',  min:.7, max:1.15,step:.01,get:function(){ return 1; } },
+    /* faixa de -20..0 é a folga real do `height:calc(100% + 20px)` — passar
+       disso descobre a base do vídeo. NÃO existe mais slider de zoom: um
+       `scale()` traria de volta a camada de composição que lava a cor. */
+    { key:'--tw-radio-y',     label:'Rádio — vídeo, sobe/desce',     unit:'px', min:-20, max:0,  step:1,  get:function(){ return -10; } },
     { key:'--tw-radio-btn-y', label:'Rádio — botão Sintonize, sobe/desce', unit:'px', min:-60, max:200,step:1, get:function(){ return 140; } },
     { key:'--tw-tab-bottom',  label:'Rádio — aba do manifesto, sobe/desce',unit:'px', min:0,   max:120,step:2, get:function(){ return 0; } }
   ];
