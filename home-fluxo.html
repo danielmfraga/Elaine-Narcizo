@@ -230,7 +230,12 @@ main{ position:relative; }
      "role para descer". */
   padding-bottom:var(--tw-pad-bottom, clamp(52px,10vh,96px));
 }
-.c-hero .hero-bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+/* O vídeo é de propósito MAIS ALTO que a capa (100% + 10vh), ancorado pelo
+   topo. Essa sobra é o que ele consome ao deslizar no parallax (ver paint()):
+   ele sobe até 7vh e a base dele nunca descobre a base da capa — sem isso o
+   vão preto voltaria, agora POR DENTRO da capa. Sobra 10vh > amplitude 7vh
+   = 43% de folga. Se mexer na amplitude do parallax, mexer nesta sobra junto. */
+.c-hero .hero-bg{ position:absolute; left:0; top:0; width:100%; height:calc(100% + 10vh); object-fit:cover; z-index:0; will-change:transform; }
 .c-hero .hero-scrim{ position:absolute; inset:0; z-index:0;
   background:linear-gradient(180deg, rgba(15,14,12,0) 0%, rgba(15,14,12,.12) 50%, rgba(15,14,12,.58) 100%); }
 .c-hero > *:not(.hero-bg):not(.hero-scrim){ position:relative; z-index:1; }
@@ -1078,7 +1083,7 @@ main{ position:relative; }
      Com a trava, lift nunca passa do que já está coberto → vão impossível
      em qualquer estado de viewport. */
   var covers=[].slice.call(document.querySelectorAll('.cover')).map(function(c){
-    return { el:c, next:c.nextElementSibling };
+    return { el:c, next:c.nextElementSibling, bg:c.querySelector('.hero-bg') };
   }).filter(function(c){ return c.next; });
   var vh=innerHeight, ticking=false;
   addEventListener('resize',function(){ vh=innerHeight; },{passive:true});
@@ -1088,7 +1093,9 @@ main{ position:relative; }
       var top=c.next.getBoundingClientRect().top;
       var p=Math.min(Math.max(1-top/vh,0),1);      /* 0 = ainda embaixo · 1 = cobriu */
       if(p<=0){                                    /* de volta na capa: estado limpo */
-        c.lift=0; c.el.style.transform=''; c.el.style.filter=''; return;
+        c.lift=0; c.el.style.transform=''; c.el.style.filter='';
+        if(c.bg) c.bg.style.transform='';
+        return;
       }
       if(p<1.01){
         /* `coberto` = o quanto a lâmina JÁ avançou por cima da capa, medido
@@ -1105,6 +1112,24 @@ main{ position:relative; }
         c.lift=lift;
         c.el.style.transform='translate3d(0,'+(-lift).toFixed(2)+'px,0)';
         c.el.style.filter='brightness('+(1-p*.35).toFixed(3)+')';
+
+        /* ── PARALLAX DO VÍDEO (pedido do Daniel) ──
+           O vídeo desliza POR DENTRO da capa, além do movimento dela: some
+           os dois e o vídeo anda ~7vh enquanto a lâmina anda 100vh, ou seja
+           ela é ~5x mais rápida — é isso que dá a leitura de profundidade
+           (a lâmina "revela" o vídeo deslizando atrás).
+           Curva = smoothstep q²(3-2q), normalizada em 55% da passagem:
+           a velocidade nasce em ZERO, cresce, e volta a ZERO ao chegar —
+           e a aceleração também zera nas duas pontas. Por isso a parada é
+           orgânica, sem o "travamento" que a curva anterior dava (aquela
+           chegava com velocidade zero mas aceleração ainda cortando seco).
+           Depois de 55% o vídeo fica parado e só a lâmina continua.
+           ⚠️ Amplitude .07 casada com a sobra de 10vh no CSS do .hero-bg. */
+        if(c.bg){
+          var qv=Math.min(p/.55,1);
+          var vlift=.07*vh*(qv*qv*(3-2*qv));
+          c.bg.style.transform='translate3d(0,'+(-vlift).toFixed(2)+'px,0)';
+        }
       }
     });
   }
