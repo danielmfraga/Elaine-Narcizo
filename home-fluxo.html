@@ -246,37 +246,49 @@ main{ position:relative; }
   min-height:100svh; padding:0; display:flex; flex-direction:column;
   background:radial-gradient(ellipse 88% 52% at 50% 72%, #f4e9e1 0%, var(--paper) 68%);
 }
-/* 🎨 ENQUADRAMENTO do vídeo — e a REGRA DE OURO DA COR (ago/2026) ═════════
-   O `radio-capa.mp4` é `yuv420p(tv, bt709)` — **limited range** (luma 16-235).
-   Quem exibe precisa EXPANDIR isso pra 0-255. O Safari/iOS faz certo no
-   caminho NATIVO de vídeo, mas quando o vídeo é obrigado a ser rasterizado
-   dentro da textura de um ancestral composto, esse caminho muda e a
-   expansão se perde: pretos viram cinza, brancos param antes do branco →
-   **exatamente o "sem vida / opaco / meio morto" que o Daniel reportou 3x.**
-   (Descartado antes de chegar aqui: arquivo idêntico ao da home-mapa — 1 só
-   commit, nunca reencodado; overlays medidos ao vivo, iguais aos do original;
-   e o vídeo é constante em cor do 1º ao último frame, conferido por mosaico
-   de frames no ffmpeg. Só sobrou o caminho de renderização.)
-   ⚠️ **NÃO reintroduzir NADA que force camada de composição em volta deste
-   vídeo** — nem `transform` nele ou em ancestral (inclusive `scale(1)`, que
-   parece inofensivo e não é), nem `will-change`, nem `filter`, nem `opacity`
-   animada por cima. Foi essa pilha que matou a cor:
-     · wrapper `.radio-video-wrap` com `transform:scale()`   ← REMOVIDO
-     · `.sheet.pin{will-change:transform}` na seção          ← agora não pega em [data-static]
-     · `translate3d()` escrito na seção a cada quadro        ← paint() nem roda mais aqui
-     · `.pin-dim` (will-change:opacity) por cima do vídeo    ← não é mais criada aqui
-   Posicionamento é tudo por LAYOUT puro (`left`/`top`/`object-position`),
-   nunca por transform. O original resolve o "cola na aba" com
-   `transform:translateX(-30px)`; aqui é `left:-30px` — mesma matemática de
-   cover (a largura continua 100%), sem custar uma camada.
-   A SOBRA de altura é só a folga do nudge `--tw-radio-y` (20px): a sobra de
-   14vh que existia aqui era pro parallax, que nesta seção está desligado
-   (data-static) — e ela ainda deixava o `object-fit:cover` com MAIS zoom que
-   o original (caixa mais alta ⇒ mais ampliação), outra diferença visível
-   contra a referência. */
+/* 🎨 ENQUADRAMENTO E COR DO VÍDEO — o que a investigação de ago/2026 provou
+   ══════════════════════════════════════════════════════════════════════════
+   O Daniel reportou 4x que o vídeo aqui ficava "sem vida / opaco / meio
+   morto" contra a home-mapa. Foram 3 correções por raciocínio que NÃO
+   resolveram. O que fechou o assunto foi medir, com uma página de
+   diagnóstico (`diag-video.html`) que mostrou o mesmo instante do mesmo
+   arquivo em 6 variantes e imprimiu média RGB + luma mín/máx no celular:
+
+     A  PNG faixa certa  rgb(152,136,108)  luma   0–227
+     B  PNG faixa errada rgb(148,133,109)  luma   7–211
+     C  vídeo puro       rgb(167,153,126)  luma   1–242
+
+   ✅ **DESCARTADO — não adianta mexer nisto de novo:**
+   · o ARQUIVO: idêntico ao da home-mapa (1 só commit, nunca reencodado) e
+     constante em cor do 1º ao último frame (mosaico de frames no ffmpeg);
+   · a FAIXA (limited range): C não tem a assinatura do erro — B comprime
+     pra 7–211, o vídeo real ABRE pra 1–242. Hipótese morta;
+   · o CONTAINER / camadas de composição: no diagnóstico, o vídeo dentro do
+     container da home-fluxo (E) e dentro do da home-mapa (F) ficaram
+     IGUAIS. Transform / will-change / border-radius / isolation não mudam
+     a cor. (Foi a hipótese da 3ª tentativa — estava errada.)
+
+   ⚠️ Sobrou UMA coisa medível clareando o vídeo: o **véu branco** logo
+   abaixo. Ele vinha da home-mapa, onde o próprio comentário admite que só
+   existia pra proteger um texto escuro **que não existe mais**. É puro
+   clareamento decorativo — por isso agora nasce em **0** (`--tw-radio-veu`).
+   Junto vão `--tw-radio-sat`/`--tw-radio-con`, pro Daniel calibrar vivacidade
+   ao vivo no painel `?tweak=1` em vez de eu chutar uma 4ª vez.
+
+   POSIÇÃO continua por layout puro (`left`/`top`/`object-position`), não por
+   transform — não porque a cor dependa disso (não depende, ver acima), mas
+   porque `transform` aqui brigaria com o paint() se um dia esta seção deixar
+   de ser `data-static`. O original faz o "cola na aba" de 30px com
+   `translateX(-30px)`; `left:-30px` é a mesma matemática de cover.
+   A sobra de altura é só a folga do nudge `--tw-radio-y` (20px) — a de 14vh
+   que existia aqui era pro parallax (desligado nesta seção) e ainda deixava
+   o `object-fit:cover` com +14% de zoom contra a referência. */
 .s-radio .radio-video{ position:absolute; left:-30px; top:var(--tw-radio-y,-10px); width:100%; height:calc(100% + 20px);
-  object-fit:cover; object-position:var(--tw-radio-x,50%) 50%; z-index:0; pointer-events:none; }
-.s-radio::after{ content:''; position:absolute; inset:0; z-index:1; pointer-events:none; background:rgba(255,255,255,.14); }
+  object-fit:cover; object-position:var(--tw-radio-x,50%) 50%; z-index:0; pointer-events:none;
+  filter:saturate(var(--tw-radio-sat,1)) contrast(var(--tw-radio-con,1)); }
+/* véu branco: agora 0 por padrão (era .14, herdado da home-mapa) */
+.s-radio::after{ content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
+  background:rgba(255,255,255,var(--tw-radio-veu,0)); }
 .s-radio .radio-inner{ position:relative; z-index:2; flex:1; display:flex; align-items:center; justify-content:center; padding:0 var(--pad); }
 /* botão SINTONIZE — chamada principal, pulsante */
 .btn-tune{
@@ -1493,11 +1505,17 @@ main{ position:relative; }
        celular: vídeo 10px mais alto, botão 60px mais abaixo. */
     { key:'--tw-radio-x',     label:'Rádio — vídeo, viés horizontal',unit:'%', min:20, max:80,  step:1,  get:function(){ return 50; } },
     /* faixa de -20..0 é a folga real do `height:calc(100% + 20px)` — passar
-       disso descobre a base do vídeo. NÃO existe mais slider de zoom: um
-       `scale()` traria de volta a camada de composição que lava a cor. */
+       disso descobre a base do vídeo. */
     { key:'--tw-radio-y',     label:'Rádio — vídeo, sobe/desce',     unit:'px', min:-20, max:0,  step:1,  get:function(){ return -10; } },
     { key:'--tw-radio-btn-y', label:'Rádio — botão Sintonize, sobe/desce', unit:'px', min:-60, max:200,step:1, get:function(){ return 140; } },
-    { key:'--tw-tab-bottom',  label:'Rádio — aba do manifesto, sobe/desce',unit:'px', min:0,   max:120,step:2, get:function(){ return 0; } }
+    { key:'--tw-tab-bottom',  label:'Rádio — aba do manifesto, sobe/desce',unit:'px', min:0,   max:120,step:2, get:function(){ return 0; } },
+    /* 🎨 VIVACIDADE do vídeo — os 3 controles da saga do "vídeo lavado".
+       O diagnóstico (diag-video.html) descartou arquivo, faixa e container;
+       o véu era a única camada clareando de verdade, e agora nasce em 0.
+       Se ainda faltar vida, é aqui que se resolve — sem eu chutar de novo. */
+    { key:'--tw-radio-veu',   label:'Rádio — véu branco por cima',   unit:'',  min:0,   max:.2, step:.01,get:function(){ return 0; } },
+    { key:'--tw-radio-sat',   label:'Rádio — saturação do vídeo',    unit:'',  min:.8,  max:1.6,step:.02,get:function(){ return 1; } },
+    { key:'--tw-radio-con',   label:'Rádio — contraste do vídeo',    unit:'',  min:.8,  max:1.4,step:.02,get:function(){ return 1; } }
   ];
   var STORE_KEY='en_tweak_v1';
 
