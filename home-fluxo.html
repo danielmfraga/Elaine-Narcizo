@@ -184,6 +184,26 @@ main{ position:relative; }
   box-shadow:0 -18px 60px rgba(0,0,0,.35);
   padding:clamp(44px,9vh,110px) var(--pad);
 }
+/* ── LÂMINA QUE TAMBÉM PRENDE (o padrão de transição, reutilizável) ──
+   Uma `.sheet` normal só sobe por cima da capa e segue embora. Com `.pin`
+   ela passa a fazer TAMBÉM o papel de capa da transição seguinte: fica
+   presa enquanto a próxima lâmina sobe por cima dela, exatamente como a
+   capa do topo faz. Reaproveita o mesmo `paint()`, a mesma curva e a mesma
+   trava anti-vão — nada duplicado.
+   Prende por `bottom:0` (e não `top:0` como as .cover): esta lâmina é mais
+   ALTA que a tela, e o que precisa ficar visível na transição é o FIM dela
+   (onde está a foto), não o começo.
+   ⚠️ Especificidade: tem que ser `.sheet.pin` (0,2,0) pra vencer o
+   `position:relative` de `.sheet` (0,1,0). Se virar só `.pin`, empata e
+   PERDE por vir antes no arquivo — foi exatamente esse tipo de empate que
+   quebrou o sticky da capa (ver .c-hero). */
+.sheet.pin{ position:sticky; bottom:0; }
+/* a foto assume o papel do vídeo da capa: desliza dentro do próprio quadro
+   enquanto a lâmina de baixo sobe. Mesma exigência do vídeo — precisa de
+   SOBRA de altura, senão a base dela descobre e abre vão dentro da moldura.
+   Sobra 14vh, casada com a amplitude .091 do paint(). */
+.sheet.pin .portrait{ position:relative; aspect-ratio:4/5; }
+.sheet.pin .portrait img{ position:absolute; left:0; top:0; width:100%; height:calc(100% + 14vh); aspect-ratio:auto; will-change:transform; }
 .y{ background:var(--amarelo); color:var(--ink); }
 .k{ background:var(--ink); color:var(--paper); }
 .w{ background:var(--paper); color:var(--ink); }
@@ -1082,8 +1102,13 @@ main{ position:relative; }
      nasce > 0 sem ter rolado nada, a fórmula pedia lift > 0 e abria vão.
      Com a trava, lift nunca passa do que já está coberto → vão impossível
      em qualquer estado de viewport. */
-  var covers=[].slice.call(document.querySelectorAll('.cover')).map(function(c){
-    return { el:c, next:c.nextElementSibling, bg:c.querySelector('.hero-bg') };
+  /* `.sheet.pin` entra junto com as `.cover`: é a lâmina que também prende
+     pra próxima subir por cima dela (ver o CSS de .sheet.pin). O `bg` é o
+     elemento que faz o parallax dentro dela — o vídeo na capa, a foto na
+     lâmina. Fica inerte enquanto não houver um elemento depois (o filter
+     de `next` cuida disso), então nada quebra antes da próxima seção existir. */
+  var covers=[].slice.call(document.querySelectorAll('.cover,.sheet.pin')).map(function(c){
+    return { el:c, next:c.nextElementSibling, bg:c.querySelector('.hero-bg,.portrait img') };
   }).filter(function(c){ return c.next; });
   var vh=innerHeight, ticking=false;
   addEventListener('resize',function(){ vh=innerHeight; },{passive:true});
