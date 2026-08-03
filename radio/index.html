@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Rádio Tinhosa — Elaine Narcizo</title>
+<meta name="description" content="Rádio Tinhosa — textos em áudio, podcasts e playlists de Elaine Narcizo." />
+<link rel="icon" type="image/svg+xml" href="../assets/logo.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   RÁDIO TINHOSA — página do player (ago/2026)
+   O player (podcast em áudio nativo no R2 + DançaDestino no YouTube)
+   foi EXTRAÍDO da home-mapa.html, onde vivia num painel lateral da
+   navegação 2D. Aqui virou página própria, destino do botão
+   "Sintonize" da home-fluxo.
+   O que mudou em relação ao original: (1) saiu o trecho que falava
+   com a navegação 2D (backChip/syncLock); (2) caminhos de asset
+   viraram ../ porque a página está numa subpasta; (3) ganhou um
+   cabeçalho com voltar. A mecânica do player está intacta.
+   ═══════════════════════════════════════════════════════════════ */
+:root{
+  --ink:#0A0A0A; --ink-soft:#2A2A2A; --mute:#6B6B6B;
+  --line:#DCDCDC; --line-soft:#EDEDED; --paper:#FFFFFF; --warm:#F8F7F4;
+  --verde:#A8B73F; --laranja:#E87A32; --amarelo:#F5D731; --roxo:#6C4BB6; --rosa:#B9A7DC;
+  --ac:var(--laranja);
+  --font:"DM Sans",-apple-system,BlinkMacSystemFont,sans-serif;
+  --serif:"Newsreader",Georgia,serif;
+  --ease:cubic-bezier(0.22,0.61,0.36,1);
+  --dur:280ms;
+  --gap:14px;
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html,body{ height:100%; background:var(--ink); }
+body{ font-family:var(--font); color:var(--ink); -webkit-font-smoothing:antialiased; overflow:hidden; }
+img{ display:block; max-width:100%; }
+button{ font:inherit; }
+a{ color:inherit; }
+
+/* ── cabeçalho: voltar pra home (a home restaura a posição na Rádio) ── */
+.rp-head{
+  position:fixed; top:0; left:0; right:0; z-index:20; height:52px;
+  display:flex; align-items:center; gap:12px; padding:0 14px;
+  background:var(--paper); border-bottom:1px solid var(--line);
+}
+.rp-back{
+  display:inline-flex; align-items:center; gap:8px; border:0; background:none;
+  cursor:pointer; color:var(--ink); font-size:13px; font-weight:600;
+  letter-spacing:.02em; padding:8px 4px;
+}
+.rp-back .a{ transition:transform .25s var(--ease); }
+.rp-back:hover .a{ transform:translateX(-3px); }
+.rp-title{
+  font-size:10px; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--mute); margin-left:auto;
+}
+/* o player ocupa o resto da tela, abaixo do cabeçalho */
+.rp-stage{ position:fixed; top:52px; left:0; right:0; bottom:0; }
+.rp-stage .radio-screen{ height:100%; }
+
+/* ── RÁDIO REMENDO ── */
+.radio-screen{ height:100%; display:flex; flex-direction:column; overflow:hidden; }
+.radio-head{
+  padding:14px 20px 12px; border-bottom:1px solid var(--linha,#e0e0e0);
+  flex-shrink:0; display:flex; align-items:center; justify-content:space-between;
+}
+.radio-head .eyebrow{ font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--mute); }
+.radio-hint{ font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--mute); opacity:.6; }
+.radio-screen > iframe{ flex:1; width:100%; border:0; display:block; min-height:0; }
+.yt-wrap{ flex:1; display:flex; flex-direction:column; overflow:hidden; min-height:0; }
+.yt-embed{ flex-shrink:0; background:#000; display:none; }
+.yt-embed.on{ display:block; }
+.yt-embed #yt-player{ width:100%; aspect-ratio:16/9; display:block; }
+.yt-embed iframe{ width:100%; height:100%; border:0; display:block; }
+.yt-list{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.yt-track{
+  display:flex; align-items:center; gap:14px;
+  padding:14px 20px; border-bottom:1px solid var(--linha,#e0e0e0);
+  cursor:pointer; transition:background .15s;
+}
+.yt-track:active,.yt-track.on{ background:var(--fundo-alt,#f7f7f5); }
+.yt-track .t-num{ font-size:.72rem; color:var(--mute); width:18px; text-align:center; flex-shrink:0; }
+.yt-track.on .t-num{ font-size:.9rem; }
+.yt-track .t-info{ flex:1; min-width:0; }
+.yt-track .t-title{ font-size:.9rem; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.yt-track .t-artist{ font-size:.78rem; color:var(--mute); margin-top:1px; }
+.yt-track .t-icon{ font-size:.8rem; color:var(--mute); flex-shrink:0; }
+
+/* ── PLAYER "ELAINE LÊ" (Spotify via IFrame API) ── */
+.sp-player{
+  position:relative; z-index:1; height:100%;
+  display:flex; flex-direction:column; gap:10px;
+  padding:12px 12px 12px; background:var(--paper);
+  touch-action:pan-y; /* bloqueia scroll horizontal do painel pai */
+}
+
+/* ── EXPANDING CARDS (Podcast ↔ DançaDestino) ── */
+.sp-cards{ flex:1 1 auto; display:flex; gap:8px; min-height:0; }
+.sp-card{
+  position:relative; border-radius:20px; overflow:hidden;
+  flex:0 0 52px; transition:flex .45s cubic-bezier(.4,0,.2,1); cursor:pointer;
+}
+.sp-card.active{ flex:1 1 auto; cursor:default; }
+.sp-card-bg{ position:absolute; inset:0; }
+.sp-card-bg img{ width:100%; height:100%; object-fit:cover; }
+.sp-card-bg img.hidden{ display:none; }
+.sp-card-grad{ position:absolute; inset:0; background:linear-gradient(to bottom,rgba(0,0,0,.2) 0%,rgba(0,0,0,0) 35%,rgba(0,0,0,.76) 100%); }
+.sp-card-type{
+  position:absolute; top:13px; left:0; right:0; text-align:center;
+  font-size:.55rem; letter-spacing:.1em; text-transform:uppercase; font-weight:700;
+  color:rgba(255,255,255,.95); opacity:0; transition:opacity .25s .2s;
+}
+.sp-card.active .sp-card-type{ opacity:1; }
+.sp-card-meta{ position:absolute; left:14px; right:14px; bottom:14px; color:#fff; opacity:0; transition:opacity .25s .1s; text-align:center; }
+.sp-card.active .sp-card-meta{ opacity:1; }
+.sp-show{ font-size:1rem; font-weight:700; letter-spacing:-.01em; }
+.sp-ep{ font-size:.63rem; opacity:.85; margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sp-card-vert{
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%) rotate(-90deg);
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  text-align:center; white-space:nowrap;
+  font-size:.58rem; letter-spacing:.08em; text-transform:uppercase; font-weight:700;
+  color:rgba(255,255,255,.95); opacity:0; transition:opacity .2s;
+}
+.sp-card-vert span{ display:block; line-height:1.05; }
+.sp-card:not(.active) .sp-card-vert{ opacity:1; }
+
+/* layout unificado: dança usa exatamente o mesmo chrome do podcast
+   (lista de 5, mesma barra + controles). Template único p/ todo novo
+   programa/playlist. */
+
+/* embed YT dentro do player unificado (temporário até áudio nativo R2) */
+.sp-player .yt-embed{ border-radius:12px; overflow:hidden; }
+.sp-player:not(.danca) .yt-embed{ display:none !important; }
+
+/* lista: altura fixa de 5 faixas (≈42px cada); o resto rola */
+.sp-list{ flex:0 0 auto; height:210px; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; touch-action:pan-y; margin:0 -4px; }
+.sp-list::-webkit-scrollbar{ display:none; }
+.sp-row{ display:flex; align-items:center; gap:12px; padding:0 8px; height:42px; border-radius:8px; cursor:default; }
+.sp-row.live{ background:var(--fundo-alt,#f7f7f5); }
+.sp-row.playable{ cursor:pointer; }
+.sp-row.playable:active{ background:var(--fundo-alt,#f7f7f5); }
+.sp-row.dim{ opacity:.5; }
+.sp-row .sp-n{ font-size:.7rem; color:var(--mute); width:18px; text-align:center; flex-shrink:0; font-variant-numeric:tabular-nums; }
+.sp-row .sp-ti{ flex:1; min-width:0; font-size:.76rem; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sp-row .sp-du{ font-size:.72rem; color:var(--mute); flex-shrink:0; font-variant-numeric:tabular-nums; }
+
+.sp-bar{ display:flex; align-items:center; gap:10px; flex-shrink:0; }
+.sp-bar .sp-t{ font-size:.66rem; color:var(--mute); font-variant-numeric:tabular-nums; width:34px; flex-shrink:0; }
+.sp-bar .sp-t.rt{ text-align:right; }
+.sp-track{ flex:1; height:4px; background:var(--line,#e0e0e0); border-radius:3px; position:relative; cursor:pointer; }
+.sp-fill{ position:absolute; left:0; top:0; height:100%; width:0%; background:var(--ink); border-radius:3px; }
+
+.sp-ctrls{ display:flex; align-items:center; justify-content:center; gap:20px; flex-shrink:0; padding-top:2px; }
+.sp-ic{ background:none; border:0; font-size:1.05rem; color:var(--ink); cursor:pointer; line-height:1; padding:4px; }
+.sp-ic:disabled{ opacity:.26; cursor:default; }
+.sp-play{
+  width:54px; height:54px; border-radius:50%; border:0; cursor:pointer;
+  background:var(--ink); color:var(--paper); font-size:1.1rem;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
+}
+.sp-play:active{ transform:scale(.95); }
+/* play/pause: SVG vetorial (evita o "quadradinho" do emoji ⏸) */
+.sp-play svg{ width:22px; height:22px; display:block; fill:currentColor; }
+.sp-play .ic-pause{ display:none; }
+.sp-play.playing .ic-play{ display:none; }
+.sp-play.playing .ic-pause{ display:block; }
+/* prev/next: só o ícone (sem caixa); SVG monocromático evita o "quadradinho" do emoji */
+.sp-ic svg{ width:24px; height:24px; display:block; fill:currentColor; }
+/* estado ativo (aleatório ligado): acende no acento da seção */
+.sp-ic.on{ color:var(--laranja); opacity:1; }
+.sp-ic.on::after{ content:""; position:absolute; left:50%; bottom:-5px; transform:translateX(-50%); width:4px; height:4px; border-radius:50%; background:var(--laranja); }
+.sp-ic{ position:relative; }
+
+/* painel de informações do episódio (☰) — sobrepõe o player */
+.sp-info{ position:absolute; inset:0; z-index:6; background:var(--paper);
+  padding:54px 22px 24px; display:flex; flex-direction:column; gap:10px; overflow-y:auto;
+  opacity:0; visibility:hidden; transform:translateY(8px);
+  transition:opacity .28s var(--ease), transform .28s var(--ease), visibility .28s; }
+.sp-info.on{ opacity:1; visibility:visible; transform:none; }
+.sp-info-x{ position:absolute; top:14px; left:14px; width:32px; height:32px; border:0; border-radius:50%;
+  background:var(--fundo-alt,#f3f2ef); color:var(--ink); font-size:14px; cursor:pointer; line-height:1; z-index:1; }
+.sp-info-eyebrow{ font-size:10px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--mute); }
+.sp-info-title{ margin:0; font-family:var(--serif); font-style:italic; font-weight:400; font-size:1.45rem; line-height:1.12; color:var(--ink); max-width:26ch; }
+.sp-info-desc{ margin:0; font-size:.92rem; font-weight:300; line-height:1.62; color:var(--ink-soft); }
+.sp-info-desc.empty{ color:var(--mute); font-style:italic; }
+
+/* engine: iframe do Spotify renderizado mas oculto atrás da UI */
+.sp-engine{ position:absolute; left:0; right:0; bottom:0; height:80px; opacity:0; pointer-events:none; z-index:0; }
+.sp-engine iframe{ width:100%; height:100%; border:0; }
+
+/* no player de áudio: esconde indicadores globais + letreiro e deixa a capa vazar até o topo */
+body.nav-hidden .worlds-rail,
+body.nav-hidden .world-dots,
+body.nav-hidden .bar{ opacity:0; pointer-events:none; }
+body.nav-hidden .stage{ top:0; }
+/* sem letreiro: a sombra lateral (que mascarava o letreiro) vira sombra pra baixo.
+   Vale p/ o ☰ E p/ o X — senão o X fica com um borrão lateral deslocado. */
+body.nav-hidden .menu-btn,
+body.nav-hidden .back-chip{ box-shadow:0 7px 16px rgba(0,0,0,.3); }
+.feed-hint{
+  font-size:11px; font-weight:500; letter-spacing:0.18em; text-transform:uppercase;
+  color:var(--mute); display:inline-flex; align-items:center; gap:8px;
+}
+.feed-hint .chev{ font-size:13px; color:var(--ink); animation:bob 1.9s var(--ease) infinite; }
+.feed-block{
+  padding:clamp(36px,7vh,64px) var(--pad-x);
+  border-top:1px solid var(--line-soft);
+  display:flex; flex-direction:column; gap:14px; align-items:flex-start;
+}
+.js .feed-block{ opacity:0; transform:translateY(18px); transition:opacity .65s var(--ease), transform .65s var(--ease); }
+.js .feed-block.is-in{ opacity:1; transform:none; }
+.fh{ font-size:clamp(1.35rem,5.4vw,1.9rem); font-weight:200; letter-spacing:-0.02em; line-height:1.15; max-width:24ch; margin:0; }
+.fp{ font-size:0.95rem; font-weight:300; line-height:1.65; color:var(--ink-soft); max-width:54ch; }
+.fp.dim{ color:var(--mute); }
+.flist{ width:100%; display:flex; flex-direction:column; }
+.fitem{ display:flex; gap:14px; padding:13px 0; border-top:1px solid var(--line); }
+.flist .fitem:last-child{ border-bottom:1px solid var(--line); }
+.fitem .fn{ font-size:0.7rem; color:var(--mute); font-variant-numeric:tabular-nums; padding-top:4px; flex:0 0 20px; }
+.fitem .ft{ font-size:0.95rem; font-weight:400; line-height:1.35; }
+.fitem .fb{ font-size:0.83rem; font-weight:300; color:var(--mute); line-height:1.55; margin-top:3px; }
+.fmod{ padding:14px 0; border-top:1px solid var(--line); width:100%; }
+.fmod .k{ font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:var(--mute); }
+.fmod .t{ font-size:1.05rem; font-weight:400; margin-top:4px; }
+.fmod .d{ font-size:0.86rem; font-weight:300; color:var(--mute); line-height:1.55; margin-top:6px; }
+.fdata{ width:100%; display:flex; flex-direction:column; }
+.fdata .row{ display:flex; justify-content:space-between; align-items:baseline; gap:14px; padding:12px 0; border-top:1px solid var(--line); }
+.fdata .row .k{ font-size:0.82rem; font-weight:300; color:var(--mute); }
+.fdata .row .v{ font-size:0.92rem; font-weight:400; text-align:right; }
+.fprice{ font-size:clamp(2.4rem,10vw,3.2rem); font-weight:200; letter-spacing:-0.03em; line-height:1; }
+.fprice small{ font-size:0.85rem; font-weight:300; color:var(--mute); letter-spacing:0; margin-left:8px; }
+.fbio{ display:flex; gap:16px; align-items:flex-start; }
+.fbio img{ width:72px; height:72px; border-radius:50%; object-fit:cover; flex:0 0 auto; border:1px solid var(--line); }
+.feed details{ width:100%; border-top:1px solid var(--line); }
+.feed details:last-of-type{ border-bottom:1px solid var(--line); }
+.feed summary{
+  padding:14px 0; font-size:0.93rem; font-weight:400; cursor:pointer;
+  list-style:none; display:flex; justify-content:space-between; align-items:baseline; gap:12px;
+}
+.feed summary::-webkit-details-marker{ display:none; }
+.feed summary::after{ content:"+"; color:var(--mute); flex-shrink:0; }
+.feed details[open] summary::after{ content:"–"; }
+.feed details .ans{ font-size:0.88rem; font-weight:300; color:var(--mute); line-height:1.6; padding:0 0 16px; max-width:54ch; }
+
+</style>
+</head>
+<body>
+
+<header class="rp-head">
+  <button class="rp-back" id="rpBack" type="button"><span class="a">←</span> Voltar</button>
+  <span class="rp-title">Rádio Tinhosa</span>
+</header>
+
+<main class="rp-stage">
+        <div class="radio-screen">
+          <div class="sp-player">
+
+            <div class="sp-cards">
+              <!-- Card Podcast (ativo por padrão) -->
+              <div class="sp-card active" id="sp-card-podcast">
+                <div class="sp-card-bg">
+                  <img id="sp-art" src="https://i.scdn.co/image/ab67656300005f1f38ed43f487ec24cb455a9330"
+                       alt="Elaine Narcizo — podcast"
+                       onerror="this.onerror=null;this.src='../assets/bg-pattern.webp'" />
+                </div>
+                <div class="sp-card-grad"></div>
+                <div class="sp-card-type">Podcast</div>
+                <div class="sp-card-meta">
+                  <div class="sp-show" id="sp-artist">Elaine Narcizo</div>
+                  <div class="sp-ep" id="sp-now">Quando dizemos "parabéns"…</div>
+                </div>
+                <div class="sp-card-vert"><span>Podcast</span><span>Elaine lê</span></div>
+              </div>
+              <!-- Card DançaDestino (filete por padrão) -->
+              <div class="sp-card" id="sp-card-danca">
+                <div class="sp-card-bg">
+                  <img src="../assets/bg-pattern.webp" alt="DançaDestino" />
+                </div>
+                <div class="sp-card-grad"></div>
+                <div class="sp-card-type">Playlist · DançaDestino</div>
+                <div class="sp-card-meta">
+                  <div class="sp-show">DançaDestino</div>
+                  <div class="sp-ep" id="yt-now-title">Casaco Marron…</div>
+                </div>
+                <div class="sp-card-vert"><span>Playlist</span><span>DançaDestino</span></div>
+              </div>
+            </div>
+
+            <!-- embed YouTube (aparece ao clicar faixa no modo dança) -->
+            <div class="yt-embed" id="yt-embed">
+              <div id="yt-player"></div>
+            </div>
+
+            <div class="sp-list" id="sp-list"><!-- via JS --></div>
+            <div class="sp-bar">
+              <span class="sp-t" id="sp-cur">0:00</span>
+              <div class="sp-track" id="sp-track"><div class="sp-fill" id="sp-fill"></div></div>
+              <span class="sp-t rt" id="sp-dur">--:--</span>
+            </div>
+            <div class="sp-ctrls">
+              <button class="sp-ic" id="sp-shuffle" aria-label="Aleatório"><svg viewBox="0 0 24 24"><path d="M10.59 9.17 5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg></button>
+              <button class="sp-ic" id="sp-prev" aria-label="Anterior"><svg viewBox="0 0 24 24"><path d="M6 6H8V18H6Z M18 6V18L10 12Z"/></svg></button>
+              <button class="sp-play" id="sp-play" aria-label="Tocar"><svg class="ic-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><svg class="ic-pause" viewBox="0 0 24 24"><path d="M7 5h3.2v14H7zM13.8 5H17v14h-3.2z"/></svg></button>
+              <button class="sp-ic" id="sp-next" aria-label="Próximo"><svg viewBox="0 0 24 24"><path d="M6 6L14 12L6 18Z M16 6H18V18H16Z"/></svg></button>
+              <button class="sp-ic" id="sp-queue" aria-label="Informações do episódio"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+            </div>
+            <!-- painel de informações do episódio (☰) -->
+            <div class="sp-info" id="sp-info">
+              <button class="sp-info-x" id="sp-info-x" aria-label="Fechar">✕</button>
+              <span class="sp-info-eyebrow" id="sp-info-eyebrow">Sobre o episódio</span>
+              <h4 class="sp-info-title" id="sp-info-title"></h4>
+              <p class="sp-info-desc" id="sp-info-desc"></p>
+            </div>
+          </div>
+          <div class="sp-engine" id="sp-engine"></div>
+        </div>
+</main>
+
+<script>
+(function(){
+  /* Voltar: se o visitante veio da home, history.back() devolve exatamente
+     onde ele estava (a home restaura a posição salva). Se caiu aqui direto
+     — link compartilhado, aba nova — não há histórico, então manda pra home. */
+  var b=document.getElementById('rpBack');
+  if(b) b.addEventListener('click',function(){
+    if(history.length>1) history.back(); else location.href='../home-fluxo.html#radio';
+  });
+
+  /* YouTube track list */
+  var ytTracks=[
+    { id:'nAyXMqB_6Kc', title:'Casaco Marron (Bye, Bye, Ceci)', artist:'DançaDestino' },
+    { id:'AA_8wtG62DI', title:'Jokerman', artist:'Caetano Veloso' },
+    { id:'rLsP8NgS01Y', title:'Faixa 03', artist:'DançaDestino' }
+  ];
+  var ytEmbed=document.getElementById('yt-embed');
+  var ytCur=-1;
+  var spMode='podcast';
+  var spPlayerEl=document.querySelector('.sp-player');
+  var spCardPodcast=document.getElementById('sp-card-podcast');
+  var spCardDanca=document.getElementById('sp-card-danca');
+
+  function ytRenderInSpList(){
+    if(!spListEl) return;
+    spListEl.innerHTML='';
+    ytTracks.forEach(function(tr,i){
+      var row=document.createElement('div');
+      row.className='sp-row playable'+(i===ytCur?' live':'');
+      var n=document.createElement('span'); n.className='sp-n'; n.textContent=i===ytCur?'♪':String(i+1);
+      var ti=document.createElement('span'); ti.className='sp-ti'; ti.textContent=tr.title;
+      var du=document.createElement('span'); du.className='sp-du'; du.textContent=i===ytCur?'':'▶';
+      row.appendChild(n); row.appendChild(ti); row.appendChild(du);
+      row.addEventListener('click',function(){ ytPlayIndex(i); });
+      spListEl.appendChild(row);
+    });
+  }
+  function spSwitchMode(mode){
+    if(mode===spMode) return;
+    spMode=mode;
+    if(spCardPodcast) spCardPodcast.classList.toggle('active',mode==='podcast');
+    if(spCardDanca) spCardDanca.classList.toggle('active',mode==='danca');
+    if(spPlayerEl) spPlayerEl.classList.toggle('danca',mode==='danca');
+    if(spInfo) spInfo.classList.remove('on');
+    if(mode==='podcast'){
+      try{ if(ytPlayer&&ytPlayer.pauseVideo) ytPlayer.pauseVideo(); }catch(e){}
+      ytStopPoll();
+      spRender(); spMark();
+      spPlaying=!spAudio.paused; spSyncBtn();
+    } else {
+      try{ spAudio.pause(); }catch(e){}
+      ytPrewarm();              /* pré-aquece API + player + cue (1º play rápido) */
+      ytRenderInSpList();
+      spPlaying=ytIsPlaying(); spSyncBtn();
+    }
+  }
+  if(spCardDanca) spCardDanca.addEventListener('click',function(){ spSwitchMode('danca'); });
+  if(spCardPodcast) spCardPodcast.addEventListener('click',function(){ spSwitchMode('podcast'); });
+  /* swipe horizontal nos cards: distingue gesto de navegação (diagonal/vertical) */
+  var spCardsEl=document.querySelector('.sp-cards');
+  var _spTsX=0,_spTsY=0;
+  if(spCardsEl){
+    spCardsEl.addEventListener('touchstart',function(e){ _spTsX=e.touches[0].clientX; _spTsY=e.touches[0].clientY; },{passive:true});
+    spCardsEl.addEventListener('touchend',function(e){
+      var dx=e.changedTouches[0].clientX-_spTsX;
+      var dy=e.changedTouches[0].clientY-_spTsY;
+      if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)){
+        e.stopPropagation();
+        spSwitchMode(dx<0?'danca':'podcast');
+      }
+    });
+  }
+
+  /* ── DANÇADESTINO · YouTube IFrame Player API ──
+     vídeo VISÍVEL (controles nativos do YouTube ocultos); NOSSOS botões dirigem:
+     play/pause atuam no vídeo do YouTube; avançar/voltar/aleatório operam na
+     nossa playlist (ytTracks) carregando o vídeo certo. */
+  var ytPlayer=null, ytApiReady=false, ytApiLoading=false, ytReady=false, ytPendingIdx=null, ytPoll=null, ytLoadedId=null;
+  function ytLoadApi(){
+    if(ytApiReady||ytApiLoading) return;
+    ytApiLoading=true;
+    var prev=window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady=function(){
+      if(typeof prev==='function'){ try{ prev(); }catch(e){} }
+      ytApiReady=true; if(ytPendingIdx!=null||spMode==='danca') ytCreatePlayer();
+    };
+    var s=document.createElement('script'); s.src='https://www.youtube.com/iframe_api'; s.async=true;
+    document.body.appendChild(s);
+  }
+  function ytCreatePlayer(){
+    if(ytPlayer||!ytApiReady||!window.YT||!YT.Player||!document.getElementById('yt-player')) return;
+    ytPlayer=new YT.Player('yt-player',{
+      width:'100%', height:'100%',
+      playerVars:{ controls:0, rel:0, modestbranding:1, playsinline:1, fs:0, iv_load_policy:3 },
+      events:{
+        onReady:function(){ ytReady=true;
+          if(ytPendingIdx!=null){ var i=ytPendingIdx; ytPendingIdx=null; ytPlayIndex(i); }
+          else { var t=ytTracks[ytCur>=0?ytCur:0]; if(t){ try{ ytPlayer.cueVideoById(t.id); ytLoadedId=t.id; }catch(e){} } }
+        },
+        onStateChange:ytOnState
+      }
+    });
+  }
+  /* pré-aquece ao entrar no card da dança: API + player + cue da 1ª faixa */
+  function ytPrewarm(){
+    ytLoadApi();
+    if(ytApiReady) ytCreatePlayer();
+    if(ytPlayer&&ytReady&&!ytLoadedId){ var t=ytTracks[ytCur>=0?ytCur:0]; if(t){ try{ ytPlayer.cueVideoById(t.id); ytLoadedId=t.id; }catch(e){} } }
+  }
+  function ytIsPlaying(){ try{ return !!(ytPlayer&&ytPlayer.getPlayerState&&ytPlayer.getPlayerState()===1); }catch(e){ return false; } }
+  function ytOnState(e){
+    var S=window.YT&&YT.PlayerState; if(!S) return;
+    if(e.data===S.PLAYING){ spPlaying=true; spSyncBtn(); ytStartPoll(); }
+    else if(e.data===S.PAUSED){ spPlaying=false; spSyncBtn(); ytStopPoll(); }
+    else if(e.data===S.ENDED){ spPlaying=false; spSyncBtn(); ytStopPoll(); ytNext(); }
+  }
+  function ytStartPoll(){ if(!ytPoll) ytPoll=setInterval(ytTick,250); }
+  function ytStopPoll(){ if(ytPoll){ clearInterval(ytPoll); ytPoll=null; } }
+  function ytTick(){
+    if(!ytPlayer||!ytPlayer.getDuration) return;
+    var dur=ytPlayer.getDuration()||0, pos=ytPlayer.getCurrentTime()||0;
+    var fill=document.getElementById('sp-fill'); if(fill&&dur) fill.style.width=(100*pos/dur)+'%';
+    var c=document.getElementById('sp-cur'); if(c) c.textContent=spFmt(pos*1000);
+    var du=document.getElementById('sp-dur'); if(du) du.textContent=spFmt(dur*1000);
+  }
+  function ytMarkRows(){
+    if(!spListEl) return;
+    [].forEach.call(spListEl.children,function(r,j){
+      r.classList.toggle('live',j===ytCur);
+      var rn=r.querySelector('.sp-n'); if(rn) rn.textContent=j===ytCur?'♪':String(j+1);
+      var rd=r.querySelector('.sp-du'); if(rd) rd.textContent=j===ytCur?'':'▶';
+    });
+  }
+  function ytPlayIndex(i){
+    var tr=ytTracks[i]; if(!tr) return;
+    ytCur=i;
+    var ynt=document.getElementById('yt-now-title'); if(ynt) ynt.textContent=tr.title;
+    if(ytEmbed) ytEmbed.classList.add('on');
+    ytMarkRows();
+    if(!ytPlayer){ ytPendingIdx=i; ytLoadApi(); if(ytApiReady) ytCreatePlayer(); return; }
+    if(!ytReady){ ytPendingIdx=i; return; }
+    if(ytLoadedId===tr.id){ ytKick(); return; }  /* já engatilhada → play instantâneo */
+    ytLoadedId=tr.id; try{ ytPlayer.loadVideoById(tr.id); }catch(e){}
+  }
+  /* "chute": dá play e, se em ~350ms ainda não estiver tocando, dá um 2º play
+     (resolve o vídeo engatilhado que precisava de dois toques). Inofensivo se já tocar. */
+  function ytKick(){
+    try{ ytPlayer.playVideo(); }catch(e){}
+    setTimeout(function(){ try{ if(ytPlayer&&ytPlayer.getPlayerState&&ytPlayer.getPlayerState()!==1) ytPlayer.playVideo(); }catch(e){} },350);
+  }
+  function ytTogglePlay(){
+    /* nenhuma faixa ativada ainda → passa pelo ytPlayIndex (revela o vídeo + marca a faixa) */
+    if(!ytPlayer||!ytReady||ytCur<0){ ytPlayIndex(ytCur>=0?ytCur:0); return; }
+    if(ytIsPlaying()) ytPlayer.pauseVideo(); else ytKick();
+  }
+  function ytRandIdx(){ if(ytTracks.length<2) return ytCur<0?0:ytCur; var r; do{ r=Math.floor(Math.random()*ytTracks.length); }while(r===ytCur); return r; }
+  function ytPrev(){ if(!ytTracks.length) return; ytPlayIndex(spShuffle?ytRandIdx():((ytCur<=0?ytTracks.length:ytCur)-1)); }
+  function ytNext(){ if(!ytTracks.length) return; ytPlayIndex(spShuffle?ytRandIdx():(ytCur+1)%ytTracks.length); }
+
+  /* RÁDIO REMENDO · player "Elaine lê" — áudio nativo hospedado no Cloudflare R2.
+     17 episódios (voz da Elaine). Cada faixa é clicável; play/pause, prev/next
+     e barra de progresso funcionam de verdade. Durações carregam dos metadados. */
+  var R2='https://pub-f3ec44b3e1a04ea5a87f65ee49b7a81c.r2.dev/';
+  var spEpisodes=[
+    { title:'O Poder da Palavra', url:R2+'01_O%20Poder%20da%20Palavra.mp3' },
+    { title:'Salvação Não Se Discute', url:R2+'02_Salva%C3%A7%C3%A3o%20N%C3%A3o%20Se%20Discute.mp3' },
+    { title:'O Vício do Convencido', url:R2+'03_O%20V%C3%ADcio%20do%20Convencido.mp3' },
+    { title:'Curar Sem Resolver — A Dignidade do que Não Melhora', url:R2+'04_Curar%20Sem%20Resolver_A%20Dignidade%20do%20que%20N%C3%A3o%20Melhora.mp3' },
+    { title:'Curar Sem Resolver — Nomear o Cuidado', url:R2+'05_Curar%20Sem%20Resolver%20Sugest%C3%B5es%20Pr%C3%A1ticas_Nomear%20o%20Cuidado.mp3' },
+    { title:'Curar Sem Resolver — Territórios da Criatividade', url:R2+'06_Curar%20Sem%20Resolver_Territ%C3%B3rios%20da%20Criatividade%20Autenticidade%20e%20do%20Aprender.mp3' },
+    { title:'Pensando Sobre o Amor e a Finitude', url:R2+'07_Pensando%20Sobre%20o%20Amor%20e%20Finitude.mp3' },
+    { title:'Originar-se — Territórios de Formação', url:R2+'08_Originar-se_Territ%C3%B3rios%20de%20Forma%C3%A7%C3%A3o.mp3' },
+    { title:'A Tristeza Aleatória', url:R2+'09_A%20Tristeza%20Aleat%C3%B3ria.mp3' },
+    { title:'Não Desista', url:R2+'10_N%C3%A3o%20desista.mp3' },
+    { title:'Reescrevendo o Agora', url:R2+'11_Reescrevendo%20o%20Agora.mp3' },
+    { title:'Deserção das Lágrimas', url:R2+'12_Deser%C3%A7%C3%A3o%20das%20Lagrimas.mp3' },
+    { title:'Atenção, 2026 — Realidade', url:R2+'13_Aten%C3%A7%C3%A3o%202026_Realidade.mp3' },
+    { title:'Descanso e Mulheres', url:R2+'14_Descanso%20e%20Mulheres.mp3' },
+    { title:'Você Responde Perguntas que Não Escolheu', url:R2+'15_Voc%C3%AA%20Responde%20Perguntas%20que%20n%C3%A3o%20Escolheu.mp3' },
+    { title:'O Ridículo pode Salvar Mulheres', url:R2+'16_O%20Rid%C3%ADculo%20pode%20Salvar%20Mulheres.mp3' },
+    { title:'Dia das Mulheres — Estamos Celebrando Exatamente o Quê?', url:R2+'17_Dia%20das%20Mulheres_Estamos%20Celebrando%20Exatamente%20o%20Que.mp3' }
+  ];
+  var spListEl=document.getElementById('sp-list');
+  var spNowEl=document.getElementById('sp-now');
+  var spPlayBtn=document.getElementById('sp-play');
+  var spPrevBtn=document.getElementById('sp-prev');
+  var spNextBtn=document.getElementById('sp-next');
+  var spShufBtn=document.getElementById('sp-shuffle');
+  var spQueueBtn=document.getElementById('sp-queue');
+  var spInfo=document.getElementById('sp-info');
+  var spInfoEyebrow=document.getElementById('sp-info-eyebrow');
+  var spInfoTitle=document.getElementById('sp-info-title');
+  var spInfoDesc=document.getElementById('sp-info-desc');
+  var spInfoX=document.getElementById('sp-info-x');
+  var spTrackEl=document.getElementById('sp-track');
+  var spArtEl=document.getElementById('sp-art');
+  var spArtistEl=document.getElementById('sp-artist');
+  var spCoverEl=spArtEl?spArtEl.parentNode:null;
+  var spCur=0, spPlaying=false, spShuffle=false;
+  /* paleta de cores puras do site (fallback de capa) */
+  var spPalette=['#E87A32','#6C4BB6','#A8B73F','#F5D731','#C9006A'];
+  function spFmt(ms){ ms=Math.max(0,ms||0); var t=Math.floor(ms/1000),m=Math.floor(t/60),s=t%60; return m+':'+(s<10?'0'+s:s); }
+  /* só as 3 primeiras palavras (+…); opcionalmente preserva o emoji do início */
+  function spTrim(t,keepEmoji){
+    var s=String(t).trim(), emoji='', m=s.match(/^📢\s*/);
+    if(m){ emoji='📢'; s=s.slice(m[0].length); }
+    var w=s.split(/\s+/).filter(Boolean), head=w.slice(0,3).join(' ');
+    if(w.length>3) head+='…';
+    return (keepEmoji&&emoji) ? emoji+' '+head : head;
+  }
+  /* regra de capa: tem capa → usa; não tem → cor pura da paleta (estável por índice) */
+  function spApplyCover(ep,i){
+    if(!spArtEl||!spCoverEl) return;
+    if(ep&&ep.cover){ spArtEl.src=ep.cover; spArtEl.classList.remove('hidden'); spCoverEl.style.background=''; }
+    else{ spArtEl.classList.add('hidden'); spCoverEl.style.background=spPalette[i%spPalette.length]; }
+  }
+  function spMark(){
+    var ep=spEpisodes[spCur];
+    if(spListEl) [].forEach.call(spListEl.children,function(row,i){
+      row.classList.toggle('live',i===spCur);
+      var n=row.querySelector('.sp-n'); if(n) n.textContent = i===spCur ? '♪' : String(i+1);
+    });
+    if(spArtistEl) spArtistEl.textContent=(ep&&ep.artist)||'Elaine Narcizo';
+    if(spNowEl&&ep) spNowEl.textContent=ep.title;
+    spApplyCover(ep,spCur);
+    spFillInfo();
+  }
+  function spFillInfo(){
+    var ep=spEpisodes[spCur]; if(!ep) return;
+    if(spInfoEyebrow) spInfoEyebrow.textContent='Sobre o episódio';
+    if(spInfoTitle) spInfoTitle.textContent=ep.title;
+    if(spInfoDesc){
+      var has=ep.desc&&String(ep.desc).trim();
+      spInfoDesc.textContent= has ? ep.desc : 'A descrição deste episódio chega em breve.';
+      spInfoDesc.classList.toggle('empty',!has);
+    }
+  }
+  function ytFillInfo(){
+    if(spInfoEyebrow) spInfoEyebrow.textContent='Sobre o ritual';
+    if(spInfoTitle) spInfoTitle.textContent='DançaDestino';
+    if(spInfoDesc){
+      spInfoDesc.classList.remove('empty');
+      spInfoDesc.textContent='Toda sexta, às 20h, cada pessoa aperta o play no mesmo momento e dança onde estiver — sem câmeras, sem plateia. Só o movimento e a sensação de fazer parte de algo maior, mesmo à distância.';
+    }
+  }
+  function spPlayIndex(i){
+    var ep=spEpisodes[i]; if(!ep) return;
+    if(i===spCur){ if(spAudio.paused) spAudio.play().catch(noop); else spAudio.pause(); return; }
+    spCur=i; spMark();
+    spAudio.src=ep.url;
+    var du=document.getElementById('sp-dur'); if(du) du.textContent= ep.durSec ? spFmt(ep.durSec*1000) : '--:--';
+    var c=document.getElementById('sp-cur'); if(c) c.textContent='0:00';
+    var fill=document.getElementById('sp-fill'); if(fill) fill.style.width='0%';
+    spAudio.play().catch(noop);
+  }
+  function noop(){}
+  function spRandIdx(){ if(spEpisodes.length<2) return spCur; var r; do{ r=Math.floor(Math.random()*spEpisodes.length); }while(r===spCur); return r; }
+  function spPrev(){ if(!spEpisodes.length) return; spPlayIndex(spShuffle?spRandIdx():(spCur-1+spEpisodes.length)%spEpisodes.length); }
+  function spNext(){ if(!spEpisodes.length) return; spPlayIndex(spShuffle?spRandIdx():(spCur+1)%spEpisodes.length); }
+  function spSyncBtn(){ if(spPlayBtn){ spPlayBtn.classList.toggle('playing',spPlaying); spPlayBtn.setAttribute('aria-label',spPlaying?'Pausar':'Tocar'); } }
+  function spUpdateRowDur(i){
+    if(!spListEl||!spListEl.children[i]) return;
+    var ep=spEpisodes[i], du=spListEl.children[i].querySelector('.sp-du');
+    if(du&&ep&&ep.durSec) du.textContent=spFmt(ep.durSec*1000);
+  }
+  function spRender(){
+    if(!spListEl) return;
+    spListEl.innerHTML='';
+    spEpisodes.forEach(function(ep,i){
+      var row=document.createElement('div');
+      row.className='sp-row playable'+(i===spCur?' live':'');
+      var n=document.createElement('span'); n.className='sp-n'; n.textContent = i===spCur ? '♪' : String(i+1);
+      var ti=document.createElement('span'); ti.className='sp-ti'; ti.textContent=ep.title;
+      var du=document.createElement('span'); du.className='sp-du'; du.textContent= ep.durSec ? spFmt(ep.durSec*1000) : '▶';
+      row.appendChild(n); row.appendChild(ti); row.appendChild(du);
+      row.addEventListener('click',function(){ spPlayIndex(i); });
+      spListEl.appendChild(row);
+    });
+  }
+  /* motor de áudio nativo (Cloudflare R2) — substitui o Spotify IFrame API */
+  var spAudio=new Audio(); spAudio.preload='metadata';
+  if(spEpisodes[0]) spAudio.src=spEpisodes[0].url;
+  spAudio.addEventListener('loadedmetadata',function(){
+    var ep=spEpisodes[spCur]; if(ep) ep.durSec=spAudio.duration||0;
+    var du=document.getElementById('sp-dur'); if(du) du.textContent=spFmt((spAudio.duration||0)*1000);
+    spUpdateRowDur(spCur);
+  });
+  spAudio.addEventListener('timeupdate',function(){
+    var pos=spAudio.currentTime||0, dur=spAudio.duration||0;
+    var fill=document.getElementById('sp-fill'); if(fill&&dur) fill.style.width=(100*pos/dur)+'%';
+    var c=document.getElementById('sp-cur'); if(c) c.textContent=spFmt(pos*1000);
+  });
+  spAudio.addEventListener('play',function(){ spPlaying=true; spSyncBtn(); });
+  spAudio.addEventListener('pause',function(){ spPlaying=false; spSyncBtn(); });
+  spAudio.addEventListener('ended',function(){ spNext(); });
+  /* preenche as durações da lista em segundo plano (sequencial, sem rajada) */
+  function spPreloadDurations(){
+    var i=0, a=new Audio(); a.preload='metadata';
+    (function step(){
+      if(i>=spEpisodes.length) return;
+      if(spEpisodes[i].durSec){ i++; return step(); }
+      a.onloadedmetadata=function(){ spEpisodes[i].durSec=a.duration||0; spUpdateRowDur(i); i++; step(); };
+      a.onerror=function(){ i++; step(); };
+      a.src=spEpisodes[i].url;
+    })();
+  }
+  if(spListEl){
+    spRender();
+    spMark();
+    if(spPlayBtn) spPlayBtn.addEventListener('click',function(){
+      if(spMode==='podcast'){ if(spAudio.paused) spAudio.play().catch(noop); else spAudio.pause(); }
+      else ytTogglePlay();
+    });
+    if(spPrevBtn) spPrevBtn.addEventListener('click',function(){ spMode==='podcast'?spPrev():ytPrev(); });
+    if(spNextBtn) spNextBtn.addEventListener('click',function(){ spMode==='podcast'?spNext():ytNext(); });
+    if(spShufBtn) spShufBtn.addEventListener('click',function(){   /* aleatório vale p/ os dois modos */
+      spShuffle=!spShuffle; spShufBtn.classList.toggle('on',spShuffle);
+      spShufBtn.setAttribute('aria-label', spShuffle?'Aleatório ligado':'Aleatório');
+    });
+    if(spQueueBtn) spQueueBtn.addEventListener('click',function(){
+      if(spMode==='podcast') spFillInfo(); else ytFillInfo();
+      if(spInfo) spInfo.classList.toggle('on');
+    });
+    if(spInfoX) spInfoX.addEventListener('click',function(){ if(spInfo) spInfo.classList.remove('on'); });
+    if(spTrackEl) spTrackEl.addEventListener('click',function(ev){
+      var r=spTrackEl.getBoundingClientRect();
+      var frac=Math.max(0,Math.min(1,(ev.clientX-r.left)/r.width));
+      if(spMode==='podcast'){ var dur=spAudio.duration||0; if(dur) spAudio.currentTime=frac*dur; }
+      else if(ytPlayer&&ytReady&&ytPlayer.getDuration){ var d=ytPlayer.getDuration()||0; if(d) ytPlayer.seekTo(frac*d,true); }
+    });
+    setTimeout(spPreloadDurations,1200);
+  }
+
+  /* revelação dos blocos do feed conforme rolam */
+  [].forEach.call(document.querySelectorAll('.feed-scroll'),function(fs){
+    var fio=new IntersectionObserver(function(es){
+      es.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('is-in'); fio.unobserve(en.target); } });
+    },{ root:fs, threshold:0.15 });
+    [].forEach.call(fs.querySelectorAll('.feed-block'),function(b){ fio.observe(b); });
+  });
+
+})();
+</script>
+</body>
+</html>

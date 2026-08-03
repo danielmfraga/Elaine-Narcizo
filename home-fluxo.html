@@ -230,8 +230,11 @@ main{ position:relative; }
   min-height:100svh; padding:0; display:flex; flex-direction:column;
   background:radial-gradient(ellipse 88% 52% at 50% 72%, #f4e9e1 0%, var(--paper) 68%);
 }
-.s-radio .radio-video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; pointer-events:none;
-  transform:translateX(-15px); }  /* cola o vídeo na aba lateral; a faixa que sobra à direita fica sob a aba (30px) */
+/* o vídeo cola na aba lateral por `left` (NÃO por transform: o transform é
+   do parallax, aplicado pelo paint()) e leva 14vh de SOBRA de altura, igual
+   ao vídeo da capa — é ela que ele consome ao deslizar sem descobrir a base */
+.s-radio .radio-video{ position:absolute; left:-15px; top:0; width:calc(100% + 15px); height:calc(100% + 14vh);
+  object-fit:cover; z-index:0; pointer-events:none; will-change:transform; }
 .s-radio::after{ content:''; position:absolute; inset:0; z-index:1; pointer-events:none; background:rgba(255,255,255,.14); }
 .s-radio .radio-inner{ position:relative; z-index:2; flex:1; display:flex; align-items:center; justify-content:center; padding:0 var(--pad); }
 /* botão SINTONIZE — chamada principal, pulsante */
@@ -296,6 +299,14 @@ main{ position:relative; }
 .tm-sub{ font-size:clamp(1rem,4.4vw,1.2rem); font-weight:700; color:var(--ink); margin:6px 0 10px; }
 .tm-body{ font-size:clamp(.92rem,3.9vw,1.05rem); line-height:1.6; color:rgba(15,14,12,.78); margin-bottom:34px; }
 @media(prefers-reduced-motion:reduce){ .btn-tune,.btn-tune::before,.btn-tune::after,.tt-txt{ animation:none; } }
+/* SUBABA da rádio: assenta cobrindo a tela, conteúdo centralizado (texto,
+   2 números e o Sintonize). O botão perde o translateY(80px) que existe só
+   pra afastá-lo do texto DENTRO do vídeo da capa. */
+.s-radio-sub{ min-height:100svh; display:flex; align-items:center; }
+.s-radio-sub .stats{ grid-template-columns:repeat(2,1fr); max-width:520px; }
+.s-radio-sub .btn-tune{ transform:none; margin-top:clamp(22px,4vh,38px); }
+.s-radio-sub .btn-tune.r{ transform:translateY(26px); }         /* estado inicial da revelação */
+.js .in .s-radio-sub .btn-tune.r{ transform:none; }             /* revelado */
 
 /* ── slot de VÍDEO (marcação visível — a referência é toda vídeo) ── */
 .vph{
@@ -891,14 +902,16 @@ main{ position:relative; }
   </div>
 
   <!-- ══ RÁDIO TINHOSA — seção trazida da home-mapa (ago/2026) ══
-       Sobe por cima do "Quem sou eu" (pinado) com a transição padrão.
+       Sobe por cima do "Quem sou eu" (pinado) com a transição padrão e
+       ela mesma leva `pin`: TRAVA na tela e a subaba de baixo sobe por
+       cima dela (o mesmo empilhamento da referência houseofyellow).
        Sem classes .r de propósito, igual à original: a capa da rádio não
        depende da revelação por scroll pra ficar visível. -->
-  <section class="sheet w s-radio" id="radio">
+  <section class="sheet w s-radio pin" id="radio">
     <video class="radio-video" src="assets/radio-capa.mp4"
            autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
     <div class="radio-inner">
-      <a class="btn-tune" href="#" data-todo="página/player da rádio">Sintonize <span class="ar">→</span></a>
+      <a class="btn-tune" href="radio/">Sintonize <span class="ar">→</span></a>
     </div>
 
     <!-- aba lateral: abre o manifesto -->
@@ -937,24 +950,26 @@ main{ position:relative; }
         <h4 class="tm-sub">O que você encontra na Rádio Tinhosa:</h4>
         <p class="tm-body">Uma programação de podcasts, playlists e programas que escutam o mundo sem encerrá-lo em uma sentença, observando e fazendo companhia ao que nele ainda insiste em viver.</p>
 
-        <a class="btn-tune" href="#" data-todo="página/player da rádio">Sintonize <span class="ar">→</span></a>
+        <a class="btn-tune" href="radio/">Sintonize <span class="ar">→</span></a>
       </div>
     </div>
   </section>
 
-  <!-- números da rádio (contadores animados) — preservados do esboço que a
-       seção real substituiu -->
-  <div class="sheet w">
+  <!-- SUBABA da rádio: sobe por cima da Rádio Tinhosa (que está pinada) e
+       assenta mostrando toda a informação — texto, os 2 números e o
+       Sintonize. Fecha a cena; a próxima seção entra quando o Daniel
+       passar o conteúdo, seguindo a mesma receita do .pin. -->
+  <div class="sheet w s-radio-sub">
     <div class="wrap">
-      <p class="manif in-io r" style="--r:0">Uma programação de podcasts, playlists e programas que
-        <b>escutam o mundo sem encerrá-lo em uma sentença</b> — fazendo companhia ao que nele
-        ainda insiste em viver.</p>
+      <p class="manif in-io r" style="--r:0">Textos em áudio, podcasts e playlists para cultivar a
+        <b>teimosia da alegria</b>, a esperteza de cuidar do que importa e a confiança na vida.</p>
       <div class="stats in-io">
         <!-- números reais do projeto; ajustar quando os feeds crescerem -->
         <div class="stat-b r" style="--r:0"><b data-count="17">0</b><span>Episódios no podcast</span></div>
-        <div class="stat-b r" style="--r:1"><b data-count="35">0</b><span>Semanas de ritual</span></div>
-        <div class="stat-b r" style="--r:2"><b data-count="2">0</b><span>Programas no ar</span></div>
-        <div class="stat-b r" style="--r:3"><b data-count="8">0</b><span>Cartazes do manifesto</span></div>
+        <div class="stat-b r" style="--r:1"><b data-count="43">0</b><span>Semanas de ritual</span></div>
+      </div>
+      <div class="in-io">
+        <a class="btn-tune r" style="--r:2" href="radio/">Sintonize <span class="ar">→</span></a>
       </div>
     </div>
   </div>
@@ -1280,7 +1295,7 @@ main{ position:relative; }
      capa, a foto no Quem-sou-eu. Sem elemento seguinte, o filter de `next`
      descarta e nada roda (seguro adicionar .pin antes da próxima existir). */
   var covers=[].slice.call(document.querySelectorAll('.cover,.sheet.pin')).map(function(c){
-    return { el:c, next:c.nextElementSibling, bg:c.querySelector('.hero-bg,.portrait img') };
+    return { el:c, next:c.nextElementSibling, bg:c.querySelector('.hero-bg,.radio-video,.portrait img') };
   }).filter(function(c){ return c.next; });
   var vh=innerHeight, ticking=false;
   addEventListener('resize',function(){ vh=innerHeight; },{passive:true});
