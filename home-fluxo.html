@@ -1415,22 +1415,33 @@ main{ position:relative; }
         }
         c.lift=lift;
         c.el.style.transform='translate3d(0,'+(-lift).toFixed(2)+'px,0)';
-        c.dim.style.opacity=(p*.35).toFixed(3);
+        /* `noLift` = trava DE VERDADE (pedido do Daniel: "dar a trancadinha"),
+           não só o bloco inteiro — o escurecimento e o parallax do vídeo por
+           dentro dele PARAM junto, senão o botão (parte do bloco, sem
+           transform próprio) fica parado enquanto o vídeo desliza sozinho
+           (dessincroniza os dois) e o véu preto progressivo (dim) soma com o
+           véu branco estático da capa, deixando o vídeo "fosco" mesmo com o
+           bloco visualmente parado. Só quando NÃO é noLift (capa/quem, que
+           saem de cena de verdade) o escurecimento faz sentido. */
+        c.dim.style.opacity=c.noLift?'0':(p*.35).toFixed(3);
 
         /* ── PARALLAX DO VÍDEO/FOTO (pedido do Daniel) ──
            Desliza POR DENTRO da capa, além do movimento dela (quando tem):
            some os dois e o bg anda ~7vh enquanto a lâmina anda 100vh — é
            isso que dá a leitura de profundidade (a lâmina "revela" o bg
-           deslizando atrás). Continua rodando mesmo com `noLift` (a Rádio
-           não sobe sozinha, mas o vídeo dela ainda ganha profundidade).
-           Curva = smoothstep q²(3-2q), normalizada em 55%: velocidade E
-           aceleração nascem e terminam em zero → parada orgânica, sem
-           travamento. Amplitude .091 casada com a sobra de 14vh no CSS
-           do bg — são um PAR: mexeu numa, mexe na outra ou o vão volta
-           por dentro da capa. */
+           deslizando atrás). Curva = smoothstep q²(3-2q), normalizada em
+           55%: velocidade E aceleração nascem e terminam em zero → parada
+           orgânica, sem travamento. Amplitude .091 casada com a sobra de
+           14vh no CSS do bg — são um PAR: mexeu numa, mexe na outra ou o
+           vão volta por dentro da capa. Some com `noLift` (ver acima):
+           enquanto a Rádio está "parada", o vídeo por dentro dela também
+           não se move — só a PRÓXIMA seção (subaba) tem parallax vivo. */
         if(c.bg){
-          var qv=Math.min(p/.55,1);
-          var vlift=.091*vh*(qv*qv*(3-2*qv));
+          var vlift=0;
+          if(!c.noLift){
+            var qv=Math.min(p/.55,1);
+            vlift=.091*vh*(qv*qv*(3-2*qv));
+          }
           c.bg.style.transform='translate3d(0,'+(-vlift).toFixed(2)+'px,0)';
         }
       }
