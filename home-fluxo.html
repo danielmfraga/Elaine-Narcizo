@@ -26,7 +26,10 @@ if(!window.enVoltou) scrollTo(0,0);
 <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Space+Mono:wght@400;700&family=Amatic+SC:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<!-- DM Sans (COM itálico) entrou pela capa de Formações: é a fonte da
+     /repertorios-sensiveis, e o título "Forma+ções" depende do par
+     romano/itálico do mesmo desenho pra funcionar. -->
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Space+Mono:wght@400;700&family=Amatic+SC:wght@400;700&family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,200..400;1,9..40,200..400&display=swap" rel="stylesheet">
 
 <style>
 /* ═════════════════════════════════════════════════════════════
@@ -65,6 +68,7 @@ if(!window.enVoltou) scrollTo(0,0);
 
   --disp:"Archivo",sans-serif;      /* display: pesado e expandido */
   --mono:"Space Mono",ui-monospace,monospace;
+  --sans:"DM Sans",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;  /* leve/editorial — vem da /repertorios-sensiveis, usada na capa de Formações */
   --ease:cubic-bezier(.22,.61,.36,1);
 
   --btnw:clamp(150px,44vw,206px);   /* largura dos botões-letreiro (o selo se ancora por ela) */
@@ -368,16 +372,83 @@ main{ position:relative; }
 .tm-sub{ font-size:clamp(1rem,4.4vw,1.2rem); font-weight:700; color:var(--ink); margin:6px 0 10px; }
 .tm-body{ font-size:clamp(.92rem,3.9vw,1.05rem); line-height:1.6; color:rgba(15,14,12,.78); margin-bottom:34px; }
 @media(prefers-reduced-motion:reduce){ .btn-tune,.btn-tune::before,.btn-tune::after,.tt-txt{ animation:none; } }
-/* SUBABA da rádio: fluxo normal (herda o padding padrão de .sheet), SEM
-   forçar 100svh+centralização — isso deixava espaço vazio sobrando em
-   cima e embaixo (o conteúdo é curto: 1 parágrafo + 2 números + 1 botão).
+/* SUBABA da rádio: conteúdo no TOPO, em fluxo normal (herda o padding de
+   .sheet) — nunca centralizado, que era o que deixava espaço vazio sobrando
+   em cima E embaixo (o conteúdo é curto: 1 parágrafo + 2 números + 1 botão).
+   ⚠️ MAS ela precisa de altura de tela cheia, porque agora ela é `pin`: a
+   capa de Formações sobe POR CIMA dela. Se ela fosse mais baixa que a tela,
+   a faixa entre a base dela e o topo da Formações que sobe mostraria a
+   RÁDIO (que fica presa em top:0 atrás da cena inteira) reaparecendo no
+   meio da transição. O vazio de baixo é justamente o que a Formações come
+   primeiro, então na prática não sobra buraco à vista.
    O botão perde o translateY(80px) que existe só na capa (pra não cair
    sobre o texto DENTRO do vídeo — aqui não tem vídeo atrás). */
+.s-radio-sub{ min-height:100svh; }
 .s-radio-sub .stats{ grid-template-columns:repeat(2,1fr); max-width:520px; }
 .s-radio-sub .btn-tune{ transform:none; margin-top:clamp(18px,3.4vh,32px); }
 .s-radio-sub .btn-tune.r{ transform:translateY(26px); }         /* estado inicial da revelação */
 .js .in .s-radio-sub .btn-tune.r{ transform:none; }             /* revelado */
 .btn-center{ display:flex; justify-content:center; }            /* centraliza o Sintonize (pedido do Daniel) */
+
+/* ═══ FORMAÇÕES — a CAPA (ago/2026) ══════════════════════════════════════
+   Referência: a hero da /repertorios-sensiveis. ⚠️ Só a CAPA — o Daniel foi
+   explícito que o CONTEÚDO daquela página não entra aqui.
+   Entra na cadeia pela receita do `.pin`: a subaba da Rádio (logo acima)
+   ganhou `pin`, esta lâmina vem logo depois na MESMA .scene e sobe por cima.
+   Fundo BRANCO PURO (#fff) — pedido do Daniel, e é o `--paper` da referência.
+   Não usar a classe `.w`, que é o creme #F3EEE0 da casa. */
+.s-form{
+  background:#fff;
+  position:relative; overflow:hidden;
+  min-height:100svh;
+  /* topo generoso é o que abre espaço pra bola, igual ao mobile da
+     referência (lá: padding-top clamp(220px,60vw,280px)) */
+  padding:clamp(220px,60vw,280px) var(--pad) clamp(56px,10vh,96px);
+}
+/* ── O CÍRCULO (`.stamp` da referência), na configuração MOBILE ──
+   O Daniel pediu explicitamente a versão mobile, que é a já calibrada:
+   58vw (teto 230px), top 58px, sangrando um pouco pela direita.
+   Os 2 efeitos originais vieram junto:
+     · stampAppear — abre por clip-path, de círculo 0% a 75% (1.6s, uma vez)
+     · stampDrift  — flutua devagar, girando de -8° a -5° e subindo 11px (9s)
+   ⚠️ o `transform` estático de rotate(-8deg) da referência NÃO é declarado
+   aqui de propósito: quem manda no transform é o stampDrift, e declarar os
+   dois faria a animação sobrescrever o estático de qualquer jeito. */
+.s-form .stamp{
+  position:absolute; z-index:0; pointer-events:none;
+  top:58px; right:clamp(-16px,-3vw,-8px);
+  width:58vw; max-width:230px;
+  aspect-ratio:1; border-radius:50%;
+  background:url("assets/formacoes-stamp.webp") center/cover no-repeat;
+  opacity:.92;
+  animation:stampAppear 1.6s cubic-bezier(.1,0,.2,1) .3s both,
+            stampDrift  9s  ease-in-out 1.9s infinite;
+}
+@keyframes stampAppear{ from{ clip-path:circle(0% at 50% 50%); } to{ clip-path:circle(75% at 50% 50%); } }
+@keyframes stampDrift{ 0%,100%{ transform:rotate(-8deg) translateY(0); } 50%{ transform:rotate(-5deg) translateY(-11px); } }
+.s-form .wrap{ position:relative; z-index:1; }
+/* ── TÍTULO: "Forma" romano + "ções" itálico ──
+   A referência marca UMA palavra em itálico ("Repertórios <em>Sensíveis</em>").
+   Como aqui o título é uma palavra só, o Daniel escolheu partir a própria
+   palavra — os dois pedaços ficam colados (sem espaço no HTML), então lê como
+   uma palavra com duas texturas. DM Sans 200/300, tracking negativo. */
+.s-form .form-title{
+  font-family:var(--sans);
+  font-weight:200; letter-spacing:-.035em; line-height:.98;
+  font-size:clamp(3rem,17vw,6.5rem);   /* "grande, não enorme" */
+  color:var(--ink); margin:0;
+}
+.s-form .form-title em{ font-style:italic; font-weight:300; }
+/* ── SUBTÍTULO (a `.lede` da referência) ── */
+.s-form .form-lede{
+  font-family:var(--sans); font-weight:300;
+  font-size:clamp(1.05rem,4.3vw,1.3rem); line-height:1.5;
+  color:rgba(15,14,12,.78); max-width:34ch;
+  margin-top:clamp(20px,3.6vh,34px);
+  text-wrap:pretty;
+}
+/* o olho [04] usa a mono da casa; DM Sans fica só no título+subtítulo */
+.s-form .idx{ margin-bottom:clamp(20px,3.4vh,30px); }
 
 /* ── slot de VÍDEO (marcação visível — a referência é toda vídeo) ── */
 .vph{
@@ -1040,7 +1111,9 @@ main{ position:relative; }
        assenta mostrando toda a informação — texto, os 2 números e o
        Sintonize. Fecha a cena; a próxima seção entra quando o Daniel
        passar o conteúdo, seguindo a mesma receita do .pin. -->
-  <div class="sheet w s-radio-sub">
+  <!-- `pin`: esta subaba TRAVA e a capa de Formações sobe por cima dela —
+       o mesmo empilhamento das transições anteriores (receita do .pin). -->
+  <div class="sheet w s-radio-sub pin">
     <div class="wrap">
       <p class="manif in-io r" style="--r:0">Textos em áudio, podcasts e playlists para cultivar a
         <b>teimosia da alegria</b>, a esperteza de cuidar do que importa e a confiança na vida.</p>
@@ -1052,6 +1125,21 @@ main{ position:relative; }
       <div class="in-io btn-center">
         <a class="btn-tune r" style="--r:2" href="radio/">Sintonize <span class="ar">→</span></a>
       </div>
+    </div>
+  </div>
+
+  <!-- ══ FORMAÇÕES — capa (ago/2026) ══
+       Sobe por cima da subaba da Rádio (que está `pin`), com a mesma
+       transição das outras. Layout vem da hero da /repertorios-sensiveis:
+       bola no topo-direito + título grande + subtítulo. Só a capa por
+       enquanto — o conteúdo da seção vem depois. -->
+  <div class="sheet s-form" id="formacoes">
+    <span class="stamp" aria-hidden="true"></span>
+    <div class="wrap">
+      <span class="idx r in-io" style="--r:0">[04] — Formações</span>
+      <!-- "Forma" + "ções" colados (sem espaço): uma palavra, duas texturas -->
+      <h2 class="form-title r in-io" style="--r:1">Forma<em>ções</em></h2>
+      <p class="form-lede r in-io" style="--r:2">Propostas formativas para ampliar repertórios e transformar práticas.</p>
     </div>
   </div>
   </div><!-- /scene 1 -->
@@ -1153,7 +1241,11 @@ main{ position:relative; }
        contadores foram preservados lá. "Como eu trabalho" segue nesta cena. -->
 
   <!-- ══ COMO EU TRABALHO — o "How we roll" (3 cards de serviço) ══ -->
-  <div class="sheet w" id="formacoes">
+  <!-- id renomeado pra `como-trabalho` (ago/2026): o `#formacoes` passou a
+       ser a capa de Formações, na cena 1. Os 3 links do site rotulados
+       "Formações" (menu, botão do Quem-sou-eu e rodapé) apontavam pra cá e
+       agora apontam pra seção certa. -->
+  <div class="sheet w" id="como-trabalho">
     <div class="wrap">
       <span class="idx r in-io" style="--r:0">[03] — Como eu trabalho</span>
       <h2 class="big split r in-io" style="--r:1">Escuto primeiro. Crio <em style="color:transparent;-webkit-text-stroke:1.5px currentColor">com</em> você.</h2>
