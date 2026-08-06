@@ -384,13 +384,10 @@ main{ position:relative; }
    O botão perde o translateY(80px) que existe só na capa (pra não cair
    sobre o texto DENTRO do vídeo — aqui não tem vídeo atrás). */
 .s-radio-sub{
-  /* PISTA da entrada lenta (`data-slow="0.5"` no HTML): subir a metade da
-     velocidade exige o DOBRO de rolagem pra cruzar a tela, e é esta margem
-     que fornece o extra — a fórmula é `vh * (1/slow - 1)`, que pra .5 dá
-     100svh. ⚠️ Margem e `data-slow` são um PAR: mudar a velocidade sem
-     mudar a margem faz a lâmina entrar na tela no momento errado.
-     O espaço não aparece vazio: a Rádio está presa em top:0 atrás dele. */
-  margin-top:100svh;
+  /* ⚠️ Aqui morava a PISTA da entrada lenta (`margin-top:100svh`, par do
+     `data-slow="0.5"`). Saiu junto com ela — sem `data-slow` esta margem
+     só empurraria a lâmina 100svh pra baixo, deixando um trecho de Rádio
+     parada à toa. Se a entrada lenta voltar, as DUAS voltam juntas. */
   /* todo o conjunto (texto + números + botão) sobe 20px */
   padding-top:calc(clamp(44px,9vh,110px) - 20px);
   /* embaixo do botão fica a MESMA medida que existe entre "semanas de
@@ -1128,11 +1125,9 @@ main{ position:relative; }
        passar o conteúdo, seguindo a mesma receita do .pin. -->
   <!-- `pin`: esta subaba TRAVA e a capa de Formações sobe por cima dela —
        o mesmo empilhamento das transições anteriores (receita do .pin).
-       `data-slow="0.5"`: ela sobe sobre o vídeo travado da Rádio a METADE da
-       velocidade do dedo (pedido do Daniel). Depende do `margin-top:100svh`
-       no CSS, que é a pista extra que essa lentidão consome — mexer num sem
-       o outro desalinha a entrada. -->
-  <div class="sheet w s-radio-sub pin" data-slow="0.5">
+       ⚠️ O `data-slow="0.5"` (subida a meia velocidade) foi DESLIGADO aqui:
+       tremia no iPhone. Ver o porquê no bloco ENTRADA LENTA do paint(). -->
+  <div class="sheet w s-radio-sub pin">
     <div class="wrap">
       <p class="manif in-io r" style="--r:0">Textos em áudio, podcasts e playlists para cultivar a
         <b>teimosia da alegria</b>, a esperteza de cuidar do que importa e a confiança na vida.</p>
@@ -1542,9 +1537,26 @@ main{ position:relative; }
       var c=r.c, top=r.top;
       var p=Math.min(Math.max(1-top/vh,0),1);      /* 0 = ainda embaixo · 1 = cobriu */
 
-      /* ═══ ENTRADA LENTA (só lâminas com data-slow) ═══════════════════════
-         Pedido do Daniel pra subaba da Rádio: ela deve subir sobre o vídeo
-         travado a METADE da velocidade do dedo, em vez de 1:1.
+      /* ═══ ENTRADA LENTA (data-slow) — 🔴 DESLIGADA: TREME NO iPHONE ══════
+         ⚠️ NÃO religar sem ler isto. A conta abaixo está certa (validada em
+         simulação: 0.50x exatos, emenda contínua, zero vãos) — o problema
+         não é a matemática, é ONDE o movimento acontece.
+         Uma lâmina que ainda NÃO grudou se move pelo scroll nativo, que o
+         navegador toca no COMPOSITOR: liso, 60fps, fora da thread do JS.
+         Aqui eu somava a isso um transform calculado no JS a cada evento de
+         scroll — thread principal, que no iOS chega atrasada e em lotes. As
+         duas fontes andam dessincronizadas, e como o transform precisava
+         CANCELAR METADE de um movimento de ~745px, cada atraso do JS virava
+         um salto grande: o Daniel descreveu como "tá, tá, tá, tá".
+         Por que a PASSAGEM (abaixo) não treme com o mesmo motor: lá a lâmina
+         está GRUDADA — parada no layout — e o JS só acrescenta ~45px de
+         lift. Fonte única e amplitude pequena.
+         🔑 A REGRA: só mover por JS o que está parado no layout. Movimento
+         grande em cima de algo que o scroll nativo já está movendo = jank.
+         Pra reintroduzir a lentidão, o caminho é tirar o movimento do JS —
+         animação dirigida por scroll no CSS (`animation-timeline`), que roda
+         no compositor — e não afinar esses números.
+         ── como a conta funcionava (fica registrado) ──
          A conta é a do parallax clássico: se a lâmina deve andar `slow` do
          que o fluxo anda, basta desenhá-la em `slow * posiçãoDeFluxo`, o que
          dá o deslocamento `(slow - 1) * fluxo` (negativo, puxa pra cima).
