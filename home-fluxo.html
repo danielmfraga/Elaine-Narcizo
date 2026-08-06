@@ -372,18 +372,26 @@ main{ position:relative; }
 .tm-sub{ font-size:clamp(1rem,4.4vw,1.2rem); font-weight:700; color:var(--ink); margin:6px 0 10px; }
 .tm-body{ font-size:clamp(.92rem,3.9vw,1.05rem); line-height:1.6; color:rgba(15,14,12,.78); margin-bottom:34px; }
 @media(prefers-reduced-motion:reduce){ .btn-tune,.btn-tune::before,.btn-tune::after,.tt-txt{ animation:none; } }
-/* SUBABA da rádio: conteúdo no TOPO, em fluxo normal (herda o padding de
-   .sheet) — nunca centralizado, que era o que deixava espaço vazio sobrando
-   em cima E embaixo (o conteúdo é curto: 1 parágrafo + 2 números + 1 botão).
-   ⚠️ MAS ela precisa de altura de tela cheia, porque agora ela é `pin`: a
-   capa de Formações sobe POR CIMA dela. Se ela fosse mais baixa que a tela,
-   a faixa entre a base dela e o topo da Formações que sobe mostraria a
-   RÁDIO (que fica presa em top:0 atrás da cena inteira) reaparecendo no
-   meio da transição. O vazio de baixo é justamente o que a Formações come
-   primeiro, então na prática não sobra buraco à vista.
+/* SUBABA da rádio: lâmina CURTA de propósito — ela mede exatamente o
+   conteúdo (1 parágrafo + 2 números + 1 botão) mais o respiro, e aí já
+   começa a Formações. Pedido do Daniel, calibrado por ele no celular.
+   ⚠️ Ela NÃO precisa de altura de tela cheia, mesmo sendo `pin`: a Formações
+   é a irmã seguinte no FLUXO, então nasce colada na base desta lâmina e
+   sobe a partir dali. Quando o sticky prende esta em top:0, a Formações já
+   está em cima da base dela (nunca abaixo), então não existe faixa
+   descoberta pra Rádio vazar por trás — cheguei a colocar 100svh achando
+   que existia, e a geometria mostra que não.
    O botão perde o translateY(80px) que existe só na capa (pra não cair
    sobre o texto DENTRO do vídeo — aqui não tem vídeo atrás). */
-.s-radio-sub{ min-height:100svh; }
+.s-radio-sub{
+  /* todo o conjunto (texto + números + botão) sobe 20px */
+  padding-top:calc(clamp(44px,9vh,110px) - 20px);
+  /* embaixo do botão fica a MESMA medida que existe entre "semanas de
+     ritual" e ele — que é a soma do gap do .wrap com o margin-top do
+     próprio botão. Escrito como soma (e não como número fixo) pra as duas
+     medidas continuarem iguais sozinhas em qualquer tela. */
+  padding-bottom:calc(clamp(22px,4vh,44px) + clamp(18px,3.4vh,32px));
+}
 .s-radio-sub .stats{ grid-template-columns:repeat(2,1fr); max-width:520px; }
 .s-radio-sub .btn-tune{ transform:none; margin-top:clamp(18px,3.4vh,32px); }
 .s-radio-sub .btn-tune.r{ transform:translateY(26px); }         /* estado inicial da revelação */
@@ -1545,7 +1553,17 @@ main{ position:relative; }
         var lift=Math.min(.06*vh*Math.sin(q*Math.PI/2), Math.max(0,coberto));
         c.lift=lift;
         c.el.style.transform='translate3d(0,'+(-lift).toFixed(2)+'px,0)';
-        c.dim.style.opacity=(p*.35).toFixed(3);
+        /* Escurecimento: `p` mede quanto da TELA a próxima já tomou, o que
+           equivale a "quanto desta lâmina foi coberto" só enquanto a lâmina
+           for pelo menos do tamanho da tela — que é o caso de todas as
+           capas. Numa lâmina CURTA (a subaba da Rádio, que mede só o
+           conteúdo) isso escureceria cedo demais: a Formações mal encosta na
+           base e o texto já estaria acinzentado no meio da leitura. Aí o
+           certo é medir contra a própria lâmina (`coberto/h`). Para h >= vh
+           as duas contas dão o mesmo número, então nenhuma transição já
+           aprovada muda. */
+        var pDim=(r.h<vh) ? Math.min(1,Math.max(0,coberto/r.h)) : p;
+        c.dim.style.opacity=(pDim*.35).toFixed(3);
 
         /* ── PARALLAX DO VÍDEO/FOTO (pedido do Daniel) ──
            Desliza POR DENTRO da capa, além do movimento dela: some os dois
