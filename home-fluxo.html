@@ -372,28 +372,30 @@ main{ position:relative; }
 .tm-sub{ font-size:clamp(1rem,4.4vw,1.2rem); font-weight:700; color:var(--ink); margin:6px 0 10px; }
 .tm-body{ font-size:clamp(.92rem,3.9vw,1.05rem); line-height:1.6; color:rgba(15,14,12,.78); margin-bottom:34px; }
 @media(prefers-reduced-motion:reduce){ .btn-tune,.btn-tune::before,.btn-tune::after,.tt-txt{ animation:none; } }
-/* SUBABA da rádio: lâmina CURTA de propósito — ela mede exatamente o
-   conteúdo (1 parágrafo + 2 números + 1 botão) mais o respiro, e aí já
-   começa a Formações. Pedido do Daniel, calibrado por ele no celular.
-   ⚠️ Ela NÃO precisa de altura de tela cheia, mesmo sendo `pin`: a Formações
-   é a irmã seguinte no FLUXO, então nasce colada na base desta lâmina e
-   sobe a partir dali. Quando o sticky prende esta em top:0, a Formações já
-   está em cima da base dela (nunca abaixo), então não existe faixa
-   descoberta pra Rádio vazar por trás — cheguei a colocar 100svh achando
-   que existia, e a geometria mostra que não.
+/* SUBABA da rádio — montada no MOLDE DA CENA 3 (#conectar → rodapé), que é
+   a transição que o Daniel apontou como a certa ("imagine que ela é o
+   Conectar e a Formações é o rodapé"). O que faz aquele efeito funcionar é
+   a lâmina de trás ter **tela cheia**: ela trava ocupando tudo e a de cima
+   sobe 100svh por cima dela.
+   ⚠️ Ela já foi CURTA (só o conteúdo + respiro) e era isso que matava o
+   efeito: sendo mais baixa que a tela, ela e a Formações subiam JUNTAS pela
+   maior parte do caminho — rolagem comum, sem sobreposição — e o "deck" só
+   acontecia nos últimos ~400px. Altura de tela cheia = percurso inteiro.
+   🔑 Conteúdo ancorado EMBAIXO (flex-end), e é isto que concilia com o
+   arremate que o Daniel calibrou: o botão fica a `padding-bottom` da BASE
+   da lâmina, que travada coincide com a base da tela — ou seja, a Formações
+   entra exatamente ali, o "e daí já inicia a próxima aba". De quebra, quando
+   a lâmina sobe, o conteúdo é a PRIMEIRA coisa que aparece (com o conteúdo
+   no topo, entrariam ~336px de vazio antes dele).
    O botão perde o translateY(80px) que existe só na capa (pra não cair
    sobre o texto DENTRO do vídeo — aqui não tem vídeo atrás). */
 .s-radio-sub{
-  /* ⚠️ Aqui morava a PISTA da entrada lenta (`margin-top:100svh`, par do
-     `data-slow="0.5"`). Saiu junto com ela — sem `data-slow` esta margem
-     só empurraria a lâmina 100svh pra baixo, deixando um trecho de Rádio
-     parada à toa. Se a entrada lenta voltar, as DUAS voltam juntas. */
-  /* todo o conjunto (texto + números + botão) sobe 20px */
-  padding-top:calc(clamp(44px,9vh,110px) - 20px);
-  /* embaixo do botão fica a MESMA medida que existe entre "semanas de
-     ritual" e ele — que é a soma do gap do .wrap com o margin-top do
-     próprio botão. Escrito como soma (e não como número fixo) pra as duas
-     medidas continuarem iguais sozinhas em qualquer tela. */
+  min-height:100svh;
+  display:flex; flex-direction:column; justify-content:flex-end;
+  /* mesma medida que existe entre "semanas de ritual" e o botão — a soma do
+     gap do .wrap com o margin-top do próprio botão. Escrito como soma (não
+     como número fixo) pra as duas continuarem iguais sozinhas em qualquer
+     tela. Ancorada embaixo, é ela que define onde a Formações entra. */
   padding-bottom:calc(clamp(22px,4vh,44px) + clamp(18px,3.4vh,32px));
 }
 .s-radio-sub .stats{ grid-template-columns:repeat(2,1fr); max-width:520px; }
