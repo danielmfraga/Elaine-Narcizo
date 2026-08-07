@@ -225,15 +225,19 @@ main{ position:relative; }
    ⚠️ Precisa ser `.sheet.pin` (0,2,0) pra vencer `.sheet{position:relative}`
    (0,1,0) — só `.pin` empataria e perderia por vir antes no arquivo. */
 .sheet.pin{ position:sticky; top:var(--pin-top,0px); will-change:transform; }
-/* pin ESTÁTICO (data-static): trava e nada dentro se mexe — o paint() nem a
-   inclui. Sem transform pra otimizar, `will-change` só manteria uma camada de
-   composição ligada à toa; por isso desligamos.
-   ⚠️ Correção de registro: este comentário já disse que a camada de composição
-   "estragava a cor do vídeo". FALSO — o diagnóstico de ago/2026 mediu e
-   descartou (ver a seção de cor da .s-radio); a causa era o véu branco.
-   🔸 HOJE NINGUÉM USA `data-static` — a Rádio, única que usava, voltou pro
-   efeito padrão. A regra fica de pé porque o mecanismo é genérico: pôr o
-   atributo de volta numa lâmina a congela de novo, sem tocar em JS. */
+/* pin ESTÁTICO (data-static) = trava UMA vez e NÃO sobe mais. A lâmina segue
+   no paint() e ganha o escurecimento normalmente; só o `lift` fica em 0.
+   🔑 QUANDO USAR: **toda `.sheet.pin` que meça exatamente 100svh.** Ela prende
+   no instante em que o CANTO ARREDONDADO do topo some da tela — uma marca
+   visual nítida — e o lift depois disso dá uma SEGUNDA parada: o "soluço" que
+   o Daniel viu (ago/2026). As `.cover` não têm o problema: são quadradas, sem
+   marca, e a hero já nasce presa (o lift é o movimento único dela).
+   Hoje usam: `.s-radio` e `.s-radio-sub`.
+   Como nunca recebem transform, `will-change:transform` só manteria uma camada
+   de composição à toa — daí o auto.
+   ⚠️ Correção de registro: este comentário já disse que essa camada "estragava
+   a cor do vídeo". FALSO — o diagnóstico de ago/2026 mediu e descartou (ver a
+   seção de cor da .s-radio); a causa era o véu branco. */
 .sheet.pin[data-static]{ will-change:auto; }
 /* a foto do Quem-sou-eu no papel do vídeo da capa: desliza dentro da própria
    moldura (mesma exigência do vídeo — SOBRA de 14vh, casada com a amplitude
@@ -1068,27 +1072,25 @@ main{ position:relative; }
        cima dela (o mesmo empilhamento da referência houseofyellow).
        Sem classes .r de propósito, igual à original: a capa da rádio não
        depende da revelação por scroll pra ficar visível. -->
-  <!-- ⚠️ `data-static` REMOVIDO (ago/2026, pedido do Daniel: "acertar a troca
-       da Rádio pra Formações"). Ele apontou como referência as transições que
-       já funcionam — a primeira (capa→Quem-sou-eu) e a do fim (#conectar→
-       rodapé) — e nas duas a lâmina de BAIXO participa: sobe ~45px e escurece
-       enquanto a de cima passa. Com `data-static` o paint() pulava esta seção
-       inteira, então a Rádio ficava CHAPADA: sem lift, sem `.pin-dim`. Era só
-       o que faltava — a geometria já estava certa (a subaba sobe até tomar a
-       tela e a Formações entra exatamente no fim dela).
-       Isso REVERTE o "só a subaba se move" pedido na rodada 10; o mecanismo
-       `data-static` continua no JS e no CSS, então voltar atrás é só recolocar
-       o atributo aqui.
-       🎨 Sobre a cor do vídeo: `will-change:transform` volta a valer aqui e
-       com ele a camada de composição. Isso NÃO lava a cor — a hipótese de
-       composição foi MEDIDA e descartada no diagnóstico (variantes E/F deram
-       igual); a causa real era o véu branco, hoje em 0. Ver a seção de cor no
-       CSS da .s-radio.
-       O vídeo segue FORA do parallax interno (não entra no seletor `bg` do
-       paint()): ele só tem 20px de sobra de altura, e o parallax pede ~68px —
-       ligar exigiria devolver os 14vh e mexer no enquadramento que o Daniel
-       acabou de aprovar. -->
-  <section class="sheet w s-radio pin" id="radio">
+  <!-- `data-static` = trava UMA vez e NÃO sobe mais (ago/2026). O Daniel viu
+       ao vivo e descreveu com precisão: "a parte superior da capa da rádio dá
+       2 travadas em vez de uma, é como um soluço… ela deveria ir subindo até
+       a parte arredondada da borda desaparecer, o topo fica reto, nessa hora
+       ela trava uma vez e para de subir, ao mesmo tempo a subaba começa a
+       subir."
+       🔑 O canto ARREDONDADO é a chave: esta lâmina mede exatamente 100svh,
+       então o pino engata no mesmo instante em que o arredondado some no topo
+       da tela — e aí o lift ainda a fazia subir mais 45px e parar de novo.
+       Duas paradas com uma marca visual nítida entre elas = o soluço.
+       Por que as capas aprovadas não sofrem disso: `.cover` é quadrada (sem
+       arredondado pra marcar o momento) e a hero já nasce presa em top:0, com
+       o lift como ÚNICO movimento — uma parada só.
+       ⚠️ O escurecimento CONTINUA (a seção segue no paint(), só o lift é que
+       zera): é ele que dá a profundidade sem exigir movimento. Só o vídeo é
+       que fica fora do parallax interno — tem 20px de sobra de altura e o
+       efeito pede ~68px; ligar exigiria devolver os 14vh e mexer no
+       enquadramento já aprovado. -->
+  <section class="sheet w s-radio pin" id="radio" data-static="1">
     <!-- ⚠️ O <video> é filho DIRETO da seção, sem wrapper — igual ao original.
          Qualquer elemento intermediário com `transform` (mesmo scale(1))
          força o vídeo a ser rasterizado na textura do ancestral e o Safari
@@ -1147,9 +1149,15 @@ main{ position:relative; }
        passar o conteúdo, seguindo a mesma receita do .pin. -->
   <!-- `pin`: esta subaba TRAVA e a capa de Formações sobe por cima dela —
        o mesmo empilhamento das transições anteriores (receita do .pin).
+       `data-static` pelo MESMO motivo da Rádio logo acima: ela também é uma
+       `.sheet` (canto arredondado no topo) de exatamente 100svh, então também
+       travaria e subiria mais 45px — o "soluço" que o Daniel descreveu. Ele
+       pediu a cadeia inteira assim: "a subaba sobe até o seu fim e quando
+       chegar no seu fim a nova sessão de formações deve começar imediatamente
+       a subir" — cada lâmina trava UMA vez e a próxima já parte.
        ⚠️ O `data-slow="0.5"` (subida a meia velocidade) foi DESLIGADO aqui:
        tremia no iPhone. Ver o porquê no bloco ENTRADA LENTA do paint(). -->
-  <div class="sheet w s-radio-sub pin">
+  <div class="sheet w s-radio-sub pin" data-static="1">
     <div class="wrap">
       <p class="manif in-io r" style="--r:0">Textos em áudio, podcasts e playlists para cultivar a
         <b>teimosia da alegria</b>, a esperteza de cuidar do que importa e a confiança na vida.</p>
@@ -1505,16 +1513,20 @@ main{ position:relative; }
      descarta e nada roda (seguro adicionar .pin antes da próxima existir).
      `dim` é a camada de escurecimento (ver CSS de .pin-dim — substituiu o
      filter por ser bem mais barato).
-     ⚠️ `data-static` fica de FORA daqui (pedido do Daniel pra Rádio→subaba:
-     a seção trava e SÓ a de cima se move). Antes ela entrava e recebia
-     "zero" em tudo — transform translate3d(0,0,0) a cada quadro, dim em 0,
-     parallax em 0. Zero escrito ainda é escrita: mantinha a seção como
-     camada de composição permanente com uma camada `.pin-dim` por cima, e
-     era isso que lavava a cor do vídeo dentro dela (REGRA DE OURO DA COR,
-     no CSS da .s-radio). O pino é 100% CSS (position:sticky) — uma seção
-     estática não precisa de UMA LINHA de JS. */
+     ⚠️ `data-static` = NÃO SOBE (noLift). A lâmina continua entrando aqui —
+     ela ganha `.pin-dim` normalmente — mas o `lift` fica preso em 0.
+     🔑 POR QUE ISSO EXISTE (o "soluço" que o Daniel viu, ago/2026): uma
+     lâmina que sobe até travar e DEPOIS ainda sobe mais 45px de lift dá
+     DUAS paradas — trava, anda de novo devagar, trava outra vez. Nas capas
+     isso não incomoda porque não há borda de referência: a `.cover` é
+     quadrada, e a hero já nasce presa em top:0 (o lift é o único movimento
+     dela). Mas `.sheet` tem CANTO ARREDONDADO no topo, e quando ela mede
+     exatamente 100svh o pino engata no instante em que esse arredondado
+     desaparece — o olho tem uma marca nítida pra ver as duas paradas.
+     São exatamente 2 lâminas nessa condição (.s-radio e .s-radio-sub) e as
+     duas levam `data-static`. Regra: **`.sheet.pin` de 100svh ⇒ data-static.** */
   var covers=[].slice.call(document.querySelectorAll('.cover,.sheet.pin')).filter(function(el){
-    return el.nextElementSibling && !el.hasAttribute('data-static');
+    return el.nextElementSibling;
   }).map(function(el){
     var dim=document.createElement('div');
     dim.className='pin-dim'; dim.setAttribute('aria-hidden','true');
@@ -1522,6 +1534,9 @@ main{ position:relative; }
     return {
       el:el, next:el.nextElementSibling, dim:dim,
       bg:el.querySelector('.hero-bg,.portrait img'),
+      /* data-static = trava e NÃO sobe mais (lift preso em 0). O
+         escurecimento continua — é ele que dá profundidade sem movimento. */
+      noLift:el.hasAttribute('data-static'),
       /* data-slow="0.5" = sobe a metade da velocidade do dedo na ENTRADA
          (ver o bloco ENTRADA LENTA no paint()). Sem o atributo, 1:1 como
          sempre foi. ⚠️ Quem usa precisa do `margin-top` casado no CSS. */
@@ -1630,7 +1645,11 @@ main{ position:relative; }
            trava em 0 sozinho). */
         var coberto=(r.natTop+r.h)-top;
         var q=Math.min(p/.7,1);
-        lift=Math.min(.06*vh*Math.sin(q*Math.PI/2), Math.max(0,coberto));
+        /* noLift (data-static): a lâmina trava UMA vez e para de vez — sem a
+           segunda subida, que numa .sheet de 100svh vira "soluço" (ver a nota
+           no monte de `covers`). O `coberto` continua sendo calculado: quem
+           usa é o escurecimento logo abaixo. */
+        lift=c.noLift ? 0 : Math.min(.06*vh*Math.sin(q*Math.PI/2), Math.max(0,coberto));
         /* Escurecimento: `p` mede quanto da TELA a próxima já tomou, o que
            equivale a "quanto desta lâmina foi coberto" só enquanto a lâmina
            for pelo menos do tamanho da tela — que é o caso de todas as
