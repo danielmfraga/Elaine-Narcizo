@@ -74,13 +74,6 @@ if(!window.enVoltou) scrollTo(0,0);
   --btnw:clamp(150px,44vw,206px);   /* largura dos botões-letreiro (o selo se ancora por ela) */
   --pad:clamp(20px,5vw,64px);
   --radius:clamp(18px,3.5vw,34px);  /* boca arredondada das lâminas que cobrem */
-  /* ENTRADA LENTA da subaba: velocidade da subida como fração da velocidade do
-     dedo. 1 = normal. `.6` = a redução de 40% que o Daniel calibrou no iPhone
-     (ago/2026) — ele tinha pedido 65% antes de ver ao vivo e assentou aqui.
-     ⚠️ Mora no :root DE PROPÓSITO: é daqui que o slider do `?tweak=1` escreve,
-     e uma declaração na própria .s-radio-sub venceria a herdada e mataria o
-     slider. Quem limita o efeito a UMA lâmina é o atributo `data-slow`. */
-  --slow:.6;
 }
 *{ margin:0; padding:0; box-sizing:border-box; }
 html{ scroll-behavior:smooth; overflow-anchor:none; } /* trava extra pro "abre na página 2": impede o navegador de empurrar o scroll sozinho quando o vídeo/imagens do topo mudam de tamanho ao carregar */
@@ -396,39 +389,36 @@ main{ position:relative; }
 .tm-sub{ font-size:clamp(1rem,4.4vw,1.2rem); font-weight:700; color:var(--ink); margin:6px 0 10px; }
 .tm-body{ font-size:clamp(.92rem,3.9vw,1.05rem); line-height:1.6; color:rgba(15,14,12,.78); margin-bottom:34px; }
 @media(prefers-reduced-motion:reduce){ .btn-tune,.btn-tune::before,.btn-tune::after,.tt-txt{ animation:none; } }
-/* SUBABA da rádio — lâmina CURTA: mede o conteúdo + os respiros, e nada mais.
-   🔴 O `min-height:100svh` SAIU (ago/2026): "depois do botão Sintonize, dê um
-   espaço de 50px e inicia a nova sessão". Com o texto no topo (30px) e a tela
-   cheia, sobrava quase uma tela de creme vazio entre o botão e a Formações —
-   era esse vazio que ele estava vendo. Agora a lâmina termina 50px abaixo do
-   botão e a Formações começa ali.
-   ⚠️ ESTA É A 3ª VOLTA DESTE MESMO PARAFUSO — leia antes de mexer de novo.
-   As três exigências abaixo NÃO cabem juntas numa lâmina só:
-     (a) texto começando a 30px do TOPO;
-     (b) Formações entrando 50px depois do BOTÃO;
-     (c) lâmina de 100svh (o que dava o "deck" de tela cheia da cena 3).
-   O conteúdo mede ~400px; (a)+(b) fixam a altura em ~480px, então (c) cai por
-   consequência aritmética, não por escolha de estilo. Já tentamos as outras
-   duas combinações: (a)+(c) deixou o vazio que ele reclamou agora; (b)+(c) foi
-   o `flex-end`, que jogava o texto pro fim do percurso — o "desconfigurou" da
-   rodada anterior. Ele viu as três e escolheu (a)+(b).
-   📉 O QUE SE PERDE COM ISSO: sendo mais baixa que a tela, a subaba e a
-   Formações passam a dividir a tela em vez de uma cobrir a outra — o "deck"
-   nesta transição fica mais fraco do que na cena 3. Foi exatamente a queixa
-   que originou a DICA DE OURO ("copia o efeito do final do site"). A aposta é
-   que a ENTRADA LENTA (--slow) compense: ela alonga a subida, que era o outro
-   ingrediente do efeito. Se ele reclamar de novo que "não reproduz o efeito",
-   a saída NÃO é mexer em números — é aceitar (c) e negociar (a) ou (b).
-   🔑 A PISTA da entrada lenta NÃO depende da altura da lâmina (depende só da
-   tela), então encurtar aqui não descasa nada. Conferido no navegador.
+/* SUBABA da rádio — montada no MOLDE DA CENA 3 (#conectar → rodapé), que é
+   a transição que o Daniel apontou como a certa ("imagine que ela é o
+   Conectar e a Formações é o rodapé"). O que faz aquele efeito funcionar é
+   a lâmina de trás ter **tela cheia**: ela trava ocupando tudo e a de cima
+   sobe 100svh por cima dela.
+   ⚠️ Ela já foi CURTA (só o conteúdo + respiro) e era isso que matava o
+   efeito: sendo mais baixa que a tela, ela e a Formações subiam JUNTAS pela
+   maior parte do caminho — rolagem comum, sem sobreposição — e o "deck" só
+   acontecia nos últimos ~400px. Altura de tela cheia = percurso inteiro.
+   🔴 CONTEÚDO NO TOPO (30px), e NÃO ancorado embaixo. O `flex-end` que ficou
+   aqui por uma rodada foi o "desconfigurou" que o Daniel reportou — e o
+   comentário que o defendia estava com a geometria INVERTIDA. Ele dizia que
+   com flex-end "o conteúdo é a primeira coisa que aparece". É o contrário:
+   a lâmina sobe, então a primeira parte dela a entrar na tela é o seu TOPO;
+   conteúdo colado na BASE só aparece no fim do percurso, depois de quase uma
+   tela inteira de creme vazio. Daí a queixa. Com o texto a 30px do topo ele
+   entra logo no começo da subida e dá tempo de ler.
+   ⚠️ CONSEQUÊNCIA ACEITA: o "arremate" (a Formações entrando logo abaixo do
+   botão) era efeito colateral do flex-end e se perde — agora ela entra pela
+   base da lâmina, bem abaixo do botão. Foi troca consciente: o Daniel pediu
+   o texto no topo depois de ver as duas versões.
    O botão perde o translateY(80px) que existe só na capa (pra não cair
    sobre o texto DENTRO do vídeo — aqui não tem vídeo atrás). */
 .s-radio-sub{
+  min-height:100svh;
   /* trava 8px mais tarde que a Rádio (que trava 8px cedo) — pedido do Daniel:
      "a aba da sessão de baixo pode estar 8 pixel a mais para cima" */
   --pin-nudge:-8px;
   padding-top:30px;                                    /* "o início do texto era apenas 30px do topo" */
-  padding-bottom:50px;                                 /* "depois do botão, 50px e inicia a nova sessão" */
+  padding-bottom:clamp(22px,4vh,44px);
   /* ENTRADA LENTA — a PISTA, casada com a velocidade `--slow`. São um PAR:
      subir a `--slow` da velocidade do dedo exige `1/slow` de rolagem pra
      cruzar a mesma tela, e esse extra vem daqui. Mexer num sem o outro faz a
@@ -1813,11 +1803,8 @@ main{ position:relative; }
        iPhone responde. Aqui o Daniel varre a faixa e acha onde para de tremer.
        1 = desligado (a subida 1:1 de hoje). A pista (margin-top) acompanha
        sozinha pelo CSS — os dois são um PAR. */
-    { key:'--slow', label:'Subaba — velocidade da subida (1 = normal · .6 = 40% + lenta)',
-      unit:'', min:.2, max:1, step:.05,
-      /* lê o padrão do :root em vez de repetir o número aqui — assim o slider
-         abre no valor certo mesmo depois de mudarmos o padrão no CSS */
-      get:function(){ return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--slow'))||1; } }
+    { key:'--slow', label:'Subaba — velocidade da subida (1 = normal · .35 = 65% + lenta)',
+      unit:'', min:.2, max:1, step:.05, get:function(){ return 1; } }
   ];
   var STORE_KEY='en_tweak_v1';
 
