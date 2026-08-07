@@ -419,6 +419,13 @@ main{ position:relative; }
   --pin-nudge:-8px;
   padding-top:30px;                                    /* "o início do texto era apenas 30px do topo" */
   padding-bottom:clamp(22px,4vh,44px);
+  /* ENTRADA LENTA — a PISTA, casada com a velocidade `--slow`. São um PAR:
+     subir a `--slow` da velocidade do dedo exige `1/slow` de rolagem pra
+     cruzar a mesma tela, e esse extra vem daqui. Mexer num sem o outro faz a
+     lâmina entrar na tela no momento errado.
+     🔒 Sem `--slow` definido ⇒ 1 ⇒ margem ZERO ⇒ comportamento de hoje,
+     intacto. Quem liga é o slider do `?tweak=1` (escreve --slow no :root). */
+  margin-top:calc(100svh / var(--slow,1) - 100svh);
 }
 .s-radio-sub .stats{ grid-template-columns:repeat(2,1fr); max-width:520px; }
 .s-radio-sub .btn-tune{ transform:none; margin-top:clamp(18px,3.4vh,32px); }
@@ -1168,9 +1175,15 @@ main{ position:relative; }
        pediu a cadeia inteira assim: "a subaba sobe até o seu fim e quando
        chegar no seu fim a nova sessão de formações deve começar imediatamente
        a subir" — cada lâmina trava UMA vez e a próxima já parte.
-       ⚠️ O `data-slow="0.5"` (subida a meia velocidade) foi DESLIGADO aqui:
-       tremia no iPhone. Ver o porquê no bloco ENTRADA LENTA do paint(). -->
-  <div class="sheet w s-radio-sub pin" data-static="1">
+       `data-slow` (sem valor) marca esta como a lâmina de ENTRADA LENTA — a
+       intensidade vem da variável CSS `--slow`, que nasce em 1 (= desligado,
+       subida 1:1 de hoje) e é dirigida pelo slider do `?tweak=1`. O atributo
+       existe pra dizer QUEM, a variável diz QUANTO: `--slow` é escrita no
+       :root e herdaria pra todas as lâminas sem esse porteiro.
+       ⚠️ Esta subida já tremeu no iPhone quando era um valor fixo no código —
+       por isso agora é calibrável ao vivo no celular. Ver ENTRADA LENTA no
+       paint() antes de fixar qualquer número aqui. -->
+  <div class="sheet w s-radio-sub pin" data-static="1" data-slow>
     <div class="wrap">
       <p class="manif in-io r" style="--r:0">Textos em áudio, podcasts e playlists para cultivar a
         <b>teimosia da alegria</b>, a esperteza de cuidar do que importa e a confiança na vida.</p>
@@ -1545,6 +1558,19 @@ main{ position:relative; }
      desaparece — o olho tem uma marca nítida pra ver as duas paradas.
      São exatamente 2 lâminas nessa condição (.s-radio e .s-radio-sub) e as
      duas levam `data-static`. Regra: **`.sheet.pin` de 100svh ⇒ data-static.** */
+  /* Velocidade de entrada da lâmina. DOIS mecanismos, de propósito:
+       · o atributo `data-slow` diz QUAIS lâminas usam a entrada lenta;
+       · a variável CSS `--slow` diz QUÃO lenta (e o slider do ?tweak=1 mexe nela).
+     ⚠️ A separação NÃO é decorativa: `--slow` é escrita no `:root` pelo painel
+     e portanto HERDA pra todas as lâminas — sem o atributo como porteiro, o
+     slider ligaria a entrada lenta também na capa e no Quem-sou-eu, que não
+     têm a pista (`margin-top`) casada e entrariam na tela na hora errada.
+     Só vale em (0,1); fora disso = desligado (1:1, como sempre foi). */
+  function lerSlow(el){
+    if(!el.hasAttribute('data-slow')) return 0;
+    var v=parseFloat(getComputedStyle(el).getPropertyValue('--slow'));
+    return (v>0 && v<1) ? v : 0;
+  }
   var covers=[].slice.call(document.querySelectorAll('.cover,.sheet.pin')).filter(function(el){
     return el.nextElementSibling;
   }).map(function(el){
@@ -1557,10 +1583,13 @@ main{ position:relative; }
       /* data-static = trava e NÃO sobe mais (lift preso em 0). O
          escurecimento continua — é ele que dá profundidade sem movimento. */
       noLift:el.hasAttribute('data-static'),
-      /* data-slow="0.5" = sobe a metade da velocidade do dedo na ENTRADA
-         (ver o bloco ENTRADA LENTA no paint()). Sem o atributo, 1:1 como
-         sempre foi. ⚠️ Quem usa precisa do `margin-top` casado no CSS. */
-      slow:parseFloat(el.getAttribute('data-slow'))||0
+      /* velocidade de ENTRADA como fração da velocidade do dedo (.35 = 65%
+         mais lento). Lida do CSS (`--slow`, herdada do :root) em vez do antigo
+         atributo `data-slow` — é isso que deixa o slider do `?tweak=1` dirigir
+         o efeito AO VIVO no celular, que é o único lugar onde dá pra julgar se
+         treme. Fora de (0,1) ⇒ 0 ⇒ desligado, 1:1 como sempre foi.
+         ⚠️ Quem usa precisa do `margin-top` casado no CSS (são um PAR). */
+      slow:lerSlow(el)
     };
   });
   var vh=innerHeight, ticking=false;
@@ -1707,6 +1736,14 @@ main{ position:relative; }
   }
   addEventListener('scroll',function(){ if(!ticking){ ticking=true; requestAnimationFrame(paint); } },{passive:true});
   paint();
+
+  /* gancho pro slider do `?tweak=1`: quando `--slow` muda, a PISTA (margin-top)
+     muda junto no CSS, então tem que recalcular os pinos ANTES de repintar —
+     a altura da lâmina não mudou, mas a posição dela no fluxo sim. */
+  window.__enSlow=function(){
+    covers.forEach(function(c){ c.slow=lerSlow(c.el); });
+    setPins(); paint();
+  };
 })();
 </script>
 
@@ -1758,7 +1795,16 @@ main{ position:relative; }
        Daniel calibrou aqui mesmo e aprovou ("ficou tudo bom"). */
     { key:'--tw-radio-veu',   label:'Rádio — véu branco por cima',   unit:'',  min:0,   max:.2, step:.01,get:function(){ return 0; } },
     { key:'--tw-radio-sat',   label:'Rádio — saturação do vídeo',    unit:'',  min:.8,  max:1.6,step:.02,get:function(){ return 1.12; } },
-    { key:'--tw-radio-con',   label:'Rádio — contraste do vídeo',    unit:'',  min:.8,  max:1.4,step:.02,get:function(){ return 1.08; } }
+    { key:'--tw-radio-con',   label:'Rádio — contraste do vídeo',    unit:'',  min:.8,  max:1.4,step:.02,get:function(){ return 1.08; } },
+    /* 🐢 ENTRADA LENTA DA SUBABA — o pedido "subir 65% mais lento" (= .35).
+       Está como SLIDER, e não como número fixo, de propósito: a versão
+       anterior disso TREMEU no iPhone, e tremor é temporal (thread/timing) —
+       nenhuma simulação minha pega, e o Chrome do desktop também não. Só o
+       iPhone responde. Aqui o Daniel varre a faixa e acha onde para de tremer.
+       1 = desligado (a subida 1:1 de hoje). A pista (margin-top) acompanha
+       sozinha pelo CSS — os dois são um PAR. */
+    { key:'--slow', label:'Subaba — velocidade da subida (1 = normal · .35 = 65% + lenta)',
+      unit:'', min:.2, max:1, step:.05, get:function(){ return 1; } }
   ];
   var STORE_KEY='en_tweak_v1';
 
@@ -1767,7 +1813,9 @@ main{ position:relative; }
     var saved={};
     try{ saved=JSON.parse(localStorage.getItem(STORE_KEY)||'{}'); }catch(e){}
     function persist(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(saved)); }catch(e){} }
-    function apply(c,val){ root.style.setProperty(c.key, val+c.unit); }
+    /* o `--slow` não é só cosmético: o motor da transição precisa reler o
+       valor e recalcular os pinos. Daí o gancho. */
+    function apply(c,val){ root.style.setProperty(c.key, val+c.unit); if(window.__enSlow) window.__enSlow(); }
 
     var wrap=document.createElement('div');
     wrap.id='twPanel';
