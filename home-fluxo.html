@@ -413,12 +413,12 @@ main{ position:relative; }
    O botão perde o translateY(80px) que existe só na capa (pra não cair
    sobre o texto DENTRO do vídeo — aqui não tem vídeo atrás). */
 .s-radio-sub{
-  min-height:100svh;
-  /* trava 8px mais tarde que a Rádio (que trava 8px cedo) — pedido do Daniel:
-     "a aba da sessão de baixo pode estar 8 pixel a mais para cima" */
-  --pin-nudge:-8px;
+  /* 🔑 SEM min-height: ela mede o CONTEÚDO + os respiros e para aí. Junto com
+     o `data-pin-fit` no HTML, é isso que a torna uma SUB-aba de verdade: sobe
+     só até caber inteira, encosta na base da tela e trava, com a capa da Rádio
+     continuando visível ACIMA dela. Ver o bloco data-pin-fit no setPins(). */
   padding-top:30px;                                    /* "o início do texto era apenas 30px do topo" */
-  padding-bottom:clamp(22px,4vh,44px);
+  padding-bottom:50px;                                 /* "depois do botão, 50px e inicia a nova sessão" */
   /* ENTRADA LENTA — a PISTA, casada com a velocidade `--slow`. São um PAR:
      subir a `--slow` da velocidade do dedo exige `1/slow` de rolagem pra
      cruzar a mesma tela, e esse extra vem daqui. Mexer num sem o outro faz a
@@ -1183,7 +1183,7 @@ main{ position:relative; }
        ⚠️ Esta subida já tremeu no iPhone quando era um valor fixo no código —
        por isso agora é calibrável ao vivo no celular. Ver ENTRADA LENTA no
        paint() antes de fixar qualquer número aqui. -->
-  <div class="sheet w s-radio-sub pin" data-static="1" data-slow>
+  <div class="sheet w s-radio-sub pin" data-static="1" data-slow data-pin-fit>
     <div class="wrap">
       <p class="manif in-io r" style="--r:0">Textos em áudio, podcasts e playlists para cultivar a
         <b>teimosia da alegria</b>, a esperteza de cuidar do que importa e a confiança na vida.</p>
@@ -1420,7 +1420,23 @@ main{ position:relative; }
      top do sticky de cada lâmina .pin = min(0, tela − altura da lâmina).
      Lâmina mais alta que a tela ⇒ top negativo ⇒ ela rola normal e SÓ
      prende quando o fim dela encosta no rodapé. Recalcula em resize e
-     quando a própria lâmina muda de tamanho (fontes/imagens chegando). */
+     quando a própria lâmina muda de tamanho (fontes/imagens chegando).
+
+     🔑 `data-pin-fit` — a SUBABA de verdade (ago/2026). O `min(0, …)` acima
+     força qualquer lâmina MAIS BAIXA que a tela a travar no TOPO, ou seja, a
+     cobrir tudo. Era por isso que a subaba da Rádio virava "uma aba inteira
+     que ocupa toda a tela" (palavras do Daniel) por mais curta que a
+     fizéssemos. Com `data-pin-fit` o clamp sai: `top = tela − altura`, que
+     numa lâmina curta é POSITIVO ⇒ ela sobe só até ficar INTEIRA na tela,
+     encostada na base, e trava ali — deixando a lâmina de trás (a capa da
+     Rádio) aparecendo por cima dela. É isso que a faz ser uma SUB-aba.
+     🎁 O encaixe sai de graça: quando ela trava, a lâmina seguinte está
+     EXATAMENTE na base da tela (`topo_travado + altura = tela`), então a
+     Formações começa a subir no mesmo instante — sem número mágico. E ela
+     passa por cima das duas, que é o "assim ela se consolida" do Daniel.
+     ⚠️ É opt-in, e não a regra geral, de propósito: sem o atributo, uma
+     lâmina de 100svh passaria a travar deslocada sempre que a barra de
+     endereço recolhe (innerHeight cresce e `tela − altura` fica positivo). */
   /* `--pin-nudge` (px, opcional, no CSS de cada lâmina): desloca o ponto em
      que ela trava. POSITIVO = trava mais CEDO, parando essa distância abaixo
      do topo da tela (fica uma fresta da lâmina de trás aparecendo — o "peek"
@@ -1430,7 +1446,10 @@ main{ position:relative; }
   function setPins(){
     document.querySelectorAll('.sheet.pin').forEach(function(el){
       var nudge=parseFloat(getComputedStyle(el).getPropertyValue('--pin-nudge'))||0;
-      el.style.setProperty('--pin-top', (Math.min(0, innerHeight-el.offsetHeight)+nudge)+'px');
+      var sobra=innerHeight-el.offsetHeight;
+      /* data-pin-fit: sem o clamp — trava assim que couber inteira na tela */
+      el.style.setProperty('--pin-top',
+        ((el.hasAttribute('data-pin-fit') ? sobra : Math.min(0, sobra)) + nudge)+'px');
     });
   }
   setPins();
