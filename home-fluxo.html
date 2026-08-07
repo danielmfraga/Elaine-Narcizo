@@ -77,7 +77,11 @@ if(!window.enVoltou) scrollTo(0,0);
 }
 *{ margin:0; padding:0; box-sizing:border-box; }
 html{ scroll-behavior:smooth; overflow-anchor:none; } /* trava extra pro "abre na página 2": impede o navegador de empurrar o scroll sozinho quando o vídeo/imagens do topo mudam de tamanho ao carregar */
-html,body{ background:var(--ink); }
+/* FUNDO DE TODO O SITE, literalmente atrás de tudo (pedido do Daniel, ago/2026):
+   o creme da casa, o mesmo do "Quem sou eu". Era `--ink` (preto) — e era esse
+   preto que aparecia nos vãos das transições quando elas ainda tinham bug.
+   Fica visível também no rubber-band do iOS (acima da capa e abaixo do rodapé). */
+html,body{ background:var(--paper); }
 body{
   font-family:var(--disp); font-size:17px; line-height:1.55; color:var(--ink);
   /* ⚠️ AQUI MORAVA O BUG DO VÃO (jul/2026). Era `overflow-x:hidden`, que é
@@ -256,6 +260,10 @@ main{ position:relative; }
    não desliza mais pro painel lateral (não existe aqui — destino pendente). */
 .s-radio{
   position:relative; overflow:hidden; isolation:isolate;
+  /* trava ~8px ANTES do ponto natural (pedido do Daniel vendo ao vivo): ela
+     para com o topo 8px abaixo do topo da tela, deixando uma fresta do
+     "Quem sou eu" aparecendo — peek de baralho. Ver --pin-nudge no setPins(). */
+  --pin-nudge:8px;
   min-height:100svh; padding:0; display:flex; flex-direction:column;
   background:radial-gradient(ellipse 88% 52% at 50% 72%, #f4e9e1 0%, var(--paper) 68%);
 }
@@ -390,22 +398,27 @@ main{ position:relative; }
    efeito: sendo mais baixa que a tela, ela e a Formações subiam JUNTAS pela
    maior parte do caminho — rolagem comum, sem sobreposição — e o "deck" só
    acontecia nos últimos ~400px. Altura de tela cheia = percurso inteiro.
-   🔑 Conteúdo ancorado EMBAIXO (flex-end), e é isto que concilia com o
-   arremate que o Daniel calibrou: o botão fica a `padding-bottom` da BASE
-   da lâmina, que travada coincide com a base da tela — ou seja, a Formações
-   entra exatamente ali, o "e daí já inicia a próxima aba". De quebra, quando
-   a lâmina sobe, o conteúdo é a PRIMEIRA coisa que aparece (com o conteúdo
-   no topo, entrariam ~336px de vazio antes dele).
+   🔴 CONTEÚDO NO TOPO (30px), e NÃO ancorado embaixo. O `flex-end` que ficou
+   aqui por uma rodada foi o "desconfigurou" que o Daniel reportou — e o
+   comentário que o defendia estava com a geometria INVERTIDA. Ele dizia que
+   com flex-end "o conteúdo é a primeira coisa que aparece". É o contrário:
+   a lâmina sobe, então a primeira parte dela a entrar na tela é o seu TOPO;
+   conteúdo colado na BASE só aparece no fim do percurso, depois de quase uma
+   tela inteira de creme vazio. Daí a queixa. Com o texto a 30px do topo ele
+   entra logo no começo da subida e dá tempo de ler.
+   ⚠️ CONSEQUÊNCIA ACEITA: o "arremate" (a Formações entrando logo abaixo do
+   botão) era efeito colateral do flex-end e se perde — agora ela entra pela
+   base da lâmina, bem abaixo do botão. Foi troca consciente: o Daniel pediu
+   o texto no topo depois de ver as duas versões.
    O botão perde o translateY(80px) que existe só na capa (pra não cair
    sobre o texto DENTRO do vídeo — aqui não tem vídeo atrás). */
 .s-radio-sub{
   min-height:100svh;
-  display:flex; flex-direction:column; justify-content:flex-end;
-  /* mesma medida que existe entre "semanas de ritual" e o botão — a soma do
-     gap do .wrap com o margin-top do próprio botão. Escrito como soma (não
-     como número fixo) pra as duas continuarem iguais sozinhas em qualquer
-     tela. Ancorada embaixo, é ela que define onde a Formações entra. */
-  padding-bottom:calc(clamp(22px,4vh,44px) + clamp(18px,3.4vh,32px));
+  /* trava 8px mais tarde que a Rádio (que trava 8px cedo) — pedido do Daniel:
+     "a aba da sessão de baixo pode estar 8 pixel a mais para cima" */
+  --pin-nudge:-8px;
+  padding-top:30px;                                    /* "o início do texto era apenas 30px do topo" */
+  padding-bottom:clamp(22px,4vh,44px);
 }
 .s-radio-sub .stats{ grid-template-columns:repeat(2,1fr); max-width:520px; }
 .s-radio-sub .btn-tune{ transform:none; margin-top:clamp(18px,3.4vh,32px); }
@@ -1395,9 +1408,16 @@ main{ position:relative; }
      Lâmina mais alta que a tela ⇒ top negativo ⇒ ela rola normal e SÓ
      prende quando o fim dela encosta no rodapé. Recalcula em resize e
      quando a própria lâmina muda de tamanho (fontes/imagens chegando). */
+  /* `--pin-nudge` (px, opcional, no CSS de cada lâmina): desloca o ponto em
+     que ela trava. POSITIVO = trava mais CEDO, parando essa distância abaixo
+     do topo da tela (fica uma fresta da lâmina de trás aparecendo — o "peek"
+     de baralho). NEGATIVO = trava mais tarde, entrando um pouco tela acima.
+     ⚠️ Fresta positiva NUNCA é vão preto: quem aparece ali é a lâmina
+     anterior, que a essa altura já cobre a tela inteira. */
   function setPins(){
     document.querySelectorAll('.sheet.pin').forEach(function(el){
-      el.style.setProperty('--pin-top', Math.min(0, innerHeight-el.offsetHeight)+'px');
+      var nudge=parseFloat(getComputedStyle(el).getPropertyValue('--pin-nudge'))||0;
+      el.style.setProperty('--pin-top', (Math.min(0, innerHeight-el.offsetHeight)+nudge)+'px');
     });
   }
   setPins();
