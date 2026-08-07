@@ -74,6 +74,12 @@ if(!window.enVoltou) scrollTo(0,0);
   --btnw:clamp(150px,44vw,206px);   /* largura dos botões-letreiro (o selo se ancora por ela) */
   --pad:clamp(20px,5vw,64px);
   --radius:clamp(18px,3.5vw,34px);  /* boca arredondada das lâminas que cobrem */
+  /* ENTRADA LENTA da subaba: velocidade da subida como fração da do dedo.
+     1 = normal · `.6` = os 40% mais lenta que o Daniel pediu.
+     ⚠️ Mora no :root DE PROPÓSITO: é daqui que o slider do `?tweak=1` escreve,
+     e uma declaração na própria `.s-radio-sub` venceria a herdada e mataria o
+     slider. Quem limita o efeito a UMA lâmina é o atributo `data-slow`. */
+  --slow:.6;
 }
 *{ margin:0; padding:0; box-sizing:border-box; }
 html{ scroll-behavior:smooth; overflow-anchor:none; } /* trava extra pro "abre na página 2": impede o navegador de empurrar o scroll sozinho quando o vídeo/imagens do topo mudam de tamanho ao carregar */
@@ -419,13 +425,14 @@ main{ position:relative; }
      continuando visível ACIMA dela. Ver o bloco data-pin-fit no setPins(). */
   padding-top:30px;                                    /* "o início do texto era apenas 30px do topo" */
   padding-bottom:50px;                                 /* "depois do botão, 50px e inicia a nova sessão" */
-  /* ENTRADA LENTA — a PISTA, casada com a velocidade `--slow`. São um PAR:
-     subir a `--slow` da velocidade do dedo exige `1/slow` de rolagem pra
-     cruzar a mesma tela, e esse extra vem daqui. Mexer num sem o outro faz a
-     lâmina entrar na tela no momento errado.
-     🔒 Sem `--slow` definido ⇒ 1 ⇒ margem ZERO ⇒ comportamento de hoje,
-     intacto. Quem liga é o slider do `?tweak=1` (escreve --slow no :root). */
-  margin-top:calc(100svh / var(--slow,1) - 100svh);
+  /* ENTRADA LENTA — a PISTA. Velocidade e pista são um PAR: mexer numa sem a
+     outra faz a lâmina entrar na tela no momento errado.
+     ⚠️ O valor vem do JS (`--pista`, no setPins()) e NÃO de um calc aqui: ele
+     depende da ALTURA desta lâmina, que é do conteúdo. Já foi um calc em cima
+     de `100svh` e ficou errado quando ela virou `data-pin-fit` — o percurso
+     dela deixou de ser uma tela e passou a ser a própria altura.
+     🔒 Sem `--slow` em (0,1) o JS escreve 0 ⇒ margem zero ⇒ subida 1:1. */
+  margin-top:var(--pista,0px);
 }
 .s-radio-sub .stats{ grid-template-columns:repeat(2,1fr); max-width:520px; }
 .s-radio-sub .btn-tune{ transform:none; margin-top:clamp(18px,3.4vh,32px); }
@@ -1448,8 +1455,26 @@ main{ position:relative; }
       var nudge=parseFloat(getComputedStyle(el).getPropertyValue('--pin-nudge'))||0;
       var sobra=innerHeight-el.offsetHeight;
       /* data-pin-fit: sem o clamp — trava assim que couber inteira na tela */
-      el.style.setProperty('--pin-top',
-        ((el.hasAttribute('data-pin-fit') ? sobra : Math.min(0, sobra)) + nudge)+'px');
+      var top=(el.hasAttribute('data-pin-fit') ? sobra : Math.min(0, sobra))+nudge;
+      el.style.setProperty('--pin-top', top+'px');
+      /* o paint() precisa deste número a cada quadro; guardar aqui evita ler
+         estilo computado dentro do laço de scroll (caro). Nas .cover fica
+         undefined ⇒ 0, que é o top:0 delas. */
+      el.__pinTop=top;
+
+      /* ── PISTA da ENTRADA LENTA ────────────────────────────────────────
+         A rolagem EXTRA que a subida lenta exige. 🔑 Ela vale
+         `percurso × (1/slow − 1)`, e o PERCURSO é a distância que a lâmina
+         cobre até travar — que **mudou** quando a subaba virou `data-pin-fit`:
+         antes ela ia do rodapé até o topo da tela (percurso = TELA), agora vai
+         do rodapé até encostar a base (percurso = a ALTURA DELA MESMA).
+         Por isso a pista é calculada aqui, em JS: a altura é do conteúdo e o
+         CSS não sabe medir isso. É uma conta ESTÁTICA (só em resize/relayout),
+         não entra no laço de scroll. */
+      var slow=parseFloat(getComputedStyle(el).getPropertyValue('--slow'));
+      var usaSlow=el.hasAttribute('data-slow') && slow>0 && slow<1;
+      var percurso=el.hasAttribute('data-pin-fit') ? el.offsetHeight : innerHeight;
+      el.style.setProperty('--pista', (usaSlow ? percurso*(1/slow-1) : 0)+'px');
     });
   }
   setPins();
@@ -1608,7 +1633,10 @@ main{ position:relative; }
          o efeito AO VIVO no celular, que é o único lugar onde dá pra julgar se
          treme. Fora de (0,1) ⇒ 0 ⇒ desligado, 1:1 como sempre foi.
          ⚠️ Quem usa precisa do `margin-top` casado no CSS (são um PAR). */
-      slow:lerSlow(el)
+      slow:lerSlow(el),
+      /* lâmina ANTERIOR — só guardada pra quem tem entrada lenta, que é quem
+         precisa da trava anti-vão da entrada (ver paint()). */
+      prev:lerSlow(el)?el.previousElementSibling:null
     };
   });
   var vh=innerHeight, ticking=false;
@@ -1634,7 +1662,11 @@ main{ position:relative; }
            visual. Raciocinar sempre em fluxo mantém uma régua só. */
         top:c.next.getBoundingClientRect().top-(c.nextTy||0),
         natTop:c.el.getBoundingClientRect().top-(c.ty||0),
-        h:c.el.offsetHeight
+        h:c.el.offsetHeight,
+        /* base da lâmina ANTERIOR — só quem tem entrada lenta precisa (trava
+           anti-vão da entrada, ver abaixo). `null` nas outras pra não pagar
+           uma leitura de layout à toa. */
+        antBase:c.prev?c.prev.getBoundingClientRect().bottom:null
       };
     });
     /* ═══ FASE 2 — só ESCRITA (nenhuma leitura de layout aqui dentro) ═══ */
@@ -1677,7 +1709,25 @@ main{ position:relative; }
          valor é exatamente 0. */
       var entry=0;
       if(c.slow){
-        if(r.natTop>0) entry=(c.slow-1)*r.natTop;
+        /* 🔑 `falta` = o quanto ainda resta pra lâmina chegar ao ponto onde
+           ela TRAVA — e não até o topo da tela. A fórmula antiga usava
+           `natTop` cru, o que embutia a premissa "toda lâmina trava em 0".
+           Deixou de valer com o `data-pin-fit`, em que a subaba trava
+           encostada na BASE (pinTop positivo): medindo até 0, a subida lenta
+           continuaria puxando depois de ela já ter travado. */
+        var falta=r.natTop-(c.el.__pinTop||0);
+        if(falta>0) entry=(c.slow-1)*falta;
+        /* ⚠️ TRAVA ANTI-VÃO DA ENTRADA (não remover) — irmã da trava `coberto`
+           do lift. Frear esta lâmina enquanto a de CIMA ainda está solta faz
+           as duas se separarem: a de cima corre a 1× com o dedo, esta a
+           `slow`, e abre uma faixa entre a base dela e o topo desta. Só
+           aparece quando a barra de endereço recolhe (aí a lâmina de cima,
+           que mede 100svh, fica MAIS BAIXA que a viewport e trava depois
+           desta começar a surgir) — ou seja, some em simulação de desktop.
+           A trava não deixa esta lâmina descer abaixo da base da anterior:
+           na prática a entrada lenta só começa a valer quando a de cima
+           trava, que é exatamente quando ela pode. */
+        if(r.antBase!==null) entry=Math.min(entry, r.antBase-r.natTop);
         if(entry!==c.nextTy){
           c.next.style.transform=entry?'translate3d(0,'+entry.toFixed(2)+'px,0)':'';
         }
@@ -1822,8 +1872,11 @@ main{ position:relative; }
        iPhone responde. Aqui o Daniel varre a faixa e acha onde para de tremer.
        1 = desligado (a subida 1:1 de hoje). A pista (margin-top) acompanha
        sozinha pelo CSS — os dois são um PAR. */
-    { key:'--slow', label:'Subaba — velocidade da subida (1 = normal · .35 = 65% + lenta)',
-      unit:'', min:.2, max:1, step:.05, get:function(){ return 1; } }
+    { key:'--slow', label:'Subaba — velocidade da subida (1 = normal · .6 = 40% + lenta)',
+      unit:'', min:.2, max:1, step:.05,
+      /* lê o padrão do :root em vez de repetir o número — assim o slider abre
+         no valor certo mesmo depois de mudarmos o padrão no CSS */
+      get:function(){ return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--slow'))||1; } }
   ];
   var STORE_KEY='en_tweak_v1';
 
