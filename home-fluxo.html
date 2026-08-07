@@ -226,9 +226,14 @@ main{ position:relative; }
    (0,1,0) — só `.pin` empataria e perderia por vir antes no arquivo. */
 .sheet.pin{ position:sticky; top:var(--pin-top,0px); will-change:transform; }
 /* pin ESTÁTICO (data-static): trava e nada dentro se mexe — o paint() nem a
-   inclui. Sem transform pra otimizar, `will-change` só manteria uma camada
-   de composição ligada à toa, e é isso que estraga a cor de vídeo dentro
-   dela (ver a REGRA DE OURO DA COR na seção da Rádio). */
+   inclui. Sem transform pra otimizar, `will-change` só manteria uma camada de
+   composição ligada à toa; por isso desligamos.
+   ⚠️ Correção de registro: este comentário já disse que a camada de composição
+   "estragava a cor do vídeo". FALSO — o diagnóstico de ago/2026 mediu e
+   descartou (ver a seção de cor da .s-radio); a causa era o véu branco.
+   🔸 HOJE NINGUÉM USA `data-static` — a Rádio, única que usava, voltou pro
+   efeito padrão. A regra fica de pé porque o mecanismo é genérico: pôr o
+   atributo de volta numa lâmina a congela de novo, sem tocar em JS. */
 .sheet.pin[data-static]{ will-change:auto; }
 /* a foto do Quem-sou-eu no papel do vídeo da capa: desliza dentro da própria
    moldura (mesma exigência do vídeo — SOBRA de 14vh, casada com a amplitude
@@ -1063,12 +1068,27 @@ main{ position:relative; }
        cima dela (o mesmo empilhamento da referência houseofyellow).
        Sem classes .r de propósito, igual à original: a capa da rádio não
        depende da revelação por scroll pra ficar visível. -->
-  <!-- data-static: pedido do Daniel — nesta transição (Rádio→subaba) só a
-       subaba se move; a Rádio fica parada, sem o "sobe junto" que a capa e
-       o Quem-sou-eu têm. O paint() IGNORA seções com esse atributo (o pino
-       é 100% CSS); é isso que mantém o vídeo fora de camada de composição
-       e com a cor certa — ver a REGRA DE OURO DA COR no CSS. -->
-  <section class="sheet w s-radio pin" id="radio" data-static="1">
+  <!-- ⚠️ `data-static` REMOVIDO (ago/2026, pedido do Daniel: "acertar a troca
+       da Rádio pra Formações"). Ele apontou como referência as transições que
+       já funcionam — a primeira (capa→Quem-sou-eu) e a do fim (#conectar→
+       rodapé) — e nas duas a lâmina de BAIXO participa: sobe ~45px e escurece
+       enquanto a de cima passa. Com `data-static` o paint() pulava esta seção
+       inteira, então a Rádio ficava CHAPADA: sem lift, sem `.pin-dim`. Era só
+       o que faltava — a geometria já estava certa (a subaba sobe até tomar a
+       tela e a Formações entra exatamente no fim dela).
+       Isso REVERTE o "só a subaba se move" pedido na rodada 10; o mecanismo
+       `data-static` continua no JS e no CSS, então voltar atrás é só recolocar
+       o atributo aqui.
+       🎨 Sobre a cor do vídeo: `will-change:transform` volta a valer aqui e
+       com ele a camada de composição. Isso NÃO lava a cor — a hipótese de
+       composição foi MEDIDA e descartada no diagnóstico (variantes E/F deram
+       igual); a causa real era o véu branco, hoje em 0. Ver a seção de cor no
+       CSS da .s-radio.
+       O vídeo segue FORA do parallax interno (não entra no seletor `bg` do
+       paint()): ele só tem 20px de sobra de altura, e o parallax pede ~68px —
+       ligar exigiria devolver os 14vh e mexer no enquadramento que o Daniel
+       acabou de aprovar. -->
+  <section class="sheet w s-radio pin" id="radio">
     <!-- ⚠️ O <video> é filho DIRETO da seção, sem wrapper — igual ao original.
          Qualquer elemento intermediário com `transform` (mesmo scale(1))
          força o vídeo a ser rasterizado na textura do ancestral e o Safari
