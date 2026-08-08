@@ -542,6 +542,58 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
 @keyframes stampAppear{ from{ clip-path:circle(0% at 50% 50%); } to{ clip-path:circle(75% at 50% 50%); } }
 @keyframes stampDrift{ 0%,100%{ transform:rotate(-8deg) translateY(0); } 50%{ transform:rotate(-5deg) translateY(-11px); } }
 .s-form .wrap{ position:relative; z-index:1; }
+
+/* ═══ CARROSSEL DE FORMAÇÕES ═══════════════════════════════════════════════
+   Referência do Daniel: a seção JOBS da mindsparklemag.com. Um fio de cartões
+   que se puxa com o dedo — rótulo em cima, título grande no meio, informação
+   embaixo — com os vizinhos espiando pelas bordas.
+   🔑 ROLAGEM NATIVA, sem uma linha de JS. Quem move é o dedo, no compositor.
+   Depois da saga da subida lenta desta sessão, a regra ficou clara: JS que
+   disputa movimento com o dedo treme no iOS. Aqui não há o que disputar.
+   `scroll-snap` faz os cartões assentarem centralizados sozinhos. */
+.fcar-wrap{
+  position:relative; z-index:1;
+  margin-top:clamp(34px,6vh,56px);
+  /* sangra até as bordas da seção pra os vizinhos espiarem (o corte que
+     aparece no print). O padding devolve o respiro DENTRO do scroller, senão
+     o 1º e o último cartão nasceriam colados na borda. */
+  margin-inline:calc(-1 * var(--pad));
+}
+.fcar{
+  display:flex; gap:14px;
+  list-style:none; margin:0; padding:4px var(--pad);
+  overflow-x:auto; overflow-y:hidden;
+  scroll-snap-type:x mandatory;
+  scroll-padding-inline:var(--pad);
+  /* ⚠️ segura o gesto DENTRO do carrossel: sem isto, ao chegar na ponta o
+     swipe encadeia pro navegador e dispara o "voltar" do iOS. */
+  overscroll-behavior-x:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;                  /* Firefox */
+}
+.fcar::-webkit-scrollbar{ display:none; }/* WebKit: fio sem barra à mostra */
+.fcar-card{ flex:0 0 clamp(190px,58vw,250px); scroll-snap-align:center; }
+.fcar-card > a{
+  display:flex; flex-direction:column; justify-content:space-between;
+  height:100%; aspect-ratio:3/4;
+  padding:20px 18px;
+  border:1px solid var(--line); border-radius:18px;
+  background:#fff; color:var(--ink); text-decoration:none; text-align:center;
+  transition:background .18s var(--ease);
+}
+/* pressionado: cinza bem leve — o Daniel pediu "coisa na casa de 10% de preto" */
+.fcar-card > a:active{ background:rgba(15,14,12,.10); }
+@media(hover:hover){ .fcar-card > a:hover{ background:rgba(15,14,12,.04); } }
+.fcar-top,.fcar-pe{
+  font-family:var(--mono); font-size:10px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--mute); line-height:1.6;
+}
+.fcar-nome{
+  font-family:var(--sans); font-weight:300;
+  font-size:clamp(1.35rem,5.6vw,1.7rem); line-height:1.15;
+  letter-spacing:-.02em; display:block;
+}
+.fcar-nome em{ font-style:italic; }
 /* ── TÍTULO: "Forma" romano + "ções" itálico ──
    A referência marca UMA palavra em itálico ("Repertórios <em>Sensíveis</em>").
    Como aqui o título é uma palavra só, o Daniel escolheu partir a própria
@@ -1283,6 +1335,40 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
       <!-- "Forma" + "ções" colados (sem espaço): uma palavra, duas texturas -->
       <h2 class="form-title r in-io" style="--r:1">Forma<em>ções</em></h2>
       <p class="form-lede r in-io" style="--r:2">Propostas formativas para ampliar repertórios e transformar práticas.</p>
+    </div>
+
+    <!-- ══ CARROSSEL DE FORMAÇÕES (ago/2026) ══
+         Referência que o Daniel mandou: a seção JOBS da mindsparklemag.com —
+         um fio de cartões que se puxa com o dedo, cada um com rótulo em cima,
+         título grande no meio e informação embaixo.
+         Rolagem HORIZONTAL NATIVA (nada de biblioteca): quem move é o dedo, no
+         compositor. Coerente com o que esta sessão inteira ensinou — JS que
+         disputa o movimento com o dedo treme no iOS.
+         ⚠️ TEXTO É PLACEHOLDER (`data-todo`), menos os dois primeiros, que
+         apontam pra páginas que já existem no site. -->
+    <div class="fcar-wrap">
+      <ul class="fcar" role="list">
+        <li class="fcar-card"><a href="repertorios-sensiveis/">
+          <span class="fcar-top">Repertórios</span>
+          <span class="fcar-nome">Repertórios <em>Sensíveis</em></span>
+          <span class="fcar-pe">Formação · presencial ou online</span>
+        </a></li>
+        <li class="fcar-card"><a href="ui_kits/ponte/">
+          <span class="fcar-top">Percurso</span>
+          <span class="fcar-nome">PONTE</span>
+          <span class="fcar-pe">Autoguiado · 3 exercícios</span>
+        </a></li>
+        <li class="fcar-card"><a href="#" data-todo="formação real + link">
+          <span class="fcar-top">Arteterapia</span>
+          <span class="fcar-nome">Corpo que <em>escuta</em></span>
+          <span class="fcar-pe">Encontro · grupos</span>
+        </a></li>
+        <li class="fcar-card"><a href="#" data-todo="formação real + link">
+          <span class="fcar-top">Escolas</span>
+          <span class="fcar-nome">Educar pelo <em>vínculo</em></span>
+          <span class="fcar-pe">Formação de equipes</span>
+        </a></li>
+      </ul>
     </div>
   </div>
   </div><!-- /scene 1 -->
