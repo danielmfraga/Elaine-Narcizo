@@ -1499,15 +1499,21 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
      Fica atrás de chave porque muda o motor de uma transição já aprovada.
      `?lenta=0.5` calibra a velocidade sem deploy novo. A tarja no rodapé diz
      se o navegador suporta, pra o veredito não depender de adivinhação. */
-  var LENTA=false, LENTA_SLOW=.6, proxy=null;
+  var LENTA=false, LENTA_SLOW=.5, proxy=null;
   (function(){
     var q=new URLSearchParams(location.search);
     if(q.get('lenta')==null) return;
     var v=parseFloat(q.get('lenta'));
     if(v>0 && v<1) LENTA_SLOW=v;
-    /* precisa das DUAS coisas: a animação por scroll e o içamento do nome */
-    var suporta=window.CSS && CSS.supports &&
-      CSS.supports('animation-timeline','view()') && CSS.supports('timeline-scope','--x');
+    var temAT=!!(window.CSS && CSS.supports && CSS.supports('animation-timeline','view()'));
+    var temTS=!!(window.CSS && CSS.supports && CSS.supports('timeline-scope','--x'));
+    /* ⚠️ O porteiro exige só o `animation-timeline`. Antes exigia TAMBÉM o
+       `timeline-scope`, e isso é forte demais: `CSS.supports` pode dizer não
+       pra uma propriedade que o navegador na prática aceita, e aí a gente
+       desligava um motor que funcionaria. Se o içamento do nome falhar, quem
+       denuncia é o diagnóstico abaixo — em vez de a página só "não fazer
+       nada", que foi exatamente o que aconteceu no 1º teste do Daniel. */
+    var suporta=temAT;
     LENTA=!!suporta;
     document.documentElement.classList.toggle('lenta', LENTA);
     if(LENTA){
@@ -1521,16 +1527,37 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
         sub.parentNode.insertBefore(proxy, sub);
       }
     }
+    /* DIAGNÓSTICO AO VIVO. A 1ª versão só dizia "suporta / não suporta", e
+       quando o Daniel testou a aba veio normal sem eu saber por quê — faltava
+       instrumento. Agora mostra cada elo da corrente, então uma olhada dele
+       responde onde quebrou, em vez de eu adivinhar. */
     addEventListener('DOMContentLoaded',function(){
       var t=document.createElement('div');
-      t.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:9999;padding:10px 14px;'+
-        'font:600 13px system-ui,-apple-system,sans-serif;text-align:center;color:#fff;background:'+
-        (suporta?'#1f7a3d':'#8a1f1f');
-      t.textContent=suporta
-        ? 'motor no compositor ATIVO · velocidade '+LENTA_SLOW+' (toque pra esconder)'
-        : 'este Safari NÃO suporta o recurso — a subida ficou normal';
+      t.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:9999;padding:8px 12px;'+
+        'font:600 12px/1.5 ui-monospace,Menlo,monospace;text-align:left;color:#fff;background:#101010;'+
+        'border-top:3px solid '+(suporta?'#1f7a3d':'#8a1f1f');
       t.onclick=function(){ t.remove(); };
       document.body.appendChild(t);
+      var sub=document.querySelector('.sheet.pin[data-slow]');
+      function ty(el){
+        var m=el&&getComputedStyle(el).transform;
+        if(!m||m==='none') return 0;
+        var p=m.match(/matrix\(([^)]+)\)/);
+        return p?Math.round(parseFloat(p[1].split(',')[5])):0;
+      }
+      function att(){
+        var anims=sub&&sub.getAnimations?sub.getAnimations():[];
+        var a=anims[0];
+        t.textContent=
+          'animation-timeline: '+(temAT?'SIM':'NÃO')+
+          '  ·  timeline-scope: '+(temTS?'SIM':'NÃO')+'\n'+
+          'marcador: '+(proxy?Math.round(proxy.offsetHeight)+'px':'NÃO CRIADO')+
+          '  ·  animações na subaba: '+anims.length+
+          (a?('  ·  timeline: '+(a.timeline?a.timeline.constructor.name:'nenhuma')):'')+'\n'+
+          'deslocamento atual da subaba: '+ty(sub)+'px'+
+          '  ·  velocidade '+LENTA_SLOW+'   (toque pra esconder)';
+      }
+      att(); addEventListener('scroll',att,{passive:true});
     });
   })();
 
