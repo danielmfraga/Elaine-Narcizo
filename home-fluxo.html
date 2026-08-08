@@ -427,7 +427,13 @@ main{ position:relative; }
      intacto. Quem liga é o slider do `?tweak=1` (escreve --slow no :root). */
   margin-top:calc(100svh / var(--slow,1) - 100svh);
 }
-/* ═══ ENTRADA LENTA — MOTOR NO COMPOSITOR (`?lenta=1`) ═════════════════════
+/* ═══ ENTRADA LENTA — MOTOR NO COMPOSITOR ✅ APROVADA (padrão) ═════════════
+   A classe `html.lenta` é posta pelo JS quando o navegador suporta o recurso;
+   sem suporte, NADA daqui se aplica e a subida fica 1:1 (o comportamento
+   antigo). Velocidade padrão .5, calibrável por `?lenta=0.7`.
+   🔑 Este é o ÚNICO desenho que não tremeu no iPhone, depois de o motor em JS
+   tremer em todas as velocidades — inclusive com a amplitude 4× menor. A
+   causa nunca foi amplitude: eram duas fontes de movimento brigando.
    Desenho refeito depois de pesquisar: a 1ª versão ia pendurar a linha do
    tempo na PRÓPRIA subaba, e isso NÃO funcionaria. É problema conhecido e
    está aberto no grupo de trabalho do CSS: uma `view()` pendurada num
@@ -1495,30 +1501,33 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
      de baralho). NEGATIVO = trava mais tarde, entrando um pouco tela acima.
      ⚠️ Fresta positiva NUNCA é vão preto: quem aparece ali é a lâmina
      anterior, que a essa altura já cobre a tela inteira. */
-  /* ═══ ENTRADA LENTA no COMPOSITOR — chave `?lenta=1` (ver o CSS html.lenta)
-     Fica atrás de chave porque muda o motor de uma transição já aprovada.
-     `?lenta=0.5` calibra a velocidade sem deploy novo. A tarja no rodapé diz
-     se o navegador suporta, pra o veredito não depender de adivinhação. */
+  /* ═══ ENTRADA LENTA no COMPOSITOR — PADRÃO desde ago/2026 ═══════════════
+     ✅ APROVADA pelo Daniel no iPhone ("achei que ficou bom, fico com essa
+     versão"). Saiu de trás da chave `?lenta=1` e passou a valer pra todo
+     mundo. É a única forma que NÃO tremeu — ver o CSS de `html.lenta` pro
+     porquê (uma fonte de movimento só, no compositor).
+     · velocidade padrão .5 (50% mais lenta), calibrável por `?lenta=0.7`;
+     · `?diag=1` traz de volta o diagnóstico ao vivo (não vai pro visitante);
+     · sem suporte no navegador ⇒ nada é aplicado e a subida fica 1:1, que é
+       o comportamento antigo, aprovado. Degradação limpa, sem quebrar nada. */
   var LENTA=false, LENTA_SLOW=.5, proxy=null;
   (function(){
     var q=new URLSearchParams(location.search);
-    if(q.get('lenta')==null) return;
     var v=parseFloat(q.get('lenta'));
     if(v>0 && v<1) LENTA_SLOW=v;
     var temAT=!!(window.CSS && CSS.supports && CSS.supports('animation-timeline','view()'));
     var temTS=!!(window.CSS && CSS.supports && CSS.supports('timeline-scope','--x'));
-    /* ⚠️ O porteiro exige só o `animation-timeline`. Antes exigia TAMBÉM o
-       `timeline-scope`, e isso é forte demais: `CSS.supports` pode dizer não
-       pra uma propriedade que o navegador na prática aceita, e aí a gente
-       desligava um motor que funcionaria. Se o içamento do nome falhar, quem
-       denuncia é o diagnóstico abaixo — em vez de a página só "não fazer
-       nada", que foi exatamente o que aconteceu no 1º teste do Daniel. */
+    /* ⚠️ O porteiro exige só o `animation-timeline`. Exigir TAMBÉM o
+       `timeline-scope` é forte demais: `CSS.supports` pode dizer não pra uma
+       propriedade que o navegador na prática aceita, e aí desligaríamos um
+       motor que funciona. (Aconteceu: no 1º teste do Daniel a página não fez
+       nada por causa disso.) */
     var suporta=temAT;
     LENTA=!!suporta;
     document.documentElement.classList.toggle('lenta', LENTA);
     if(LENTA){
-      /* o marcador nasce aqui (e não no HTML) pra que, sem a chave, a página
-         seja exatamente a aprovada — nem um nó a mais no DOM */
+      /* o marcador nasce por JS, não no HTML: assim, num navegador sem
+         suporte, a página não ganha nem um nó a mais */
       var sub=document.querySelector('.sheet.pin[data-slow]');
       if(sub){
         proxy=document.createElement('div');
@@ -1527,10 +1536,10 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
         sub.parentNode.insertBefore(proxy, sub);
       }
     }
-    /* DIAGNÓSTICO AO VIVO. A 1ª versão só dizia "suporta / não suporta", e
-       quando o Daniel testou a aba veio normal sem eu saber por quê — faltava
-       instrumento. Agora mostra cada elo da corrente, então uma olhada dele
-       responde onde quebrou, em vez de eu adivinhar. */
+    /* DIAGNÓSTICO AO VIVO — só com `?diag=1`. Mantido (em vez de apagado)
+       porque custou duas rodadas pra ficar confiável e é o instrumento que
+       responde "o motor está movendo a lâmina?" sem adivinhação. */
+    if(q.get('diag')!=='1') return;
     addEventListener('DOMContentLoaded',function(){
       var t=document.createElement('div');
       /* ⚠️ `white-space:pre-line` NÃO é enfeite: sem ele as quebras de linha do
