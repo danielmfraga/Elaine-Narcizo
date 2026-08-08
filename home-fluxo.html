@@ -585,7 +585,10 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
 .fcar-card{
   /* a largura vira variável porque a ALTURA é derivada dela (ver abaixo) */
   --fcar-w:clamp(190px,58vw,250px);
-  flex:0 0 var(--fcar-w); scroll-snap-align:center;
+  /* `start` e não `center`: o fio abre com o PRIMEIRO cartão alinhado à
+     esquerda, na mesma margem do texto acima, e quem quiser ver os outros
+     arrasta. (Era `center`, que abria com o 1º no meio da tela.) */
+  flex:0 0 var(--fcar-w); scroll-snap-align:start;
 }
 .fcar-card > a{
   display:flex; flex-direction:column; justify-content:space-between;
@@ -596,11 +599,17 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   padding:20px 18px;
   border:1px solid var(--ink); border-radius:18px;   /* fio preto 100% */
   background:#fff; color:var(--ink); text-decoration:none; text-align:center;
-  transition:background .18s var(--ease);
+  transition:background .16s var(--ease);
+  /* par do estado de toque no JS: sem isto o realce cinza padrão do iOS
+     pisca por cima e briga com o nosso */
+  -webkit-tap-highlight-color:transparent;
 }
-/* pressionado: cinza bem leve — o Daniel pediu "coisa na casa de 10% de preto" */
+/* PRESSIONADO. `.press` é posto pelo JS no toque — o `:active` sozinho é
+   pouco confiável dentro de um scroller no iOS (ver o comentário no JS).
+   O `:active` fica como reserva pra mouse e teclado. */
+.fcar-card > a.press,
 .fcar-card > a:active{ background:rgba(15,14,12,.10); }
-@media(hover:hover){ .fcar-card > a:hover{ background:rgba(15,14,12,.04); } }
+@media(hover:hover){ .fcar-card > a:hover{ background:rgba(15,14,12,.06); } }
 .fcar-top,.fcar-pe{
   font-family:var(--mono); font-size:10px; letter-spacing:.16em;
   text-transform:uppercase; color:var(--mute); line-height:1.6;
@@ -2053,59 +2062,36 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
     setPins(); paint();
   };
 
-  /* ═══ CARROSSEL CONTÍNUO (pedido do Daniel: "quando chega no último item
-     volta no primeiro e assim por diante") ══════════════════════════════════
-     Rolagem nativa não dá volta sozinha, então a receita é: TRIPLICAR os
-     cartões e, quando a rolagem para, saltar de volta pro trecho do meio. Como
-     os três trechos são idênticos, o salto cai num ponto visualmente IGUAL —
-     ninguém vê nada, e o fio nunca chega numa ponta.
-
-     ⚠️ QUANDO saltar é a parte delicada, e é a mesma armadilha desta sessão em
-     outra roupa: mexer em `scrollLeft` enquanto o dedo arrasta ou enquanto a
-     inércia do iOS está correndo MATA a inércia — o carrossel "trava" na mão.
-     Por isso o salto só acontece com o dedo fora e a rolagem parada: o
-     temporizador é rearmado a cada evento de scroll, então ele só dispara
-     quando tudo sossegou. Aqui o JS não DISPUTA movimento com o dedo — ele
-     espera a vez. É o que o motor da subida lenta não podia fazer, e por isso
-     lá a saída teve que ser o compositor.
-
-     A conta do salto é um módulo: qualquer posição volta pro trecho do meio
-     sem precisar saber por qual ponta ela saiu. */
+  /* ═══ ESTADO DE TOQUE DO CARROSSEL ═══════════════════════════════════════
+     O cinza estava em `:active` puro e "não funcionava bem" (palavras do
+     Daniel). Motivo: no iOS o `:active` é pouco confiável dentro de um
+     scroller — o Safari só decide aplicá-lo depois de concluir que o gesto NÃO
+     é rolagem, o que num carrossel horizontal chega tarde ou não chega. Somado
+     a isso, o realce cinza padrão do iOS (`tap-highlight`) pisca por cima e
+     briga com o nosso.
+     Aqui o estado é comandado no toque: acende no encostar e apaga se o dedo
+     ANDAR (aí virou arrasto, não toque) ou soltar. `passive:true` em todos —
+     nenhum deles cancela ou atrasa a rolagem.
+     ⚠️ O `-webkit-tap-highlight-color:transparent` no CSS é par disto: sem
+     ele, o realce do sistema continua aparecendo junto. */
   (function(){
     var fio=document.querySelector('.fcar');
     if(!fio) return;
-    var orig=[].slice.call(fio.children);
-    if(orig.length<2) return;
-
-    for(var c=0;c<2;c++){
-      orig.forEach(function(li){
-        var cl=li.cloneNode(true);
-        /* clones não existem pra leitor de tela nem pro tab — são só pista */
-        cl.setAttribute('aria-hidden','true');
-        var a=cl.querySelector('a'); if(a) a.tabIndex=-1;
-        fio.appendChild(cl);
-      });
-    }
-
-    var passo=0, tocando=false, t=null;
-    function medir(){
-      passo=fio.children[orig.length].offsetLeft - fio.children[0].offsetLeft;
-      if(passo>0 && fio.scrollLeft<1) fio.scrollLeft=passo;   /* começa no meio */
-    }
-    function reposicionar(){
-      if(tocando || passo<=0) return;
-      var x=fio.scrollLeft;
-      var alvo=passo + ((x-passo) % passo + passo) % passo;
-      if(Math.abs(alvo-x)>1) fio.scrollLeft=alvo;
-    }
-    function agendar(){ clearTimeout(t); t=setTimeout(reposicionar,140); }
-
-    fio.addEventListener('scroll',agendar,{passive:true});
-    fio.addEventListener('touchstart',function(){ tocando=true; },{passive:true});
-    fio.addEventListener('touchend',function(){ tocando=false; agendar(); },{passive:true});
-    addEventListener('resize',function(){ medir(); },{passive:true});
-    addEventListener('load',medir);
-    medir();
+    var alvo=null, x0=0, y0=0;
+    function solta(){ if(alvo){ alvo.classList.remove('press'); alvo=null; } }
+    fio.addEventListener('touchstart',function(e){
+      var a=e.target.closest && e.target.closest('.fcar-card > a');
+      if(!a) return;
+      alvo=a; x0=e.touches[0].clientX; y0=e.touches[0].clientY;
+      a.classList.add('press');
+    },{passive:true});
+    fio.addEventListener('touchmove',function(e){
+      if(!alvo) return;
+      var t=e.touches[0];
+      if(Math.abs(t.clientX-x0)>8 || Math.abs(t.clientY-y0)>8) solta();
+    },{passive:true});
+    fio.addEventListener('touchend',solta,{passive:true});
+    fio.addEventListener('touchcancel',solta,{passive:true});
   })();
 })();
 </script>
