@@ -418,7 +418,13 @@ main{ position:relative; }
      só até caber inteira, encosta na base da tela e trava, com a capa da Rádio
      continuando visível ACIMA dela. Ver o bloco data-pin-fit no setPins(). */
   padding-top:30px;                                    /* "o início do texto era apenas 30px do topo" */
-  padding-bottom:50px;                                 /* "depois do botão, 50px e inicia a nova sessão" */
+  /* 50px era o "depois do botão, 50px e inicia a nova sessão"; +40px vieram
+     depois, vendo ao vivo ("a subaba pode aumentar ela uns 40px para baixo").
+     ⚠️ Como ela é `data-pin-fit` (trava com a BASE na borda de baixo da tela),
+     crescer pra baixo na prática sobe o TOPO dela: a lâmina fica 40px maior e
+     aparecem 40px A MENOS da Rádio acima. O resto se ajusta sozinho — pista da
+     subida lenta, `--sub-h` e a margem da Formações saem todos da altura. */
+  padding-bottom:90px;
   /* ENTRADA LENTA — a PISTA, casada com a velocidade `--slow`. São um PAR:
      subir a `--slow` da velocidade do dedo exige `1/slow` de rolagem pra
      cruzar a mesma tela, e esse extra vem daqui. Mexer num sem o outro faz a
