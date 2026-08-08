@@ -1533,8 +1533,14 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
        responde onde quebrou, em vez de eu adivinhar. */
     addEventListener('DOMContentLoaded',function(){
       var t=document.createElement('div');
+      /* ⚠️ `white-space:pre-line` NÃO é enfeite: sem ele as quebras de linha do
+         textContent colapsam, tudo vira UMA linha, e a parte que muda (o
+         deslocamento) sai da tela pela direita. Foi o que aconteceu no teste
+         do Daniel — ele viu a tarja "não mudar" porque o número que mudava
+         estava fora de vista, e eu quase concluí que o motor estava morto. */
       t.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:9999;padding:8px 12px;'+
-        'font:600 12px/1.5 ui-monospace,Menlo,monospace;text-align:left;color:#fff;background:#101010;'+
+        'font:600 12px/1.5 ui-monospace,Menlo,monospace;white-space:pre-line;word-break:break-word;'+
+        'text-align:left;color:#fff;background:#101010;'+
         'border-top:3px solid '+(suporta?'#1f7a3d':'#8a1f1f');
       t.onclick=function(){ t.remove(); };
       document.body.appendChild(t);
@@ -1545,17 +1551,19 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
         var p=m.match(/matrix\(([^)]+)\)/);
         return p?Math.round(parseFloat(p[1].split(',')[5])):0;
       }
+      /* o número que MUDA vem primeiro e grande — é o único que responde a
+         pergunta ("o motor está movendo a lâmina?"). O resto é contexto. */
       function att(){
         var anims=sub&&sub.getAnimations?sub.getAnimations():[];
         var a=anims[0];
+        var d=ty(sub);
         t.textContent=
-          'animation-timeline: '+(temAT?'SIM':'NÃO')+
-          '  ·  timeline-scope: '+(temTS?'SIM':'NÃO')+'\n'+
+          '▶ DESLOCAMENTO: '+d+'px   ← tem que MUDAR ao rolar\n'+
+          'suporte: timeline '+(temAT?'SIM':'NÃO')+' · scope '+(temTS?'SIM':'NÃO')+'\n'+
           'marcador: '+(proxy?Math.round(proxy.offsetHeight)+'px':'NÃO CRIADO')+
-          '  ·  animações na subaba: '+anims.length+
-          (a?('  ·  timeline: '+(a.timeline?a.timeline.constructor.name:'nenhuma')):'')+'\n'+
-          'deslocamento atual da subaba: '+ty(sub)+'px'+
-          '  ·  velocidade '+LENTA_SLOW+'   (toque pra esconder)';
+          ' · animações: '+anims.length+
+          ' · relógio: '+(a&&a.timeline?a.timeline.constructor.name:'NENHUM')+'\n'+
+          'velocidade '+LENTA_SLOW+'  (toque pra esconder)';
       }
       att(); addEventListener('scroll',att,{passive:true});
     });
