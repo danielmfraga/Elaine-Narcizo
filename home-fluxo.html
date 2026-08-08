@@ -569,15 +569,26 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
      swipe encadeia pro navegador e dispara o "voltar" do iOS. */
   overscroll-behavior-x:contain;
   -webkit-overflow-scrolling:touch;
+  /* ⚠️ o salto do carrossel contínuo TEM que ser instantâneo. Explícito aqui
+     porque a página declara `scroll-behavior:smooth` no <html> — se um dia
+     alguém mudar isso pra herdar, o salto viraria uma animação visível. */
+  scroll-behavior:auto;
   scrollbar-width:none;                  /* Firefox */
 }
 .fcar::-webkit-scrollbar{ display:none; }/* WebKit: fio sem barra à mostra */
-.fcar-card{ flex:0 0 clamp(190px,58vw,250px); scroll-snap-align:center; }
+.fcar-card{
+  /* a largura vira variável porque a ALTURA é derivada dela (ver abaixo) */
+  --fcar-w:clamp(190px,58vw,250px);
+  flex:0 0 var(--fcar-w); scroll-snap-align:center;
+}
 .fcar-card > a{
   display:flex; flex-direction:column; justify-content:space-between;
-  height:100%; aspect-ratio:3/4;
+  /* era `aspect-ratio:3/4`. Virou altura calculada porque o Daniel pediu
+     "uns 15px menos vertical" — e 15px é uma medida absoluta, que não cabe
+     numa proporção. A conta mantém a proporção antiga e desconta os 15. */
+  height:calc(var(--fcar-w) * 4 / 3 - 15px);
   padding:20px 18px;
-  border:1px solid var(--line); border-radius:18px;
+  border:1px solid var(--ink); border-radius:18px;   /* fio preto 100% */
   background:#fff; color:var(--ink); text-decoration:none; text-align:center;
   transition:background .18s var(--ease);
 }
@@ -2031,6 +2042,61 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
     covers.forEach(function(c){ c.slow=lerSlow(c.el); });
     setPins(); paint();
   };
+
+  /* ═══ CARROSSEL CONTÍNUO (pedido do Daniel: "quando chega no último item
+     volta no primeiro e assim por diante") ══════════════════════════════════
+     Rolagem nativa não dá volta sozinha, então a receita é: TRIPLICAR os
+     cartões e, quando a rolagem para, saltar de volta pro trecho do meio. Como
+     os três trechos são idênticos, o salto cai num ponto visualmente IGUAL —
+     ninguém vê nada, e o fio nunca chega numa ponta.
+
+     ⚠️ QUANDO saltar é a parte delicada, e é a mesma armadilha desta sessão em
+     outra roupa: mexer em `scrollLeft` enquanto o dedo arrasta ou enquanto a
+     inércia do iOS está correndo MATA a inércia — o carrossel "trava" na mão.
+     Por isso o salto só acontece com o dedo fora e a rolagem parada: o
+     temporizador é rearmado a cada evento de scroll, então ele só dispara
+     quando tudo sossegou. Aqui o JS não DISPUTA movimento com o dedo — ele
+     espera a vez. É o que o motor da subida lenta não podia fazer, e por isso
+     lá a saída teve que ser o compositor.
+
+     A conta do salto é um módulo: qualquer posição volta pro trecho do meio
+     sem precisar saber por qual ponta ela saiu. */
+  (function(){
+    var fio=document.querySelector('.fcar');
+    if(!fio) return;
+    var orig=[].slice.call(fio.children);
+    if(orig.length<2) return;
+
+    for(var c=0;c<2;c++){
+      orig.forEach(function(li){
+        var cl=li.cloneNode(true);
+        /* clones não existem pra leitor de tela nem pro tab — são só pista */
+        cl.setAttribute('aria-hidden','true');
+        var a=cl.querySelector('a'); if(a) a.tabIndex=-1;
+        fio.appendChild(cl);
+      });
+    }
+
+    var passo=0, tocando=false, t=null;
+    function medir(){
+      passo=fio.children[orig.length].offsetLeft - fio.children[0].offsetLeft;
+      if(passo>0 && fio.scrollLeft<1) fio.scrollLeft=passo;   /* começa no meio */
+    }
+    function reposicionar(){
+      if(tocando || passo<=0) return;
+      var x=fio.scrollLeft;
+      var alvo=passo + ((x-passo) % passo + passo) % passo;
+      if(Math.abs(alvo-x)>1) fio.scrollLeft=alvo;
+    }
+    function agendar(){ clearTimeout(t); t=setTimeout(reposicionar,140); }
+
+    fio.addEventListener('scroll',agendar,{passive:true});
+    fio.addEventListener('touchstart',function(){ tocando=true; },{passive:true});
+    fio.addEventListener('touchend',function(){ tocando=false; agendar(); },{passive:true});
+    addEventListener('resize',function(){ medir(); },{passive:true});
+    addEventListener('load',medir);
+    medir();
+  })();
 })();
 </script>
 
