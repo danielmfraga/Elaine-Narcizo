@@ -74,15 +74,6 @@ if(!window.enVoltou) scrollTo(0,0);
   --btnw:clamp(150px,44vw,206px);   /* largura dos botões-letreiro (o selo se ancora por ela) */
   --pad:clamp(20px,5vw,64px);
   --radius:clamp(18px,3.5vw,34px);  /* boca arredondada das lâminas que cobrem */
-  /* ENTRADA LENTA da subaba: velocidade da subida como fração da do dedo.
-     🔴 PADRÃO 1 (DESLIGADA). O motor em JS TREMEU no iPhone em todas as
-     tentativas — inclusive depois de a amplitude cair 4× com a subaba virando
-     `data-pin-fit`. Está desligado por isso.
-     O motor NOVO (compositor) mora atrás de `?lenta=1` — ver `html.lenta`.
-     ⚠️ Mora no :root DE PROPÓSITO: é daqui que o slider do `?tweak=1` escreve,
-     e uma declaração na própria `.s-radio-sub` venceria a herdada e mataria o
-     slider. Quem limita o efeito a UMA lâmina é o atributo `data-slow`. */
-  --slow:1;
 }
 *{ margin:0; padding:0; box-sizing:border-box; }
 html{ scroll-behavior:smooth; overflow-anchor:none; } /* trava extra pro "abre na página 2": impede o navegador de empurrar o scroll sozinho quando o vídeo/imagens do topo mudam de tamanho ao carregar */
@@ -428,65 +419,14 @@ main{ position:relative; }
      continuando visível ACIMA dela. Ver o bloco data-pin-fit no setPins(). */
   padding-top:30px;                                    /* "o início do texto era apenas 30px do topo" */
   padding-bottom:50px;                                 /* "depois do botão, 50px e inicia a nova sessão" */
-  /* ENTRADA LENTA — a PISTA. Velocidade e pista são um PAR: mexer numa sem a
-     outra faz a lâmina entrar na tela no momento errado.
-     ⚠️ O valor vem do JS (`--pista`, no setPins()) e NÃO de um calc aqui: ele
-     depende da ALTURA desta lâmina, que é do conteúdo. Já foi um calc em cima
-     de `100svh` e ficou errado quando ela virou `data-pin-fit` — o percurso
-     dela deixou de ser uma tela e passou a ser a própria altura.
-     🔒 Sem `--slow` em (0,1) o JS escreve 0 ⇒ margem zero ⇒ subida 1:1. */
-  margin-top:var(--pista,0px);
+  /* ENTRADA LENTA — a PISTA, casada com a velocidade `--slow`. São um PAR:
+     subir a `--slow` da velocidade do dedo exige `1/slow` de rolagem pra
+     cruzar a mesma tela, e esse extra vem daqui. Mexer num sem o outro faz a
+     lâmina entrar na tela no momento errado.
+     🔒 Sem `--slow` definido ⇒ 1 ⇒ margem ZERO ⇒ comportamento de hoje,
+     intacto. Quem liga é o slider do `?tweak=1` (escreve --slow no :root). */
+  margin-top:calc(100svh / var(--slow,1) - 100svh);
 }
-/* ═══ ENTRADA LENTA v2 — MOTOR NO COMPOSITOR (experimento, `?lenta=1`) ══════
-   ⚠️ ISOLADO ATRÁS DE UMA CHAVE NA URL DE PROPÓSITO. Sem `?lenta=1` nada aqui
-   se aplica e a página é a que o Daniel aprovou. Motivo: este motor depende de
-   `animation-timeline` (Safari recente) E de um comportamento que não deu pra
-   verificar sem iPhone — se a linha do tempo de uma view() CONGELA quando o
-   elemento está grudado por `position:sticky`. Se congelar, o efeito não roda.
-   Testar antes de promover a padrão.
-
-   POR QUE ESTE DESENHO, e não "deixar mais devagar" outra vez:
-   o tremor nunca foi de amplitude, foi de DUAS FONTES DE MOVIMENTO brigando —
-   o scroll nativo movia a lâmina no compositor enquanto o JS subtraía parte
-   desse movimento pela thread principal, que no iOS chega atrasada e em lotes.
-   Aqui a lâmina é GRUDADA na borda de baixo da tela (`--pin-top` = altura da
-   janela), ou seja PARADA no layout, e quem a move é uma animação de CSS
-   dirigida pelo scroll — que roda no compositor. Uma fonte só, e no lugar
-   certo. É a mesma receita dos efeitos que funcionam aqui (o lift e o parallax
-   do vídeo agem sobre elementos presos).
-
-   🔑 A FORMAÇÕES NÃO PRECISA DE COLA — e é isso que faz este desenho caber em
-   CSS puro. Durante a subida, a base da subaba está SEMPRE abaixo da borda da
-   tela (topo ≥ tela−altura ⇒ base ≥ tela), então a distância entre ela e a
-   Formações fica fora de vista o tempo todo. Basta a Formações CHEGAR na hora:
-   `margin-top` = a pista. Sem transform, sem JS. */
-html.lenta .s-radio-sub{
-  animation:subaba-lenta linear both;
-  animation-timeline:view();
-  /* a faixa `entry` dura a ALTURA da lâmina em rolagem; a subida lenta precisa
-     de `altura/slow` ⇒ estica a faixa na mesma proporção */
-  animation-range:entry 0% entry calc(100% / var(--slow-lenta,.6));
-}
-@keyframes subaba-lenta{
-  from{ transform:translateY(0); }                        /* grudada no rodapé */
-  to  { transform:translateY(calc(-1 * var(--sub-h,0px))); } /* assentada */
-}
-/* a pista: atrasa a Formações pra ela encostar na base exatamente quando a
-   subaba termina de subir (JS calcula, porque depende da altura do conteúdo) */
-html.lenta #formacoes{ margin-top:var(--pista,0px); }
-/* ⚠️ FALHA CONHECIDA, ainda não corrigida DE PROPÓSITO: com a barra de endereço
-   RECOLHIDA a janela fica mais alta que a Rádio (que mede 100svh), então a
-   Rádio ainda não travou quando a subaba começa a aparecer. Nessa janela de
-   ~47px as duas andam em velocidades diferentes e abre uma faixa de ~19px
-   entre elas. É a mesma causa que a trava anti-vão do motor em JS resolvia —
-   aqui não dá pra travar, porque quem move é o CSS.
-   Não corrigi ainda porque a pergunta que este experimento existe pra
-   responder é ANTERIOR: o motor no compositor roda e para de tremer? Se não
-   rodar, polir isto seria trabalho jogado fora. Saídas se ele for promovido:
-   (a) travar a Rádio mais cedo por JS (`--pin-nudge` = a sobra da janela; some
-   atrás do header de 62px), ou (b) dar à Rádio altura de `100lvh` — mas isso
-   mexe no enquadramento do vídeo, que já está aprovado. */
-
 .s-radio-sub .stats{ grid-template-columns:repeat(2,1fr); max-width:520px; }
 .s-radio-sub .btn-tune{ transform:none; margin-top:clamp(18px,3.4vh,32px); }
 .s-radio-sub .btn-tune.r{ transform:translateY(26px); }         /* estado inicial da revelação */
@@ -1503,72 +1443,13 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
      de baralho). NEGATIVO = trava mais tarde, entrando um pouco tela acima.
      ⚠️ Fresta positiva NUNCA é vão preto: quem aparece ali é a lâmina
      anterior, que a essa altura já cobre a tela inteira. */
-  /* ═══ EXPERIMENTO `?lenta=1` — entrada lenta com motor no COMPOSITOR ═══
-     Fica atrás de chave na URL porque depende de `animation-timeline`, que
-     (a) só existe em Safari recente e (b) tem um comportamento que não deu pra
-     verificar sem iPhone: se a linha do tempo congela com `position:sticky`.
-     Sem a chave, a página é exatamente a aprovada. O rodapé mostra o veredito
-     de suporte pra não depender de adivinhação. */
-  var LENTA=false, LENTA_SLOW=.6;
-  (function(){
-    var q=new URLSearchParams(location.search);
-    if(q.get('lenta')==null) return;
-    var v=parseFloat(q.get('lenta'));                    /* ?lenta=.5 calibra */
-    if(v>0 && v<1) LENTA_SLOW=v;
-    var suporta=window.CSS && CSS.supports && CSS.supports('animation-timeline','view()');
-    LENTA=!!suporta;
-    document.documentElement.classList.toggle('lenta', LENTA);
-    document.documentElement.style.setProperty('--slow-lenta', LENTA_SLOW);
-    var aviso=document.createElement('div');
-    aviso.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:9999;padding:10px 14px;'+
-      'font:600 13px system-ui,-apple-system,sans-serif;text-align:center;color:#fff;background:'+
-      (suporta?'#1f7a3d':'#8a1f1f');
-    aviso.textContent=suporta
-      ? 'motor no compositor ATIVO · velocidade '+LENTA_SLOW+' (toque pra esconder)'
-      : 'este navegador NÃO suporta animation-timeline — a subida ficou normal';
-    aviso.onclick=function(){ aviso.remove(); };
-    addEventListener('DOMContentLoaded',function(){ document.body.appendChild(aviso); });
-  })();
-
   function setPins(){
     document.querySelectorAll('.sheet.pin').forEach(function(el){
       var nudge=parseFloat(getComputedStyle(el).getPropertyValue('--pin-nudge'))||0;
       var sobra=innerHeight-el.offsetHeight;
       /* data-pin-fit: sem o clamp — trava assim que couber inteira na tela */
-      var top=(el.hasAttribute('data-pin-fit') ? sobra : Math.min(0, sobra))+nudge;
-      el.style.setProperty('--pin-top', top+'px');
-      /* o paint() precisa deste número a cada quadro; guardar aqui evita ler
-         estilo computado dentro do laço de scroll (caro). Nas .cover fica
-         undefined ⇒ 0, que é o top:0 delas. */
-      el.__pinTop=top;
-
-      /* ── PISTA da ENTRADA LENTA ────────────────────────────────────────
-         A rolagem EXTRA que a subida lenta exige. 🔑 Ela vale
-         `percurso × (1/slow − 1)`, e o PERCURSO é a distância que a lâmina
-         cobre até travar — que **mudou** quando a subaba virou `data-pin-fit`:
-         antes ela ia do rodapé até o topo da tela (percurso = TELA), agora vai
-         do rodapé até encostar a base (percurso = a ALTURA DELA MESMA).
-         Por isso a pista é calculada aqui, em JS: a altura é do conteúdo e o
-         CSS não sabe medir isso. É uma conta ESTÁTICA (só em resize/relayout),
-         não entra no laço de scroll. */
-      var slow=parseFloat(getComputedStyle(el).getPropertyValue('--slow'));
-      var usaSlow=el.hasAttribute('data-slow') && slow>0 && slow<1;
-      var percurso=el.hasAttribute('data-pin-fit') ? el.offsetHeight : innerHeight;
-      el.style.setProperty('--pista', (usaSlow ? percurso*(1/slow-1) : 0)+'px');
-
-      /* ── MOTOR NO COMPOSITOR (`?lenta=1`) — ver o CSS de `html.lenta` ──
-         Aqui a lâmina passa a grudar na BORDA DE BAIXO da tela (--pin-top =
-         altura da janela): parada no layout, pra que a animação de CSS seja a
-         ÚNICA fonte de movimento. O JS só publica as duas medidas que o CSS
-         não sabe calcular (a altura do conteúdo e a pista) — conta estática,
-         fora do laço de scroll. */
-      if(LENTA && el.hasAttribute('data-slow')){
-        var h=el.offsetHeight;
-        el.style.setProperty('--pin-top', innerHeight+'px');
-        el.__pinTop=innerHeight;
-        el.style.setProperty('--sub-h', h+'px');
-        document.documentElement.style.setProperty('--pista', h*(1/LENTA_SLOW-1)+'px');
-      }
+      el.style.setProperty('--pin-top',
+        ((el.hasAttribute('data-pin-fit') ? sobra : Math.min(0, sobra)) + nudge)+'px');
     });
   }
   setPins();
@@ -1727,10 +1608,7 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
          o efeito AO VIVO no celular, que é o único lugar onde dá pra julgar se
          treme. Fora de (0,1) ⇒ 0 ⇒ desligado, 1:1 como sempre foi.
          ⚠️ Quem usa precisa do `margin-top` casado no CSS (são um PAR). */
-      slow:lerSlow(el),
-      /* lâmina ANTERIOR — só guardada pra quem tem entrada lenta, que é quem
-         precisa da trava anti-vão da entrada (ver paint()). */
-      prev:lerSlow(el)?el.previousElementSibling:null
+      slow:lerSlow(el)
     };
   });
   var vh=innerHeight, ticking=false;
@@ -1756,11 +1634,7 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
            visual. Raciocinar sempre em fluxo mantém uma régua só. */
         top:c.next.getBoundingClientRect().top-(c.nextTy||0),
         natTop:c.el.getBoundingClientRect().top-(c.ty||0),
-        h:c.el.offsetHeight,
-        /* base da lâmina ANTERIOR — só quem tem entrada lenta precisa (trava
-           anti-vão da entrada, ver abaixo). `null` nas outras pra não pagar
-           uma leitura de layout à toa. */
-        antBase:c.prev?c.prev.getBoundingClientRect().bottom:null
+        h:c.el.offsetHeight
       };
     });
     /* ═══ FASE 2 — só ESCRITA (nenhuma leitura de layout aqui dentro) ═══ */
@@ -1803,25 +1677,7 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
          valor é exatamente 0. */
       var entry=0;
       if(c.slow){
-        /* 🔑 `falta` = o quanto ainda resta pra lâmina chegar ao ponto onde
-           ela TRAVA — e não até o topo da tela. A fórmula antiga usava
-           `natTop` cru, o que embutia a premissa "toda lâmina trava em 0".
-           Deixou de valer com o `data-pin-fit`, em que a subaba trava
-           encostada na BASE (pinTop positivo): medindo até 0, a subida lenta
-           continuaria puxando depois de ela já ter travado. */
-        var falta=r.natTop-(c.el.__pinTop||0);
-        if(falta>0) entry=(c.slow-1)*falta;
-        /* ⚠️ TRAVA ANTI-VÃO DA ENTRADA (não remover) — irmã da trava `coberto`
-           do lift. Frear esta lâmina enquanto a de CIMA ainda está solta faz
-           as duas se separarem: a de cima corre a 1× com o dedo, esta a
-           `slow`, e abre uma faixa entre a base dela e o topo desta. Só
-           aparece quando a barra de endereço recolhe (aí a lâmina de cima,
-           que mede 100svh, fica MAIS BAIXA que a viewport e trava depois
-           desta começar a surgir) — ou seja, some em simulação de desktop.
-           A trava não deixa esta lâmina descer abaixo da base da anterior:
-           na prática a entrada lenta só começa a valer quando a de cima
-           trava, que é exatamente quando ela pode. */
-        if(r.antBase!==null) entry=Math.min(entry, r.antBase-r.natTop);
+        if(r.natTop>0) entry=(c.slow-1)*r.natTop;
         if(entry!==c.nextTy){
           c.next.style.transform=entry?'translate3d(0,'+entry.toFixed(2)+'px,0)':'';
         }
@@ -1966,11 +1822,8 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
        iPhone responde. Aqui o Daniel varre a faixa e acha onde para de tremer.
        1 = desligado (a subida 1:1 de hoje). A pista (margin-top) acompanha
        sozinha pelo CSS — os dois são um PAR. */
-    { key:'--slow', label:'Subaba — velocidade da subida (1 = normal · .6 = 40% + lenta)',
-      unit:'', min:.2, max:1, step:.05,
-      /* lê o padrão do :root em vez de repetir o número — assim o slider abre
-         no valor certo mesmo depois de mudarmos o padrão no CSS */
-      get:function(){ return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--slow'))||1; } }
+    { key:'--slow', label:'Subaba — velocidade da subida (1 = normal · .35 = 65% + lenta)',
+      unit:'', min:.2, max:1, step:.05, get:function(){ return 1; } }
   ];
   var STORE_KEY='en_tweak_v1';
 
