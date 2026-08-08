@@ -507,7 +507,15 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
 .s-form{
   background:#fff;
   position:relative; overflow:hidden;
-  min-height:100svh;
+  /* 🔑 `lvh` e NÃO `svh` aqui. `100svh` é a altura da tela COM a barra de
+     endereço; quando ela recolhe, a janela cresce ~55px e sobra uma faixa da
+     cena seguinte (preta) aparecendo embaixo. As outras lâminas não sofrem
+     disso porque TRAVAM e a de cima cobre — esta é a última da cena e não
+     trava, então a falha fica exposta. `lvh` é a altura com a barra recolhida:
+     cobre a tela nos dois estados.
+     ⚠️ Ao adicionar o CTA, o conteúdo pode passar de uma tela — `min-height`
+     deixa crescer, então a seção acompanha sem precisar de ajuste. */
+  min-height:100lvh;
   /* topo generoso é o que abre espaço pra bola, igual ao mobile da
      referência (lá: padding-top clamp(220px,60vw,280px)) */
   padding:clamp(220px,60vw,280px) var(--pad) clamp(56px,10vh,96px);
@@ -1270,7 +1278,8 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   <div class="sheet s-form" id="formacoes">
     <span class="stamp" aria-hidden="true"></span>
     <div class="wrap">
-      <span class="idx r in-io" style="--r:0">[04] — Formações</span>
+      <!-- só o número: a palavra "Formações" já vem logo abaixo, no título -->
+      <span class="idx r in-io" style="--r:0">[04]</span>
       <!-- "Forma" + "ções" colados (sem espaço): uma palavra, duas texturas -->
       <h2 class="form-title r in-io" style="--r:1">Forma<em>ções</em></h2>
       <p class="form-lede r in-io" style="--r:2">Propostas formativas para ampliar repertórios e transformar práticas.</p>
