@@ -507,6 +507,10 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
 .s-form{
   background:#fff;
   position:relative; overflow:hidden;
+  /* coluna flex pra a faixa do botão poder engolir a sobra vertical e
+     centrar o botão nela (ver `.fcar-cta-wrap`). O `.stamp` é absoluto,
+     então fica fora deste fluxo e não vira item flex. */
+  display:flex; flex-direction:column;
   /* 🔑 `lvh` e NÃO `svh` aqui. `100svh` é a altura da tela COM a barra de
      endereço; quando ela recolhe, a janela cresce ~55px e sobra uma faixa da
      cena seguinte (preta) aparecendo embaixo. As outras lâminas não sofrem
@@ -613,17 +617,19 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
 .fcar-card > a:active{ background:rgba(15,14,12,.10); }
 @media(hover:hover){ .fcar-card > a:hover{ background:rgba(15,14,12,.06); } }
 .fcar-top,.fcar-pe{
-  font-family:var(--mono); font-size:10px; letter-spacing:.16em;
+  /* DM Sans ExtraLight (era Space Mono). ⚠️ O `letter-spacing:.16em` foi
+     calibrado pra fonte MONOESPAÇADA; na DM Sans pode ficar solto demais —
+     é o primeiro número a mexer se o miolo do cartão parecer arejado demais. */
+  font-family:var(--sans); font-weight:200; font-size:10px; letter-spacing:.16em;
   /* preto cheio (era `--mute`, cinza): pedido do Daniel — os três textos do
      cartão têm o mesmo peso de cor, só mudam de tamanho */
   text-transform:uppercase; color:var(--ink); line-height:1.6;
 }
 .fcar-nome{
-  /* ⚠️ 700 EXIGIU estender o intervalo da DM Sans no <link> (era 200..400).
-     Sem isso o navegador engrossa a fonte por conta própria — "faux bold" —
-     que numa fonte variável fica visivelmente sujo. Se um dia alguém reduzir
-     o intervalo de volta pra economizar peso, este 700 quebra em silêncio. */
-  font-family:var(--sans); font-weight:700;
+  /* Light 300 (o bold 700 foi testado e descartado). O intervalo da DM Sans
+     no <link> continua em 200..700 — não reduzir sem conferir: o botão e os
+     textos menores usam 200, e o 700 fica disponível pra voltar a testar. */
+  font-family:var(--sans); font-weight:300;
   font-size:clamp(1.35rem,5.6vw,1.7rem); line-height:1.15;
   letter-spacing:-.02em; display:block;
 }
@@ -632,14 +638,21 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
 /* BOTÃO abaixo do fio — pílula de contorno fino, igual à referência.
    Mesmo contorno preto e mesmo cinza de toque dos cartões, pra o conjunto ler
    como uma família só. */
-.fcar-cta-wrap{ position:relative; z-index:1; display:flex; justify-content:center;
-  margin-top:clamp(26px,4.5vh,40px); }
+/* 🔑 `flex:1` faz esta faixa engolir TODA a sobra vertical da seção, e o
+   `align-items:center` centra o botão dentro dela — que é o "centralizado
+   entre o fim dos box e o fim da seção" que o Daniel pediu. Depende de a
+   `.s-form` ser flex-column (declarado lá em cima).
+   O `padding-top` garante um respiro mínimo caso o conteúdo cresça e não
+   sobre espaço nenhum pra distribuir. */
+.fcar-cta-wrap{ position:relative; z-index:1; flex:1;
+  display:flex; align-items:center; justify-content:center;
+  padding-top:clamp(26px,4.5vh,40px); }
 .fcar-cta{
   display:inline-flex; align-items:center; justify-content:center;
   padding:15px 30px;
   border:1px solid var(--ink); border-radius:999px;
   background:#fff; color:var(--ink); text-decoration:none;
-  font-family:var(--sans); font-weight:400; font-size:15px; letter-spacing:-.01em;
+  font-family:var(--sans); font-weight:200; font-size:15px; letter-spacing:-.01em;
   transition:background .16s var(--ease);
   -webkit-tap-highlight-color:transparent;
 }
