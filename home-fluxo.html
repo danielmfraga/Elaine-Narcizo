@@ -427,6 +427,58 @@ main{ position:relative; }
      intacto. Quem liga é o slider do `?tweak=1` (escreve --slow no :root). */
   margin-top:calc(100svh / var(--slow,1) - 100svh);
 }
+/* ═══ ENTRADA LENTA — MOTOR NO COMPOSITOR (`?lenta=1`) ═════════════════════
+   Desenho refeito depois de pesquisar: a 1ª versão ia pendurar a linha do
+   tempo na PRÓPRIA subaba, e isso NÃO funcionaria. É problema conhecido e
+   está aberto no grupo de trabalho do CSS: uma `view()` pendurada num
+   elemento `position:sticky` CONGELA no instante em que ele gruda (mudou no
+   Chrome 116; relatado por Roman Komarov). E não dá pra contornar com um
+   wrapper — envolver o sticky quebra o sticky.
+
+   A SAÍDA que a comunidade usa é `timeline-scope`: quem mede a rolagem é um
+   elemento que NÃO gruda, o nome da linha do tempo é içado pra um ancestral
+   comum, e o elemento sticky só CONSOME. Aqui:
+     · `.lenta-proxy`  → marcador invisível, não gruda, é o relógio;
+     · `.scene`        → iça o nome (timeline-scope);
+     · `.s-radio-sub`  → consome e anima.
+
+   POR QUE ISTO NÃO TREME, sendo que o motor em JS tremia em qualquer
+   velocidade: lá havia DUAS fontes de movimento brigando — o scroll nativo
+   movia a lâmina no compositor enquanto o JS subtraía parte disso pela
+   thread principal, que no iOS chega atrasada e em lotes (a doc do Chrome
+   desaconselha explicitamente usar evento de scroll pra parallax). Aqui a
+   lâmina fica GRUDADA na borda de baixo da tela — parada no layout — e quem
+   a move é a animação, no compositor. Uma fonte só, e no lugar certo.
+
+   🔑 A GEOMETRIA DO MARCADOR (é o que dispensa qualquer offset na faixa):
+   ele começa exatamente onde a subaba começa e tem a altura da rolagem que a
+   subida consome (`altura/slow`). Com `height:X; margin-bottom:-X` ele ocupa
+   ZERO espaço no fluxo, então nada se desloca. Assim `entry 0%` cai no
+   instante em que a subaba encosta no rodapé e `entry 100%` no instante em
+   que ela termina de assentar — a faixa padrão serve, sem conta mágica.
+
+   🔑 A FORMAÇÕES NÃO PRECISA DE COLA: durante a subida a base da subaba está
+   sempre abaixo da borda da tela, então a distância entre as duas fica fora
+   de vista. Basta ela CHEGAR na hora — e isso é `margin-top`, puro layout. */
+html.lenta .lenta-proxy{
+  height:var(--lenta-span,0px);
+  margin-bottom:calc(-1 * var(--lenta-span,0px));   /* ocupa zero no fluxo */
+  pointer-events:none;
+  view-timeline-name:--subaba;
+  view-timeline-axis:block;
+}
+html.lenta .scene{ timeline-scope:--subaba; }
+html.lenta .s-radio-sub{
+  animation:subaba-lenta linear both;
+  animation-timeline:--subaba;
+  animation-range:entry 0% entry 100%;
+}
+@keyframes subaba-lenta{
+  from{ transform:translateY(0); }                           /* no rodapé */
+  to  { transform:translateY(calc(-1 * var(--sub-h,0px))); } /* assentada */
+}
+html.lenta #formacoes{ margin-top:var(--pista,0px); }
+
 .s-radio-sub .stats{ grid-template-columns:repeat(2,1fr); max-width:520px; }
 .s-radio-sub .btn-tune{ transform:none; margin-top:clamp(18px,3.4vh,32px); }
 .s-radio-sub .btn-tune.r{ transform:translateY(26px); }         /* estado inicial da revelação */
@@ -1443,13 +1495,72 @@ main{ position:relative; }
      de baralho). NEGATIVO = trava mais tarde, entrando um pouco tela acima.
      ⚠️ Fresta positiva NUNCA é vão preto: quem aparece ali é a lâmina
      anterior, que a essa altura já cobre a tela inteira. */
+  /* ═══ ENTRADA LENTA no COMPOSITOR — chave `?lenta=1` (ver o CSS html.lenta)
+     Fica atrás de chave porque muda o motor de uma transição já aprovada.
+     `?lenta=0.5` calibra a velocidade sem deploy novo. A tarja no rodapé diz
+     se o navegador suporta, pra o veredito não depender de adivinhação. */
+  var LENTA=false, LENTA_SLOW=.6, proxy=null;
+  (function(){
+    var q=new URLSearchParams(location.search);
+    if(q.get('lenta')==null) return;
+    var v=parseFloat(q.get('lenta'));
+    if(v>0 && v<1) LENTA_SLOW=v;
+    /* precisa das DUAS coisas: a animação por scroll e o içamento do nome */
+    var suporta=window.CSS && CSS.supports &&
+      CSS.supports('animation-timeline','view()') && CSS.supports('timeline-scope','--x');
+    LENTA=!!suporta;
+    document.documentElement.classList.toggle('lenta', LENTA);
+    if(LENTA){
+      /* o marcador nasce aqui (e não no HTML) pra que, sem a chave, a página
+         seja exatamente a aprovada — nem um nó a mais no DOM */
+      var sub=document.querySelector('.sheet.pin[data-slow]');
+      if(sub){
+        proxy=document.createElement('div');
+        proxy.className='lenta-proxy';
+        proxy.setAttribute('aria-hidden','true');
+        sub.parentNode.insertBefore(proxy, sub);
+      }
+    }
+    addEventListener('DOMContentLoaded',function(){
+      var t=document.createElement('div');
+      t.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:9999;padding:10px 14px;'+
+        'font:600 13px system-ui,-apple-system,sans-serif;text-align:center;color:#fff;background:'+
+        (suporta?'#1f7a3d':'#8a1f1f');
+      t.textContent=suporta
+        ? 'motor no compositor ATIVO · velocidade '+LENTA_SLOW+' (toque pra esconder)'
+        : 'este Safari NÃO suporta o recurso — a subida ficou normal';
+      t.onclick=function(){ t.remove(); };
+      document.body.appendChild(t);
+    });
+  })();
+
   function setPins(){
     document.querySelectorAll('.sheet.pin').forEach(function(el){
       var nudge=parseFloat(getComputedStyle(el).getPropertyValue('--pin-nudge'))||0;
       var sobra=innerHeight-el.offsetHeight;
       /* data-pin-fit: sem o clamp — trava assim que couber inteira na tela */
-      el.style.setProperty('--pin-top',
-        ((el.hasAttribute('data-pin-fit') ? sobra : Math.min(0, sobra)) + nudge)+'px');
+      var top=(el.hasAttribute('data-pin-fit') ? sobra : Math.min(0, sobra))+nudge;
+
+      if(LENTA){
+        /* 🔑 nenhuma lâmina pode travar deixando espaço ABAIXO dela. Com a
+           barra de endereço recolhida a janela fica mais alta que a Rádio
+           (100svh), e ela travaria em 8px com 47px sobrando embaixo — aí a
+           subaba, já freada, se separaria dela e abriria uma faixa. Travando
+           em `sobra` a Rádio prende no MESMO instante em que a subaba começa
+           a aparecer, e as duas nunca andam em velocidades diferentes.
+           Os ~55px que isso desce ficam atrás do header (62px, opaco). */
+        top=Math.max(top, sobra);
+        /* a lâmina da entrada lenta gruda na BORDA DE BAIXO: parada no
+           layout, pra animação ser a única fonte de movimento */
+        if(el.hasAttribute('data-slow')){
+          var h=el.offsetHeight;
+          top=innerHeight;
+          el.style.setProperty('--sub-h', h+'px');
+          if(proxy) proxy.style.setProperty('--lenta-span', (h/LENTA_SLOW)+'px');
+          document.documentElement.style.setProperty('--pista', (h*(1/LENTA_SLOW-1))+'px');
+        }
+      }
+      el.style.setProperty('--pin-top', top+'px');
     });
   }
   setPins();
@@ -1586,18 +1697,30 @@ main{ position:relative; }
      têm a pista (`margin-top`) casada e entrariam na tela na hora errada.
      Só vale em (0,1); fora disso = desligado (1:1, como sempre foi). */
   function lerSlow(el){
+    /* com `?lenta=1` quem faz a subida lenta é o CSS, no compositor — os dois
+       motores juntos moveriam a lâmina em dobro. O do JS cede a vez. */
+    if(LENTA) return 0;
     if(!el.hasAttribute('data-slow')) return 0;
     var v=parseFloat(getComputedStyle(el).getPropertyValue('--slow'));
     return (v>0 && v<1) ? v : 0;
   }
+  /* a lâmina seguinte, PULANDO o marcador invisível da entrada lenta — ele é
+     só um relógio, não participa do empilhamento. Sem isto, a `next` da Rádio
+     viraria o marcador e o escurecimento dela mediria contra o elemento
+     errado. */
+  function proxLamina(el){
+    var n=el.nextElementSibling;
+    while(n && n.classList.contains('lenta-proxy')) n=n.nextElementSibling;
+    return n;
+  }
   var covers=[].slice.call(document.querySelectorAll('.cover,.sheet.pin')).filter(function(el){
-    return el.nextElementSibling;
+    return proxLamina(el);
   }).map(function(el){
     var dim=document.createElement('div');
     dim.className='pin-dim'; dim.setAttribute('aria-hidden','true');
     el.appendChild(dim);
     return {
-      el:el, next:el.nextElementSibling, dim:dim,
+      el:el, next:proxLamina(el), dim:dim,
       bg:el.querySelector('.hero-bg,.portrait img'),
       /* data-static = trava e NÃO sobe mais (lift preso em 0). O
          escurecimento continua — é ele que dá profundidade sem movimento. */
