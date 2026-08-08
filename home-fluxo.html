@@ -29,7 +29,7 @@ if(!window.enVoltou) scrollTo(0,0);
 <!-- DM Sans (COM itálico) entrou pela capa de Formações: é a fonte da
      /repertorios-sensiveis, e o título "Forma+ções" depende do par
      romano/itálico do mesmo desenho pra funcionar. -->
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Space+Mono:wght@400;700&family=Amatic+SC:wght@400;700&family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,200..400;1,9..40,200..400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Space+Mono:wght@400;700&family=Amatic+SC:wght@400;700&family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,200..700;1,9..40,200..700&display=swap" rel="stylesheet">
 
 <style>
 /* ═════════════════════════════════════════════════════════════
@@ -563,7 +563,13 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   display:flex; gap:14px;
   list-style:none; margin:0; padding:4px var(--pad);
   overflow-x:auto; overflow-y:hidden;
-  scroll-snap-type:x mandatory;
+  /* 🔑 `proximity`, e NÃO `mandatory` — é isto que devolve a INÉRCIA que o
+     Daniel pediu ("passa o dedo e ele continua sozinho mais um pouco").
+     A rolagem por toque do iOS já tem inércia de fábrica; o encaixe
+     OBRIGATÓRIO é que a matava, cravando no cartão mais próximo a cada gesto.
+     Com `proximity` o fio desliza e só encaixa quando para perto de um cartão.
+     Preço: os cartões não ficam mais sempre perfeitamente centrados. */
+  scroll-snap-type:x proximity;
   scroll-padding-inline:var(--pad);
   /* ⚠️ segura o gesto DENTRO do carrossel: sem isto, ao chegar na ponta o
      swipe encadeia pro navegador e dispara o "voltar" do iOS. */
@@ -600,7 +606,11 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   text-transform:uppercase; color:var(--mute); line-height:1.6;
 }
 .fcar-nome{
-  font-family:var(--sans); font-weight:300;
+  /* ⚠️ 700 EXIGIU estender o intervalo da DM Sans no <link> (era 200..400).
+     Sem isso o navegador engrossa a fonte por conta própria — "faux bold" —
+     que numa fonte variável fica visivelmente sujo. Se um dia alguém reduzir
+     o intervalo de volta pra economizar peso, este 700 quebra em silêncio. */
+  font-family:var(--sans); font-weight:700;
   font-size:clamp(1.35rem,5.6vw,1.7rem); line-height:1.15;
   letter-spacing:-.02em; display:block;
 }
