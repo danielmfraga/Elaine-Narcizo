@@ -274,7 +274,9 @@ main{ position:relative; }
      "50px a partir do topo do cartão" (ignorando o header), é só trocar
      pra `padding-top:50px` — mas aí o título nasce ~12px atrás do header. */
   justify-content:flex-start;
-  padding-top:calc(62px + 50px);
+  /* confirmado com o Daniel: estava em 62(header)+50, ficou apertado —
+     subiu pra 62+130. */
+  padding-top:calc(62px + 130px);
 }
 .c-bilhe .lead{ max-width:34ch; }
 /* título+subtítulo 80px acima. Por `transform` e não por margem: margem
@@ -299,7 +301,9 @@ main{ position:relative; }
 }
 .c-bilhe .giant::after{
   content:"Bilheteria"; position:absolute; inset:0; pointer-events:none;
-  background:linear-gradient(115deg, transparent 30%, rgba(255,255,255,.85) 48%, transparent 66%);
+  /* intensidade -50% (pedido "tipo reduzir opacidade no Photoshop"), sem
+     mexer no movimento: só o pico do gradiente, .85 → .43. */
+  background:linear-gradient(115deg, transparent 30%, rgba(255,255,255,.43) 48%, transparent 66%);
   background-size:300% 100%;
   background-clip:text; -webkit-background-clip:text;
   color:transparent; -webkit-text-fill-color:transparent;
