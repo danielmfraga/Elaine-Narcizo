@@ -1210,6 +1210,68 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
 @keyframes ddFlo{ from{ transform:translateY(0); } to{ transform:translateY(-9px); } }
 @media (prefers-reduced-motion:reduce){ .dd-capa .flo,.dd-capa .cv-seal img{ animation:none; } }
 
+/* ── miniplayer "Rádio DançaDestino" — trazido de volta pra dentro da capa
+   (pedido do Daniel: "no mesmo local da capa original"). Era
+   `position:fixed` na página original (flutuava sobre a página inteira, com
+   uma conta de `right` pensada pra centralizar numa coluna de 540px própria
+   daquela página) — aqui virou `position:absolute` ANCORADO na `.dd-capa`
+   (que já é `position:relative`), pra ficar só dentro deste card, não a home
+   inteira. Nomes de keyframe prefixados (ddRipple/ddEq) por segurança. */
+.dd-capa #dd-fab{ position:absolute; right:16px; bottom:16px; z-index:6;
+  width:58px; height:58px; border-radius:50%; background:var(--amarelo); border:0; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; box-shadow:0 10px 26px rgba(0,0,0,.45);
+  transition:transform .4s cubic-bezier(.2,.7,.25,1), opacity .3s ease; }
+.dd-capa #dd-fab::before, .dd-capa #dd-fab::after{ content:''; position:absolute; inset:0; border-radius:50%;
+  border:2px solid var(--amarelo); pointer-events:none; opacity:0; }
+.dd-capa #dd-fab:not(.playing)::before, .dd-capa #dd-fab:not(.playing)::after{ animation:ddRipple 2.6s ease-out infinite; }
+.dd-capa #dd-fab:not(.playing)::after{ animation-delay:1.3s; }
+@keyframes ddRipple{ 0%{ transform:scale(1); opacity:.5; } 100%{ transform:scale(2.2); opacity:0; } }
+.dd-capa #dd-fab svg{ width:24px; height:24px; fill:var(--roxo-escuro); margin-left:2px; }
+.dd-capa #dd-fab .dd-eq{ display:none; align-items:flex-end; gap:3px; height:20px; }
+.dd-capa #dd-fab .dd-eq i{ display:block; width:4px; height:20px; border-radius:2px; background:var(--roxo-escuro);
+  transform-origin:bottom; animation:ddEq 1.05s ease-in-out infinite; }
+.dd-capa #dd-fab .dd-eq i:nth-child(2){ animation-delay:.18s; }
+.dd-capa #dd-fab .dd-eq i:nth-child(3){ animation-delay:.36s; }
+.dd-capa #dd-fab.playing svg{ display:none; }
+.dd-capa #dd-fab.playing .dd-eq{ display:flex; }
+@keyframes ddEq{ 0%,100%{ transform:scaleY(.3); } 50%{ transform:scaleY(1); } }
+.dd-capa #dd-panel{ position:absolute; right:16px; bottom:84px; z-index:7;
+  width:min(88%,320px); background:var(--roxo-escuro); border:2px solid var(--amarelo);
+  border-radius:16px; padding:12px; box-shadow:0 26px 54px rgba(0,0,0,.5);
+  opacity:0; pointer-events:none; translate:0 16px; transition:opacity .28s ease, translate .28s ease; }
+.dd-capa #dd-panel.open{ opacity:1; pointer-events:auto; translate:0 0; }
+.dd-capa .dd-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:9px; }
+.dd-capa .dd-eyebrow{ font-size:.6rem; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--amarelo); }
+.dd-capa #dd-close{ background:none; border:0; color:var(--branco); font-size:1rem; cursor:pointer; padding:2px 6px; }
+.dd-capa .dd-video{ position:relative; width:100%; aspect-ratio:16/9; background:#1c0640; border-radius:10px; overflow:hidden;
+  border:1px solid rgba(245,217,51,.28); }
+.dd-capa .dd-video iframe, .dd-capa #dd-yt{ position:absolute; inset:0; width:100% !important; height:100% !important; }
+.dd-capa .dd-title{ margin-top:10px; font-size:.72rem; font-weight:700; color:var(--branco);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.dd-capa .dd-bar{ height:5px; margin-top:9px; border-radius:99px; background:rgba(255,255,255,.18); cursor:pointer; }
+.dd-capa .dd-fill{ height:100%; width:0; border-radius:99px; background:var(--amarelo); }
+.dd-capa .dd-times{ display:flex; justify-content:space-between; font-size:.58rem; color:rgba(255,255,255,.55); margin-top:5px; }
+.dd-capa .dd-ctrls{ display:flex; align-items:center; justify-content:center; gap:16px; margin:8px 0 4px; }
+.dd-capa .dd-ctrls button{ background:none; border:0; cursor:pointer; padding:6px; display:flex; align-items:center; justify-content:center; }
+.dd-capa .dd-ctrls svg{ width:20px; height:20px; fill:var(--amarelo); }
+.dd-capa #dd-shuffle{ opacity:.5; position:relative; }
+.dd-capa #dd-shuffle.on{ opacity:1; }
+.dd-capa #dd-shuffle.on::after{ content:''; position:absolute; left:50%; bottom:0; width:4px; height:4px; border-radius:50%;
+  background:var(--amarelo); translate:-50% 0; }
+.dd-capa #dd-play{ width:46px; height:46px; border-radius:50%; background:var(--amarelo); }
+.dd-capa #dd-play svg{ fill:var(--roxo-escuro); width:22px; height:22px; margin-left:2px; }
+.dd-capa #dd-play .ic-pau{ display:none; margin-left:0; }
+.dd-capa #dd-play.playing .ic-pla{ display:none; }
+.dd-capa #dd-play.playing .ic-pau{ display:block; }
+.dd-capa .dd-list{ margin-top:4px; }
+.dd-capa .dd-row{ display:flex; align-items:center; gap:8px; padding:7px 4px; border-top:1px solid rgba(255,255,255,.12);
+  font-size:.68rem; cursor:pointer; color:rgba(255,255,255,.85); }
+.dd-capa .dd-row .n{ width:14px; color:rgba(255,255,255,.5); }
+.dd-capa .dd-row .t{ flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.dd-capa .dd-row .p{ color:var(--amarelo); font-size:.58rem; }
+.dd-capa .dd-row.live, .dd-capa .dd-row.live .n{ color:var(--amarelo); }
+@media (prefers-reduced-motion:reduce){ .dd-capa #dd-fab::before,.dd-capa #dd-fab::after,.dd-capa .dd-eq i{ animation:none !important; } }
+
 /* faixa de parcerias (o grid de 30 logos da referência) */
 .partners{ margin-top:clamp(30px,6vh,60px); padding-top:clamp(20px,3vh,32px); border-top:1px solid var(--line); }
 .partners .cap{ font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--mute); margin-bottom:14px; }
@@ -1672,7 +1734,40 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
               <p class="r1">Um ritual<br>para nosso<br>tempo.</p>
               <p class="r2">Toda sexta, 20h.</p>
             </div>
+
+            <!-- miniplayer "Rádio DançaDestino" — trazido de volta pro
+                 mesmo canto que tinha na página original, a pedido do
+                 Daniel. Mesmo player (YouTube IFrame API + controles
+                 próprios), JS no fim do body. -->
+            <button id="dd-fab" aria-label="Rádio DançaDestino">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+              <span class="dd-eq" aria-hidden="true"><i></i><i></i><i></i></span>
+            </button>
+            <aside id="dd-panel" aria-hidden="true">
+              <div class="dd-head">
+                <span class="dd-eyebrow">Rádio · DançaDestino</span>
+                <button id="dd-close" aria-label="Fechar">✕</button>
+              </div>
+              <div class="dd-video"><div id="dd-yt"></div></div>
+              <p class="dd-title" id="dd-title">Toque play pra rodar o ritual ♪</p>
+              <div class="dd-bar" id="dd-bar"><div class="dd-fill" id="dd-fill"></div></div>
+              <div class="dd-times"><span id="dd-cur">0:00</span><span id="dd-dur">0:00</span></div>
+              <div class="dd-ctrls">
+                <button id="dd-shuffle" aria-label="Aleatório"><svg viewBox="0 0 24 24"><path d="M10.59 9.17 5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg></button>
+                <button id="dd-prev" aria-label="Anterior"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm12 0-8.5 6 8.5 6z"/></svg></button>
+                <button id="dd-play" aria-label="Tocar ou pausar">
+                  <svg class="ic-pla" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                  <svg class="ic-pau" viewBox="0 0 24 24"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>
+                </button>
+                <button id="dd-next" aria-label="Próxima"><svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zM6 6l8.5 6L6 18z"/></svg></button>
+              </div>
+              <div class="dd-list" id="dd-list"></div>
+            </aside>
           </div>
+          <!-- botão "Embarque" — mesmo visual do chip "Portão 01", pedido do
+               Daniel; leva pro danca-destino/ completo (os 7 cartazes do
+               manifesto, que não vieram pra dentro da capa embutida). -->
+          <a class="chip hot r" style="--r:2;background:var(--rosa)" href="danca-destino/">Embarque</a>
         </article>
 
         <!-- OBRA 2 · Cartas entre Homens -->
@@ -2499,6 +2594,130 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   }
 
   if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', buildPanel); } else { buildPanel(); }
+})();
+</script>
+
+<!-- ── Miniplayer "Rádio DançaDestino" — mesmo motor da página danca-destino/
+     (YouTube IFrame API + controles próprios), trazido pra dentro da capa
+     embutida a pedido do Daniel. Só o player em si: a parte de revelação por
+     scroll e o observer de "sobe perto do lettering" (setFab) da página
+     original não vieram — aqui só existe a capa, sem outros cartazes pra
+     reagir a. ⚠️ Playlist duplicada 2× no site (aqui e em danca-destino/
+     index.html) — mudou lá, mudar aqui também. -->
+<script>
+(function(){
+  var ddTracks=[
+    { id:'nAyXMqB_6Kc', title:'Casaco Marron (Bye, Bye, Ceci)', artist:'DançaDestino' },
+    { id:'AA_8wtG62DI', title:'Jokerman', artist:'Caetano Veloso' },
+    { id:'rLsP8NgS01Y', title:'Faixa 03', artist:'DançaDestino' }
+  ];
+  var ddFab=document.getElementById('dd-fab');
+  if(!ddFab) return;   /* card ainda não existe nesta página (defensivo) */
+  var ddPlayer=null,ddApiReady=false,ddApiLoading=false,ddReady=false,ddPendingIdx=null,ddPoll=null,ddLoadedId=null,ddCur=-1,ddShuffle=false;
+  var ddPanel=document.getElementById('dd-panel'),
+      ddTitle=document.getElementById('dd-title'),ddFill=document.getElementById('dd-fill'),
+      ddBar=document.getElementById('dd-bar'),ddCurEl=document.getElementById('dd-cur'),
+      ddDurEl=document.getElementById('dd-dur'),ddList=document.getElementById('dd-list'),
+      ddPlayBtn=document.getElementById('dd-play');
+  function ddFmt(s){ s=Math.max(0,Math.floor(s||0)); return Math.floor(s/60)+':'+('0'+(s%60)).slice(-2); }
+  function ddRenderList(){
+    ddList.innerHTML='';
+    ddTracks.forEach(function(tr,i){
+      var r=document.createElement('div');
+      r.className='dd-row'+(i===ddCur?' live':'');
+      var n=document.createElement('span'); n.className='n'; n.textContent=i===ddCur?'♪':String(i+1);
+      var t=document.createElement('span'); t.className='t'; t.textContent=tr.title+' · '+tr.artist;
+      var p=document.createElement('span'); p.className='p'; p.textContent=i===ddCur?'':'▶';
+      r.appendChild(n); r.appendChild(t); r.appendChild(p);
+      r.addEventListener('click',function(){ ddPlayIndex(i); });
+      ddList.appendChild(r);
+    });
+  }
+  function ddMarkRows(){
+    [].forEach.call(ddList.children,function(r,j){
+      r.classList.toggle('live',j===ddCur);
+      r.querySelector('.n').textContent=j===ddCur?'♪':String(j+1);
+      r.querySelector('.p').textContent=j===ddCur?'':'▶';
+    });
+  }
+  function ddLoadApi(){
+    if(ddApiReady||ddApiLoading) return;
+    ddApiLoading=true;
+    var prev=window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady=function(){
+      if(typeof prev==='function'){ try{ prev(); }catch(e){} }
+      ddApiReady=true; ddCreatePlayer();
+    };
+    var s=document.createElement('script'); s.src='https://www.youtube.com/iframe_api'; s.async=true;
+    document.body.appendChild(s);
+  }
+  function ddCreatePlayer(){
+    if(ddPlayer||!ddApiReady||!window.YT||!YT.Player||!document.getElementById('dd-yt')) return;
+    ddPlayer=new YT.Player('dd-yt',{
+      width:'100%', height:'100%',
+      playerVars:{ controls:0, rel:0, modestbranding:1, playsinline:1, fs:0, iv_load_policy:3 },
+      events:{
+        onReady:function(){ ddReady=true;
+          if(ddPendingIdx!=null){ var i=ddPendingIdx; ddPendingIdx=null; ddPlayIndex(i); }
+          else{ var t=ddTracks[0]; try{ ddPlayer.cueVideoById(t.id); ddLoadedId=t.id; }catch(e){} }
+        },
+        onStateChange:ddOnState
+      }
+    });
+  }
+  function ddPrewarm(){ ddLoadApi(); if(ddApiReady) ddCreatePlayer(); }
+  function ddIsPlaying(){ try{ return !!(ddPlayer&&ddPlayer.getPlayerState&&ddPlayer.getPlayerState()===1); }catch(e){ return false; } }
+  function ddSync(p){ ddFab.classList.toggle('playing',p); ddPlayBtn.classList.toggle('playing',p); }
+  function ddOnState(e){
+    var S=window.YT&&YT.PlayerState; if(!S) return;
+    if(e.data===S.PLAYING){ ddSync(true); ddStartPoll(); }
+    else if(e.data===S.PAUSED){ ddSync(false); ddStopPoll(); }
+    else if(e.data===S.ENDED){ ddSync(false); ddStopPoll(); ddNext(); }
+  }
+  function ddStartPoll(){ if(!ddPoll) ddPoll=setInterval(ddTick,250); }
+  function ddStopPoll(){ if(ddPoll){ clearInterval(ddPoll); ddPoll=null; } }
+  function ddTick(){
+    if(!ddPlayer||!ddPlayer.getDuration) return;
+    var d=ddPlayer.getDuration()||0, p=ddPlayer.getCurrentTime()||0;
+    if(d) ddFill.style.width=(100*p/d)+'%';
+    ddCurEl.textContent=ddFmt(p); ddDurEl.textContent=ddFmt(d);
+  }
+  function ddPlayIndex(i){
+    var tr=ddTracks[i]; if(!tr) return;
+    ddCur=i;
+    ddTitle.textContent=tr.title+' · '+tr.artist;
+    ddMarkRows();
+    if(!ddPlayer){ ddPendingIdx=i; ddLoadApi(); if(ddApiReady) ddCreatePlayer(); return; }
+    if(!ddReady){ ddPendingIdx=i; return; }
+    if(ddLoadedId===tr.id){ ddKick(); return; }   /* já engatilhada → play instantâneo */
+    ddLoadedId=tr.id; try{ ddPlayer.loadVideoById(tr.id); }catch(e){}
+  }
+  /* "chute": play e, se em ~350ms não tocar, repete (vídeo cued pedia 2 toques) */
+  function ddKick(){
+    try{ ddPlayer.playVideo(); }catch(e){}
+    setTimeout(function(){ try{ if(ddPlayer&&ddPlayer.getPlayerState&&ddPlayer.getPlayerState()!==1) ddPlayer.playVideo(); }catch(e){} },350);
+  }
+  function ddToggle(){
+    if(!ddPlayer||!ddReady||ddCur<0){ ddPlayIndex(ddCur>=0?ddCur:0); return; }
+    if(ddIsPlaying()) ddPlayer.pauseVideo(); else ddKick();
+  }
+  function ddRandIdx(){ if(ddTracks.length<2) return ddCur<0?0:ddCur; var r; do{ r=Math.floor(Math.random()*ddTracks.length); }while(r===ddCur); return r; }
+  function ddPrev(){ ddPlayIndex(ddShuffle?ddRandIdx():((ddCur<=0?ddTracks.length:ddCur)-1)); }
+  function ddNext(){ ddPlayIndex(ddShuffle?ddRandIdx():(ddCur+1)%ddTracks.length); }
+  ddBar.addEventListener('click',function(e){
+    if(!ddPlayer||!ddReady) return;
+    var r=ddBar.getBoundingClientRect(), f=(e.clientX-r.left)/r.width, d=ddPlayer.getDuration()||0;
+    if(d){ try{ ddPlayer.seekTo(Math.max(0,Math.min(1,f))*d,true); }catch(e2){} }
+  });
+  ddPlayBtn.addEventListener('click',ddToggle);
+  document.getElementById('dd-prev').addEventListener('click',ddPrev);
+  document.getElementById('dd-next').addEventListener('click',ddNext);
+  document.getElementById('dd-shuffle').addEventListener('click',function(){ ddShuffle=!ddShuffle; this.classList.toggle('on',ddShuffle); });
+  function ddOpen(){ ddPanel.classList.add('open'); ddPanel.setAttribute('aria-hidden','false'); ddPrewarm(); }
+  function ddClose(){ ddPanel.classList.remove('open'); ddPanel.setAttribute('aria-hidden','true'); }
+  ddFab.addEventListener('click',function(){ ddPanel.classList.contains('open')?ddClose():ddOpen(); });
+  document.getElementById('dd-close').addEventListener('click',ddClose);
+  ddRenderList();
 })();
 </script>
 </body>
