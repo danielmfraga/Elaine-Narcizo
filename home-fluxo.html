@@ -265,20 +265,15 @@ main{ position:relative; }
   overflow:hidden;
   /* -30px pedido pelo Daniel. */
   min-height:calc(100svh - 30px);
-  /* Voltou a `justify-content:center` (era `flex-start` com só padding-top,
-     que deixava o espaço de baixo à mercê da sobra de tela — imprevisível,
-     e foi exatamente o que ficou torto no print). Com `center` E os dois
-     paddings IGUAIS, a simetria é garantida por construção em qualquer
-     tela: a sobra de espaço que a centralização distribui é a MESMA dos
-     dois lados, então se padding-top = padding-bottom, o espaço visível
-     acima do título = o espaço visível abaixo das frases, sempre.
-     62px = altura do header fixo — só importa pro lado de cima (não tem
-     header embaixo), mas deixei os dois iguais mesmo assim porque é isso
-     que o Daniel pediu no desenho: o número final igual, não a fórmula. */
+  /* `justify-content:center` continua (garante que qualquer sobra de tela
+     se divide igual pros dois lados — ver comentário antigo no histórico).
+     ⚠️ Só que agora os paddings NÃO são mais iguais: o mockup que o Daniel
+     mandou mostra a base bem mais folgada que o topo — li a proporção do
+     mockup como topo≈110px pra base≈300px (~1:2,7) numa tela cheia. Chute
+     visual, não medição exata — passar o número certo se estiver longe. */
   justify-content:center;
-  /* -25px dos dois lados (pedido "pra começar" — pode vir mais) */
-  padding-top:calc(62px + 130px - 25px);
-  padding-bottom:calc(62px + 130px - 25px);
+  padding-top:110px;
+  padding-bottom:300px;
 }
 .c-bilhe .lead{ max-width:34ch; }
 /* título+subtítulo 80px acima. Por `transform` e não por margem: margem
