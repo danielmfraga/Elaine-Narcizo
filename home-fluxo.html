@@ -265,15 +265,13 @@ main{ position:relative; }
   overflow:hidden;
   /* -30px pedido pelo Daniel. */
   min-height:calc(100svh - 30px);
-  /* `justify-content:center` continua (garante que qualquer sobra de tela
-     se divide igual pros dois lados — ver comentário antigo no histórico).
-     ⚠️ Só que agora os paddings NÃO são mais iguais: o mockup que o Daniel
-     mandou mostra a base bem mais folgada que o topo — li a proporção do
-     mockup como topo≈110px pra base≈300px (~1:2,7) numa tela cheia. Chute
-     visual, não medição exata — passar o número certo se estiver longe. */
+  /* `justify-content:center` + paddings IGUAIS = espaço visível simétrico
+     em qualquer tela (a sobra que a centralização distribui é a mesma dos
+     dois lados). Voltou a ser assim de propósito — o mockup mostrava a
+     base mais folgada, mas o Daniel confirmou que quer simétrico mesmo. */
   justify-content:center;
-  padding-top:110px;
-  padding-bottom:300px;
+  padding-top:120px;
+  padding-bottom:120px;
 }
 .c-bilhe .lead{ max-width:34ch; }
 /* título+subtítulo 80px acima. Por `transform` e não por margem: margem
