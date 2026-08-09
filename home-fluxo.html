@@ -578,9 +578,9 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
 .s-form{
   background:#fff;
   position:relative; overflow:hidden;
-  /* coluna flex pra a faixa do botão poder engolir a sobra vertical e
-     centrar o botão nela (ver `.fcar-cta-wrap`). O `.stamp` é absoluto,
-     então fica fora deste fluxo e não vira item flex. */
+  /* coluna flex: hoje só empilha os filhos (nenhum tem flex-grow mais — ver
+     `.fcar-cta-wrap`, que perdeu o `flex:1` de engolir a sobra vertical).
+     O `.stamp` é absoluto, então fica fora deste fluxo de qualquer jeito. */
   display:flex; flex-direction:column;
   /* 🔑 `lvh` e NÃO `svh` aqui. `100svh` é a altura da tela COM a barra de
      endereço; quando ela recolhe, a janela cresce ~55px e sobra uma faixa da
@@ -593,9 +593,12 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   min-height:100lvh;
   /* topo generoso é o que abre espaço pra bola, igual ao mobile da
      referência (lá: padding-top clamp(220px,60vw,280px)) */
-  /* +50px embaixo (pedido do Daniel) pra dar ar entre o botão e o fim da
-     seção — escrito como soma pra o respiro original continuar responsivo */
-  padding:clamp(220px,60vw,280px) var(--pad) calc(clamp(56px,10vh,96px) + 50px);
+  /* sem padding embaixo: o respiro depois do botão agora é do próprio
+     `.fcar-cta-wrap` (padding-top E padding-bottom iguais), pra ficar
+     simétrico com o respiro antes dele — ver comentário lá embaixo.
+     O fundo branco cobre até `min-height:100lvh` de qualquer jeito, então
+     zerar isto aqui não abre vão nenhum. */
+  padding:clamp(220px,60vw,280px) var(--pad) 0;
 }
 /* ── O CÍRCULO (`.stamp` da referência), na configuração MOBILE ──
    O Daniel pediu explicitamente a versão mobile, que é a já calibrada:
@@ -709,15 +712,14 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
 /* BOTÃO abaixo do fio — pílula de contorno fino, igual à referência.
    Mesmo contorno preto e mesmo cinza de toque dos cartões, pra o conjunto ler
    como uma família só. */
-/* 🔑 `flex:1` faz esta faixa engolir TODA a sobra vertical da seção, e o
-   `align-items:center` centra o botão dentro dela — que é o "centralizado
-   entre o fim dos box e o fim da seção" que o Daniel pediu. Depende de a
-   `.s-form` ser flex-column (declarado lá em cima).
-   O `padding-top` garante um respiro mínimo caso o conteúdo cresça e não
-   sobre espaço nenhum pra distribuir. */
-.fcar-cta-wrap{ position:relative; z-index:1; flex:1;
-  display:flex; align-items:center; justify-content:center;
-  padding-top:clamp(26px,4.5vh,40px); }
+/* 🔑 Respiro SIMÉTRICO: mesma distância antes e depois do botão (pedido do
+   Daniel). Era `flex:1` engolindo toda a sobra vertical da seção e
+   centralizando o botão nela — o espaço depois ficava maior que antes (e
+   variava por aparelho, porque dependia de quanto sobrava de tela).
+   Agora os dois lados usam o MESMO valor fixo. */
+.fcar-cta-wrap{ position:relative; z-index:1;
+  display:flex; justify-content:center;
+  padding:clamp(26px,4.5vh,40px) 0; }
 .fcar-cta{
   display:inline-flex; align-items:center; justify-content:center;
   padding:15px 30px;
