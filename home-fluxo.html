@@ -582,6 +582,18 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
      centrar o botão nela (ver `.fcar-cta-wrap`). O `.stamp` é absoluto,
      então fica fora deste fluxo e não vira item flex. */
   display:flex; flex-direction:column;
+  /* 🔑 SOMBRA SEM VAZAMENTO PRA BAIXO (só nesta lâmina).
+     A `.sheet` usa `0 -18px 60px`: deslocada 18px pra cima, mas o desfoque de
+     60px espalha ~30px pra CADA lado — então sobram 12px de sombra ABAIXO da
+     borda de baixo. Como a Formações fica à frente da Bilheteria na ordem de
+     pintura, esses 12px caíam sobre a lima e viravam uma linha escura bem na
+     passagem entre as duas.
+     A conta da correção: desloca 24, desfoca 48 (±24), encolhe 12 ⇒ embaixo a
+     sombra termina 12px ACIMA da borda (não vaza) e em cima ainda alcança
+     36px, que é o que mantém o efeito de profundidade sobre a subaba.
+     ⚠️ Escopo só aqui de propósito: as outras lâminas dependem da sombra
+     original pro empilhamento. */
+  box-shadow:0 -24px 48px -12px rgba(0,0,0,.35);
   /* 🔑 `lvh` e NÃO `svh` aqui. `100svh` é a altura da tela COM a barra de
      endereço; quando ela recolhe, a janela cresce ~55px e sobra uma faixa da
      cena seguinte (preta) aparecendo embaixo. As outras lâminas não sofrem
