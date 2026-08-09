@@ -62,6 +62,42 @@
     display:flex; align-items:center; justify-content:center;
     padding:0 clamp(20px,7vw,44px); }
 
+  /* ═══ CAPA — vídeo full-bleed, adicionada como preâmbulo da série de selos
+     (pedido do Daniel, ago/2026). Não é um selo (sem `.val`, fora da
+     numeração 01–06) — é a tela ANTES da série começar.
+     Distinta de todo `.slot`: ocupa a TELA INTEIRA (100dvh), não os 76dvh
+     dos selos — por isso cancela com margin-top negativo o
+     `padding-top:12dvh` do `.rail` (que só existe pra centralizar os selos
+     menores) e trava no TOPO (`scroll-snap-align:start`) em vez de
+     centralizar. O `.rail` continua a MESMA engrenagem de sempre
+     (scroll-snap nativo + `nearest()` genérico no JS) — só ganhou um 1º
+     slot maior; nada mudou pros outros 6. */
+  .slot.cover{ height:100dvh; margin-top:-12dvh; padding:0;
+    position:relative; overflow:hidden; scroll-snap-align:start;
+    align-items:flex-end; }
+  .cover-bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+  /* escurece progressivamente de cima pra baixo — o texto mora embaixo,
+     onde a imagem precisa segurar mais contraste; cor = --ink da página
+     (mesmo tom quente escuro usado no resto do site, não um preto neutro) */
+  .cover-scrim{ position:absolute; inset:0; z-index:1;
+    background:linear-gradient(180deg, rgba(42,38,32,.12) 0%, rgba(42,38,32,.22) 45%, rgba(42,38,32,.74) 100%); }
+  .cover-content{ position:relative; z-index:2; width:100%;
+    padding:0 clamp(20px,7vw,44px) clamp(48px,9vh,84px); color:#fff; text-align:center; }
+  .cover-title{ font-family:var(--type); font-weight:400; text-transform:uppercase; letter-spacing:.08em;
+    font-size:clamp(2.3rem,10.5vw,3.6rem); line-height:1.05; text-shadow:0 2px 10px rgba(0,0,0,.5); }
+  .cover-sub{ margin-top:10px; font-family:var(--type); font-size:10px; letter-spacing:.26em; text-transform:uppercase;
+    color:rgba(255,255,255,.82); text-shadow:0 1px 4px rgba(0,0,0,.5); }
+  .cover-lede{ font-family:var(--serif); font-weight:300; font-size:clamp(.92rem,3.8vw,1.08rem);
+    line-height:1.6; max-width:38ch; margin:18px auto 0; text-shadow:0 1px 6px rgba(0,0,0,.45); }
+  .cover-cta-wrap{ margin-top:22px; }
+  /* reaproveita o .cta que já existe na página (pílula tracejada + halo
+     pulsando), só troca a cor pro branco (o original é --ac, escuro,
+     pensado pra ficar sobre o papel creme do selo — aqui é sobre vídeo). */
+  .cover-cta-wrap .cta{ color:#fff; border-color:rgba(255,255,255,.7); }
+  .cover-cta-wrap .cta:hover{ background:rgba(255,255,255,.16); }
+  .cover-cta-note{ margin-top:10px; font-family:var(--serif); font-style:italic; font-size:.82rem;
+    color:rgba(255,255,255,.82); text-shadow:0 1px 4px rgba(0,0,0,.45); }
+
   /* wrapper leva a sombra (o mask do selo recortaria um box-shadow).
      will-change promove CADA selo-wrap a sua própria camada de composição:
      sem isso, o navegador recalcula o drop-shadow contra as bordas picotadas
@@ -190,7 +226,27 @@
 
   <div class="rail" id="rail">
 
-    <!-- 01 · CAPA -->
+    <!-- 00 · CAPA (vídeo) — preâmbulo antes da série de selos, pedido do
+         Daniel (ago/2026). Vídeo dele, mudo e em loop (tinha áudio no
+         arquivo original — só o `muted` já resolve, sem precisar reencodar). -->
+    <section class="slot cover" data-bg="#141210" data-ac="#141210"
+             data-cap="cartas entre homens" data-tit="Tudo Quer Viver">
+      <video class="cover-bg" src="../assets/video/cartas-capa.mp4" poster="../assets/video/cartas-capa-poster.jpg"
+        autoplay muted loop playsinline></video>
+      <div class="cover-scrim" aria-hidden="true"></div>
+      <div class="cover-content">
+        <h1 class="cover-title">Tudo Quer Viver</h1>
+        <p class="cover-sub">Cartas entre Homens</p>
+        <p class="cover-lede">Um projeto gratuito que aposta na força dos encontros improváveis. Homens que não se conhecem escrevem cartas e criam, pela palavra, possibilidades de diálogo e conexão.</p>
+        <div class="cover-cta-wrap">
+          <a class="cta" href="#" data-cta>Venha</a>
+          <p class="cover-cta-note">Para participar é simples.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 01 · 1º SELO (era rotulado "CAPA" antes da nova capa em vídeo acima
+         existir — o número/selo em si não mudou, só o comentário) -->
     <section class="slot" data-bg="#59718A" data-ac="#3C5570"
              data-cap="cartas entre homens" data-tit="Tudo Quer Viver">
       <div class="selo-wrap"><article class="selo" style="--ac:#3C5570">
