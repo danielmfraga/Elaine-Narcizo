@@ -276,8 +276,9 @@ main{ position:relative; }
      header embaixo), mas deixei os dois iguais mesmo assim porque é isso
      que o Daniel pediu no desenho: o número final igual, não a fórmula. */
   justify-content:center;
-  padding-top:calc(62px + 130px);
-  padding-bottom:calc(62px + 130px);
+  /* -25px dos dois lados (pedido "pra começar" — pode vir mais) */
+  padding-top:calc(62px + 130px - 25px);
+  padding-bottom:calc(62px + 130px - 25px);
 }
 .c-bilhe .lead{ max-width:34ch; }
 /* título+subtítulo 80px acima. Por `transform` e não por margem: margem
