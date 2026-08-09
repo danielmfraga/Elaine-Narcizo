@@ -532,7 +532,13 @@ html.lenta .lenta-proxy{
   view-timeline-name:--subaba;
   view-timeline-axis:block;
 }
-html.lenta .scene{ timeline-scope:--subaba; }
+/* ⚠️ O `timeline-scope` da `.scene` mora em UM lugar só, lá em cima, junto do
+   `.mq-proxy` — e tem que continuar assim. Aqui existia uma segunda regra
+   `html.lenta .scene{ timeline-scope:--subaba }` que, por vir DEPOIS e ter a
+   mesma especificidade, vencia e APAGAVA o `--cartaz` da lista. Resultado: as
+   frases da Bilheteria não achavam o relógio delas e ficavam paradas, sem
+   erro nenhum no console. Nome novo de linha do tempo ⇒ acrescentar NAQUELA
+   lista, nunca declarar outra vez. */
 html.lenta .s-radio-sub{
   animation:subaba-lenta linear both;
   animation-timeline:--subaba;
