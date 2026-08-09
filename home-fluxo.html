@@ -346,14 +346,23 @@ html.sdt .scene{ timeline-scope:--subaba,--cartaz; }
    válido de curva E um identificador válido de nome, e navegadores divergem
    ao decidir qual dos dois é. Se o Safari o tomou como NOME, a animação
    apontava pra um keyframes inexistente — nada rodava, sem erro nenhum.
-   🔑 Regra: em animação por rolagem, nunca partir o atalho — nome junto. */
+   🔑 Regra: em animação por rolagem, nunca partir o atalho — nome junto.
+   ⚠️ RANGE estendido de `entry 0% entry 100%` pra `entry 0% contain 100%`
+   (pedido do Daniel: o movimento parava antes da aba de baixo cobrir).
+   A fase `entry` sozinha dura só 1 tela de rolagem (min(sujeito,viewport) —
+   o `.mq-proxy` tem 200svh, MAIOR que a tela, então entry=100svh) — e isso
+   termina bem ANTES da Bilheteria ficar coberta: ela só é coberta depois
+   de mais ~1 tela inteira rolando (a altura dela mesma, que é como todo
+   `.cover` funciona). Somando a fase `contain` (mais 100svh, já que o
+   `.mq-proxy` é 200svh = 2 telas), o range agora cobre as ~2 telas
+   inteiras entre o início da cena e o instante em que ela é coberta. */
 html.sdt .mq-dir{
   animation:mq-dir linear both;
-  animation-timeline:--cartaz; animation-range:entry 0% entry 100%;
+  animation-timeline:--cartaz; animation-range:entry 0% contain 100%;
 }
 html.sdt .mq-esq{
   animation:mq-esq linear both;
-  animation-timeline:--cartaz; animation-range:entry 0% entry 100%;
+  animation-timeline:--cartaz; animation-range:entry 0% contain 100%;
 }
 /* sem suporte a animação por rolagem, as frases ficam paradas e deslocadas
    pra que as duas linhas não comecem alinhadas (fica proposital, não quebrado) */
