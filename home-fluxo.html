@@ -293,11 +293,23 @@ html.sdt .scene{ timeline-scope:--subaba,--cartaz; }
    começo. Mexeu no número de cópias, mexe no 25% junto (100/nº). */
 @keyframes mq-dir{ from{ transform:translateX(-25%); } to{ transform:translateX(0); } }
 @keyframes mq-esq{ from{ transform:translateX(0); } to{ transform:translateX(-25%); } }
-html.sdt .mq-dir,html.sdt .mq-esq{
-  animation:linear both; animation-timeline:--cartaz; animation-range:entry 0% entry 100%;
+/* ⚠️ CADA LINHA COM O ATALHO COMPLETO, nome incluído — exatamente o mesmo
+   formato da subaba, que é o único comprovadamente funcionando no iPhone.
+   Antes estava dividido: `animation:linear both` num seletor e o
+   `animation-name` noutro. No desktop funcionava; no iPhone ficava parado.
+   A causa provável é o atalho sem nome: `linear` é ao mesmo tempo um valor
+   válido de curva E um identificador válido de nome, e navegadores divergem
+   ao decidir qual dos dois é. Se o Safari o tomou como NOME, a animação
+   apontava pra um keyframes inexistente — nada rodava, sem erro nenhum.
+   🔑 Regra: em animação por rolagem, nunca partir o atalho — nome junto. */
+html.sdt .mq-dir{
+  animation:mq-dir linear both;
+  animation-timeline:--cartaz; animation-range:entry 0% entry 100%;
 }
-html.sdt .mq-dir{ animation-name:mq-dir; }
-html.sdt .mq-esq{ animation-name:mq-esq; }
+html.sdt .mq-esq{
+  animation:mq-esq linear both;
+  animation-timeline:--cartaz; animation-range:entry 0% entry 100%;
+}
 /* sem suporte a animação por rolagem, as frases ficam paradas e deslocadas
    pra que as duas linhas não comecem alinhadas (fica proposital, não quebrado) */
 .mq-esq{ transform:translateX(-12%); }
