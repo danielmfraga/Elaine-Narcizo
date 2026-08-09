@@ -265,18 +265,19 @@ main{ position:relative; }
   overflow:hidden;
   /* -30px pedido pelo Daniel. */
   min-height:calc(100svh - 30px);
-  /* ⚠️ Deixou de ser centralizado (era `justify-content:center`, herdado do
-     `.cover`) — o Daniel marcou no print que quer um espaço FIXO de 50px
-     entre o título e o que fica acima dele, e centralizar não permite isso
-     (a folga vira metade da sobra de tela, não um número fixo).
-     62px = altura do header fixo (`.hdr`, sempre sólido nesta altura da
-     página) + 50px pedidos = onde o título começa. Se o Daniel quis dizer
-     "50px a partir do topo do cartão" (ignorando o header), é só trocar
-     pra `padding-top:50px` — mas aí o título nasce ~12px atrás do header. */
-  justify-content:flex-start;
-  /* confirmado com o Daniel: estava em 62(header)+50, ficou apertado —
-     subiu pra 62+130. */
+  /* Voltou a `justify-content:center` (era `flex-start` com só padding-top,
+     que deixava o espaço de baixo à mercê da sobra de tela — imprevisível,
+     e foi exatamente o que ficou torto no print). Com `center` E os dois
+     paddings IGUAIS, a simetria é garantida por construção em qualquer
+     tela: a sobra de espaço que a centralização distribui é a MESMA dos
+     dois lados, então se padding-top = padding-bottom, o espaço visível
+     acima do título = o espaço visível abaixo das frases, sempre.
+     62px = altura do header fixo — só importa pro lado de cima (não tem
+     header embaixo), mas deixei os dois iguais mesmo assim porque é isso
+     que o Daniel pediu no desenho: o número final igual, não a fórmula. */
+  justify-content:center;
   padding-top:calc(62px + 130px);
+  padding-bottom:calc(62px + 130px);
 }
 .c-bilhe .lead{ max-width:34ch; }
 /* título+subtítulo 80px acima. Por `transform` e não por margem: margem
