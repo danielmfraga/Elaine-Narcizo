@@ -719,7 +719,9 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
    Agora os dois lados usam o MESMO valor fixo. */
 .fcar-cta-wrap{ position:relative; z-index:1;
   display:flex; justify-content:center;
-  padding:clamp(26px,4.5vh,40px) 0; }
+  /* +15px dos dois lados (pedido do Daniel, "respirinho a mais") — soma pra
+     o valor original continuar responsivo por baixo */
+  padding:calc(clamp(26px,4.5vh,40px) + 15px) 0; }
 .fcar-cta{
   display:inline-flex; align-items:center; justify-content:center;
   padding:15px 30px;
