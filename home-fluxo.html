@@ -265,6 +265,12 @@ main{ position:relative; }
   justify-content:center; overflow:hidden;
 }
 .c-bilhe .lead{ max-width:34ch; }
+/* título+subtítulo 80px acima. Por `transform` e não por margem: margem
+   mudaria a altura do conjunto e, com o conteúdo centrado, empurraria tudo
+   junto — aqui só este bloco sobe, e o respiro pras frases cresce 80px.
+   ⚠️ Seguro porque o `.wrap` NÃO carrega a classe `.r`; nos elementos que
+   carregam, a revelação por scroll apaga transforms próprios. */
+.c-bilhe .wrap{ transform:translateY(-80px); }
 
 /* marcador invisível: mede a rolagem pro carrossel de frases sem grudar */
 .mq-proxy{ height:200svh; margin-bottom:-200svh; pointer-events:none; }
@@ -274,8 +280,11 @@ html.sdt .scene{ timeline-scope:--subaba,--cartaz; }
 .mq{ margin-top:clamp(26px,5vh,48px); display:flex; flex-direction:column; gap:2px; }
 .mq-row{
   display:flex; width:max-content; white-space:nowrap;
-  font-family:var(--disp); font-weight:860; font-stretch:118%;
-  text-transform:uppercase; letter-spacing:-.015em; line-height:1.02;
+  /* DM Sans regular (era Archivo 860 caixa-alta). Tirei também o caixa-alta:
+     o texto passa a sair como o Daniel escreveu ("Escolha seu embarque") e é
+     assim que a referência trata essas frases. */
+  font-family:var(--sans); font-weight:400;
+  letter-spacing:-.02em; line-height:1.06;
   font-size:clamp(1.9rem,8.2vw,4.6rem);
 }
 .mq-row > span{ padding-right:.35em; }
