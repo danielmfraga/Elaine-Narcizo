@@ -29,7 +29,9 @@ if(!window.enVoltou) scrollTo(0,0);
 <!-- DM Sans (COM itálico) entrou pela capa de Formações: é a fonte da
      /repertorios-sensiveis, e o título "Forma+ções" depende do par
      romano/itálico do mesmo desenho pra funcionar. -->
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Space+Mono:wght@400;700&family=Amatic+SC:wght@400;700&family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,200..700;1,9..40,200..700&display=swap" rel="stylesheet">
+<!-- Space+Grotesk entrou pra capa da DançaDestino embutida (tagline "Um ritual
+     para nosso tempo." — mesma fonte da página própria danca-destino/). -->
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Space+Mono:wght@400;700&family=Amatic+SC:wght@400;700&family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,200..700;1,9..40,200..700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 
 <style>
 /* ═════════════════════════════════════════════════════════════
@@ -1160,6 +1162,54 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   .work > :not(.media){ grid-column:2; }
 }
 
+/* ═══ CAPA da DançaDestino, embutida no card "Portão 01" ═══════════════════
+   Trazida de `danca-destino/index.html` (só o <header class="capa">, não o
+   manifesto de 7 cartazes nem o miniplayer — pedido do Daniel foi só "a
+   capa"). Tudo escopado embaixo de `.dd-capa`: as variáveis de cor/fonte
+   dessa identidade (--roxo, --amarelo, --disp, --mono…) têm OUTROS valores
+   aqui na casa — declarar num seletor que não é `:root` faz a variável
+   valer só pra dentro do bloco, sem vazar pro resto da página.
+   Caminhos de asset perderam o `../` (a página original vive em
+   danca-destino/, esta home está na raiz — mesma pasta assets/). */
+.dd-capa{
+  --roxo:#6C28D6; --roxo-fundo:#5A1FB8; --roxo-escuro:#3D1185;
+  --amarelo:#F5D933; --branco:#FDFBFF;
+  --disp:"Space Grotesk",sans-serif; --mono:"Space Mono",ui-monospace,monospace;
+  position:relative; overflow:hidden; height:100svh; min-height:560px;
+  border-radius:clamp(12px,2vw,22px);
+  background:radial-gradient(130% 92% at 50% 44%, rgba(0,0,0,0) 50%, rgba(38,9,86,.42) 100%),
+             url("assets/Dancadestino/FUNDO%20PADR%C3%83O.webp") center/cover, var(--roxo-fundo);
+  color:var(--branco); font-family:var(--mono);
+}
+.dd-capa .cv-paint{ position:absolute; bottom:-7%; left:33%; width:66%; height:auto; opacity:.92; z-index:2;
+  transform:scaleY(-1); pointer-events:none; }
+/* wordmark vertical — sem o #dd-fab (miniplayer) da página original pra
+   reservar espaço embaixo, então centraliza na tela toda mesmo. */
+.dd-capa .cv-wm{ position:absolute; right:1vw; top:50%; transform:translateY(-50%);
+  height:84svh; width:9.7svh; display:flex; align-items:center; justify-content:center; z-index:4; }
+.dd-capa .cv-wm img{ width:84svh; max-width:none; transform:rotate(-90deg); }
+.dd-capa .cv-ht{ position:absolute; right:14svh; top:6%; height:30svh; width:2.2svh;
+  display:flex; align-items:center; justify-content:center; z-index:4; }
+.dd-capa .cv-ht img{ width:30svh; max-width:none; transform:rotate(-90deg); }
+.dd-capa .cv-yb{ position:absolute; left:1%; top:26%; width:63%; height:43%;
+  background:var(--amarelo); transform:rotate(-2deg); z-index:1; }
+.dd-capa .cv-col{ position:absolute; left:-7%; bottom:22%; width:91%; z-index:2;
+  filter:drop-shadow(0 18px 26px rgba(0,0,0,.3)); }
+.dd-capa .cv-candle{ position:absolute; bottom:0; left:47%; width:26%; z-index:3;
+  filter:drop-shadow(0 10px 14px rgba(0,0,0,.32)); }
+.dd-capa .cv-seal{ position:absolute; left:5%; top:7%; width:31vw; max-width:132px; z-index:5; }
+.dd-capa .cv-seal img{ width:100%; animation:ddSpin 22s linear infinite; }
+@keyframes ddSpin{ to{ transform:rotate(360deg); } }
+.dd-capa .cv-tag{ position:absolute; left:5%; bottom:5%; z-index:5; text-align:left; }
+.dd-capa .cv-tag .r1{ font-family:var(--disp); font-weight:700; font-size:1.32rem; line-height:1.05;
+  color:var(--amarelo); text-transform:uppercase; }
+.dd-capa .cv-tag .r2{ font-family:var(--disp); font-weight:500; font-size:1.02rem; color:var(--branco); margin-top:6px; }
+/* flutuação contínua e sutil da colagem principal — só efeito ambiente,
+   nome do keyframe prefixado (ddFlo) pra não colidir com nada da casa */
+.dd-capa .flo{ animation:ddFlo var(--fd,8s) ease-in-out var(--fdl,0s) infinite alternate; }
+@keyframes ddFlo{ from{ transform:translateY(0); } to{ transform:translateY(-9px); } }
+@media (prefers-reduced-motion:reduce){ .dd-capa .flo,.dd-capa .cv-seal img{ animation:none; } }
+
 /* faixa de parcerias (o grid de 30 logos da referência) */
 .partners{ margin-top:clamp(30px,6vh,60px); padding-top:clamp(20px,3vh,32px); border-top:1px solid var(--line); }
 .partners .cap{ font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--mute); margin-bottom:14px; }
@@ -1605,25 +1655,24 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
     <div class="wrap">
       <div class="works">
 
-        <!-- OBRA 1 · Dança Destino -->
+        <!-- OBRA 1 · Dança Destino — o card-resumo (vídeo/título/meta/stat/
+             link) caiu por pedido do Daniel; agora é só o chip "Portão 01" no
+             topo e, embaixo, a CAPA real da danca-destino/ embutida direto. -->
         <article class="work in-io">
-          <div class="media r" style="--r:0">
-            <!-- VÍDEO · TEASER DO RITUAL — sugestão: pessoas dançando em casas
-                 diferentes, cortadas no mesmo ritmo (15s, loop). Por ora, a arte
-                 da mão entra de pôster de fundo. -->
-            <div class="vph">
-              <img class="poster" src="assets/bg-mao.webp" alt="" aria-hidden="true" loading="lazy" />
-              <span class="play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
-              <span class="note">Vídeo aqui · teaser do ritual — gente dançando onde estiver (15s)</span>
+          <span class="chip hot r" style="--r:0;background:var(--rosa)">Portão 01</span>
+          <div class="dd-capa r" style="--r:1">
+            <img class="cv-paint" src="assets/Dancadestino/Paint.webp" alt="" aria-hidden="true" loading="lazy" />
+            <div class="cv-yb" aria-hidden="true"></div>
+            <img class="cv-col flo" style="--fd:9s;--fdl:-3s" src="assets/Dancadestino/Imagem%20principal%20Capa_0.webp" alt="Estátua dançante entre flores" loading="lazy" />
+            <img class="cv-candle" src="assets/Dancadestino/Imagem%20secundaria%20Capa_0.webp" alt="Vela acesa" loading="lazy" />
+            <div class="cv-wm"><img src="assets/Dancadestino/SVG/Lettering%20dAN%C3%87ADESTINO.svg" alt="DançaDestino" /></div>
+            <div class="cv-ht"><img src="assets/Dancadestino/SVG/Lettering%20hashtag%20dAN%C3%87ADESTINO.svg" alt="#ProjetoDançaDestino" /></div>
+            <div class="cv-seal"><img src="assets/Dancadestino/Lettering%20Redondo.webp" alt="Você dança, onde estiver" /></div>
+            <div class="cv-tag">
+              <p class="r1">Um ritual<br>para nosso<br>tempo.</p>
+              <p class="r2">Toda sexta, 20h.</p>
             </div>
           </div>
-          <span class="chip hot r" style="--r:1;background:var(--rosa)">Portão 01</span>
-          <h3 class="r" style="--r:2">Dança <em>Destino</em></h3>
-          <div class="meta r" style="--r:3">
-            <span class="chip">Ritual coletivo</span><span class="chip">Ao vivo</span><span class="chip">Vagas limitadas</span>
-          </div>
-          <p class="stat r" style="--r:4">Toda sexta · 20h · onde você estiver — semana 35 do ritual</p>
-          <a class="go r" style="--r:5" href="danca-destino/">Embarcar <span class="ar">→</span></a>
         </article>
 
         <!-- OBRA 2 · Cartas entre Homens -->
