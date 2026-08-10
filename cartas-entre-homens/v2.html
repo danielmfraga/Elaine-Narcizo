@@ -7,11 +7,9 @@
 <meta name="description" content="Tudo Quer Viver — uma experiência de troca de cartas entre homens, mantida pela escrita." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- DM Sans entrou pra capa nova (pedido do Daniel: usar a mesma fonte da
-     tela de Formações do home-fluxo — troca o Archivo 900 que tínhamos
-     posto antes pro título gigante). Mesmo range de peso/itálico que o
-     home-fluxo usa lá. -->
-<link href="https://fonts.googleapis.com/css2?family=Homemade+Apple&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..440&family=Special+Elite&family=DM+Sans:ital,opsz,wght@0,9..40,200..700;1,9..40,200..700&display=swap" rel="stylesheet">
+<!-- Título/subtítulo da capa voltaram pro Archivo 900 (pedido do Daniel);
+     DM Sans ficou só no texto de apoio + nota do CTA. Os dois convivem. -->
+<link href="https://fonts.googleapis.com/css2?family=Homemade+Apple&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..440&family=Special+Elite&family=Archivo:wght@900&family=DM+Sans:ital,opsz,wght@0,9..40,200..700;1,9..40,200..700&display=swap" rel="stylesheet">
 <script>if(window!==window.top)document.documentElement.classList.add('embedded');</script>
 <style>
   html.embedded,html.embedded body{ overscroll-behavior-y:contain; }
@@ -100,15 +98,13 @@
   /* a barrinha decorativa saiu — o vídeo já tem uma barra vermelha própria
      (parte da colagem/arte), a nossa duplicava e confundia (marcado pelo
      Daniel no print). */
-  /* DM Sans — mesma fonte da tela de Formações do home-fluxo (pedido do
-     Daniel). Peso varia por papel: título mais pesado (impacto), corpo
-     mais leve (300, igual à lede de Formações) — a FAMÍLIA é que é igual,
-     não necessariamente cada peso individual. */
-  .cover-title{ font-family:"DM Sans",sans-serif; font-weight:700; text-transform:uppercase;
+  /* título/subtítulo voltaram pro Archivo 900 (pedido do Daniel, revertendo
+     a troca pra DM Sans) — texto de apoio e nota do CTA ficaram em DM Sans. */
+  .cover-title{ font-family:"Archivo",sans-serif; font-weight:900; text-transform:uppercase;
     letter-spacing:-.01em; line-height:.98; font-size:clamp(2.1rem,11.5vw,3.9rem); color:#fff;
     text-shadow:0 1px 3px rgba(0,0,0,.85), 0 4px 18px rgba(0,0,0,.4); }
   .cover-rule{ height:2px; background:rgba(255,255,255,.75); margin:clamp(12px,2.6vh,18px) 0; }
-  .cover-sub{ font-family:"DM Sans",sans-serif; font-weight:500; font-size:.82rem;
+  .cover-sub{ font-family:"Archivo",sans-serif; font-weight:900; font-size:.82rem;
     letter-spacing:.06em; text-transform:uppercase; color:#E8703B; text-shadow:0 1px 3px rgba(0,0,0,.7); }
   .cover-lede{ font-family:"DM Sans",sans-serif; font-weight:300; font-size:clamp(.82rem,3.2vw,.94rem);
     line-height:1.5; margin-top:clamp(10px,2.2vh,16px); color:rgba(255,255,255,.9);
