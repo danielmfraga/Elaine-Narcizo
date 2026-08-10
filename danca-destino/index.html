@@ -240,9 +240,60 @@
   .dd-row .t{ flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .dd-row .p{ color:var(--amarelo); font-size:.58rem; }
   .dd-row.live, .dd-row.live .n{ color:var(--amarelo); }
+
+  /* ═══ CABEÇALHO DA PÁGINA — ✕ (voltar) e Menu ══════════════════════════
+     Esta página é um destino do "Embarque" da home, e não tinha saída
+     própria: só o botão de voltar do navegador. Agora o ✕ devolve pra
+     EXATAMENTE onde a pessoa estava rolando quando clicou (history.back()
+     — a home guarda e restaura a posição), com fallback pra home caso
+     alguém abra o link direto, sem histórico. */
+  .pgnav{ position:fixed; top:0; left:0; right:0; z-index:95;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 16px calc(14px + env(safe-area-inset-top,0px));
+    pointer-events:none; }
+  .pgnav > *{ pointer-events:auto; }
+  .pgnav button{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    min-height:38px; padding:0 14px; border:0; border-radius:999px; cursor:pointer;
+    background:rgba(20,10,45,.55); -webkit-backdrop-filter:blur(7px); backdrop-filter:blur(7px);
+    color:var(--branco); font-family:var(--mono); font-weight:700;
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    -webkit-tap-highlight-color:transparent;
+    transition:background .18s ease, color .18s ease; }
+  .pgnav button:active{ background:var(--amarelo); color:var(--roxo-escuro); }
+  .pg-x{ width:38px; padding:0 !important; font-size:15px !important; letter-spacing:0 !important; }
+  /* menu: overlay com os mesmos 7 destinos do índice da home */
+  .pgmenu{ position:fixed; inset:0; z-index:94; background:rgba(16,6,40,.97);
+    -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px);
+    display:flex; flex-direction:column; justify-content:center; gap:2px;
+    padding:0 clamp(22px,7vw,54px);
+    opacity:0; pointer-events:none; transition:opacity .28s ease; }
+  .pgmenu.open{ opacity:1; pointer-events:auto; }
+  .pgmenu a{ display:flex; align-items:baseline; gap:14px; padding:11px 0;
+    color:var(--branco); text-decoration:none;
+    font-family:var(--disp); font-weight:700; font-size:clamp(1.5rem,7vw,2.4rem); line-height:1.1; }
+  .pgmenu a small{ font-family:var(--mono); font-size:11px; color:var(--amarelo); }
+  .pgmenu a:active{ color:var(--amarelo); }
+  /* embutida em outra página, a navegação da própria página não faz sentido */
+  html.embedded .pgnav, html.embedded .pgmenu{ display:none; }
 </style>
 </head>
 <body>
+  <!-- ✕ volta pra onde a pessoa estava na home · Menu abre o índice -->
+  <nav class="pgnav" aria-label="Navegação da página">
+    <button class="pg-x" id="pgX" aria-label="Fechar e voltar">✕</button>
+    <button id="pgMenuBtn" aria-expanded="false" aria-controls="pgmenu">Menu</button>
+  </nav>
+  <div class="pgmenu" id="pgmenu" aria-hidden="true">
+    <a href="../home-fluxo.html#inicio"><small>00</small>Home</a>
+    <a href="../home-fluxo.html#quem"><small>01</small>Quem sou eu</a>
+    <a href="../home-fluxo.html#radio"><small>02</small>Rádio Tinhosa</a>
+    <a href="../home-fluxo.html#formacoes"><small>03</small>Formações</a>
+    <a href="../home-fluxo.html#cartaz"><small>04</small>Bilheteria</a>
+    <a href="../home-fluxo.html#conectar"><small>05</small>Conectar</a>
+    <a href="../home-fluxo.html#informacoes"><small>06</small>Informações gerais</a>
+  </div>
+
   <div class="wrap">
 
     <header class="capa">
@@ -365,6 +416,30 @@
 
   <script>
     if(window!==window.top)document.documentElement.classList.add('embedded');
+
+    /* ── ✕ e Menu ──
+       O ✕ usa history.back(): a home guarda a posição de rolagem e restaura
+       na volta, então a pessoa cai exatamente onde estava quando clicou no
+       Embarque. `history.length>1` cobre quem abriu o link direto (sem
+       histórico pra voltar) — aí vai pra home. */
+    (function(){
+      var x=document.getElementById('pgX'),
+          mb=document.getElementById('pgMenuBtn'),
+          mn=document.getElementById('pgmenu');
+      if(!x||!mb||!mn) return;
+      x.addEventListener('click',function(){
+        if(history.length>1) history.back();
+        else location.href='../home-fluxo.html';
+      });
+      function abre(v){
+        mn.classList.toggle('open',v);
+        mn.setAttribute('aria-hidden', v?'false':'true');
+        mb.setAttribute('aria-expanded', v?'true':'false');
+        mb.textContent = v ? 'Fechar' : 'Menu';
+      }
+      mb.addEventListener('click',function(){ abre(!mn.classList.contains('open')); });
+      document.addEventListener('keydown',function(e){ if(e.key==='Escape') abre(false); });
+    })();
     /* C6 — "Um ritual para" / "Nosso tempo": quebra em letras p/ a onda leve escalonada */
     document.querySelectorAll('.c6-left,.c6-right').forEach(function(el){
       var t=el.textContent; el.textContent='';

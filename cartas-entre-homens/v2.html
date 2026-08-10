@@ -357,9 +357,60 @@
        (o letreiro fica no lilás inicial, que já é o fill declarado) */
     .cover-sub,.btn-venha .bv-word,.btn-venha::after{ animation:none; }
   }
+
+  /* ═══ CABEÇALHO DA PÁGINA — ✕ (voltar) e Menu ══════════════════════════
+     Esta página é destino do "Embarque" da home e não tinha saída própria.
+     O ✕ devolve pra EXATAMENTE onde a pessoa estava rolando quando clicou
+     (history.back() — a home guarda e restaura a posição), com fallback pra
+     home caso alguém abra o link direto, sem histórico.
+     ⚠️ z-index acima do `.noise` (6) e da `.tit-bar` (5). */
+  .pgnav{ position:fixed; top:0; left:0; right:0; z-index:95;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 16px calc(14px + env(safe-area-inset-top,0px));
+    pointer-events:none; }
+  .pgnav > *{ pointer-events:auto; }
+  .pgnav button{
+    display:inline-flex; align-items:center; justify-content:center;
+    min-height:38px; padding:0 14px; border:0; border-radius:999px; cursor:pointer;
+    background:rgba(20,16,12,.5); -webkit-backdrop-filter:blur(7px); backdrop-filter:blur(7px);
+    color:#fff; font-family:var(--type); font-size:10px; letter-spacing:.2em; text-transform:uppercase;
+    -webkit-tap-highlight-color:transparent;
+    transition:background .18s var(--ease), color .18s var(--ease); }
+  .pgnav button:active{ background:var(--paper); color:var(--ink); }
+  .pg-x{ width:38px; padding:0 !important; font-size:14px !important; letter-spacing:0 !important; }
+  /* menu: os mesmos 7 destinos do índice da home */
+  .pgmenu{ position:fixed; inset:0; z-index:94; background:rgba(26,22,18,.97);
+    -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px);
+    display:flex; flex-direction:column; justify-content:center; gap:2px;
+    padding:0 clamp(22px,7vw,54px);
+    opacity:0; pointer-events:none; transition:opacity .28s var(--ease); }
+  .pgmenu.open{ opacity:1; pointer-events:auto; }
+  .pgmenu a{ display:flex; align-items:baseline; gap:14px; padding:11px 0;
+    color:var(--paper); text-decoration:none;
+    font-family:var(--serif); font-weight:400; font-size:clamp(1.5rem,7vw,2.4rem); line-height:1.1; }
+  .pgmenu a small{ font-family:var(--type); font-size:10px; letter-spacing:.16em; color:var(--mute); }
+  .pgmenu a:active{ color:#fff; }
+  /* embutida (o ?capa=1 do card da home): a navegação da página não entra */
+  html.embedded .pgnav, html.embedded .pgmenu,
+  html.so-capa .pgnav, html.so-capa .pgmenu{ display:none; }
 </style>
 </head>
 <body>
+  <!-- ✕ volta pra onde a pessoa estava na home · Menu abre o índice -->
+  <nav class="pgnav" aria-label="Navegação da página">
+    <button class="pg-x" id="pgX" aria-label="Fechar e voltar">✕</button>
+    <button id="pgMenuBtn" aria-expanded="false" aria-controls="pgmenu">Menu</button>
+  </nav>
+  <div class="pgmenu" id="pgmenu" aria-hidden="true">
+    <a href="../home-fluxo.html#inicio"><small>00</small>Home</a>
+    <a href="../home-fluxo.html#quem"><small>01</small>Quem sou eu</a>
+    <a href="../home-fluxo.html#radio"><small>02</small>Rádio Tinhosa</a>
+    <a href="../home-fluxo.html#formacoes"><small>03</small>Formações</a>
+    <a href="../home-fluxo.html#cartaz"><small>04</small>Bilheteria</a>
+    <a href="../home-fluxo.html#conectar"><small>05</small>Conectar</a>
+    <a href="../home-fluxo.html#informacoes"><small>06</small>Informações gerais</a>
+  </div>
+
   <div class="bg" id="bg"></div>
   <div class="noise"></div>
 
@@ -504,6 +555,28 @@
   </div>
 
   <script>
+  /* ── ✕ e Menu ──
+     O ✕ usa history.back(): a home guarda a posição de rolagem e restaura na
+     volta, então a pessoa cai exatamente onde estava quando clicou no
+     Embarque. `history.length>1` cobre quem abriu o link direto. */
+  (function(){
+    var x=document.getElementById('pgX'),
+        mb=document.getElementById('pgMenuBtn'),
+        mn=document.getElementById('pgmenu');
+    if(!x||!mb||!mn) return;
+    x.addEventListener('click',function(){
+      if(history.length>1) history.back();
+      else location.href='../home-fluxo.html';
+    });
+    function abre(v){
+      mn.classList.toggle('open',v);
+      mn.setAttribute('aria-hidden', v?'false':'true');
+      mb.setAttribute('aria-expanded', v?'true':'false');
+      mb.textContent = v ? 'Fechar' : 'Menu';
+    }
+    mb.addEventListener('click',function(){ abre(!mn.classList.contains('open')); });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape') abre(false); });
+  })();
   (function(){
     var rail=document.getElementById('rail');
     var bg=document.getElementById('bg');
