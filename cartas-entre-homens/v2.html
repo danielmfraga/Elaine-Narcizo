@@ -86,7 +86,14 @@
      embaixo; agora o bloco de texto pode ficar em qualquer altura).
      ⚠️ Daniel achou o fundo "mais escuro que o original" com .46 — o vídeo
      original é claro/vívido (colagem em papel creme), reduzido pra .22. */
-  .cover-scrim{ position:absolute; inset:0; z-index:1; background:rgba(20,16,12,.22); }
+  /* ⚠️ véu quase zerado (era .22): o Daniel pediu clarear o fundo do vídeo
+     ~30%, e o véu era exatamente o que comia essa luz — a .22 ele derrubava
+     ~22% do brilho, então tirá-lo devolve quase os 30% pedidos, sem precisar
+     de `filter:brightness` (que criaria camada de composição em volta do
+     vídeo — coisa que já custou uma saga na capa da Rádio).
+     Sobra um resto mínimo pros trechos claros do vídeo; quem segura a
+     legibilidade do texto branco são as text-shadow de 2 camadas. */
+  .cover-scrim{ position:absolute; inset:0; z-index:1; background:rgba(20,16,12,var(--cover-veu,.05)); }
   /* posições em % vieram do mockup .idml do Daniel (medi os TextFrames de
      verdade no arquivo — não é chute visual): título e texto ficam numa
      coluna à esquerda; o CTA "venha" flutua sozinho à direita, na altura do

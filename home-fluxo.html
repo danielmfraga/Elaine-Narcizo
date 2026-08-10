@@ -1283,18 +1283,37 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   position:relative; overflow:hidden; height:100svh; min-height:560px;
   border-radius:clamp(12px,2vw,22px);
   background:#141210; color:#fff;
+  /* 🔑 O QUE CONSERTA A DIAGRAMAÇÃO DENTRO DA CAIXA.
+     Na página oficial a capa é do tamanho da TELA; aqui ela vive dentro do
+     card, que é mais estreito (a `.sheet` tira `--pad` de cada lado — num
+     iPhone de 390px sobram ~350px, ou seja 90%).
+     Só que o corpo de texto era dimensionado em `vw` = largura da TELA, não
+     da caixa. Resultado: o título saía ~11% maior do que devia PARA ESSA
+     caixa (44.8px onde cabiam 40.2px), e como é ele que empurra o CTA e
+     define a quebra das linhas, a composição inteira saía de proporção.
+     Mesma família de bug do CTA: duas réguas diferentes.
+     `container-type:inline-size` transforma esta caixa na régua — daí as
+     medidas internas usam `cqw` (% da CAIXA) em vez de `vw` (% da tela) e a
+     capa vira uma cópia proporcional exata da página oficial, em qualquer
+     largura de card. */
+  container-type:inline-size;
 }
 .ceh-bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
-.ceh-scrim{ position:absolute; inset:0; z-index:1; background:rgba(20,16,12,.22); }
+/* véu quase zerado (era .22): o Daniel viu "uma camada que deixa tudo mais
+   escuro" e pediu clarear ~30%. Tirar o véu é exatamente isso — ele comia
+   ~22% da luz do vídeo. Fica um resto mínimo só de segurança pros trechos
+   claros do vídeo; a legibilidade do texto branco vem das text-shadow de
+   2 camadas (contato + halo), não do véu. */
+.ceh-scrim{ position:absolute; inset:0; z-index:1; background:rgba(20,16,12,var(--ceh-veu,.05)); }
 .ceh-content{ position:absolute; inset:0; z-index:2; }
 .ceh-left{ position:absolute; left:7%; top:12.5%; width:86%; }
 /* título + CTA lado a lado, alinhados pela BASE — é o que põe o "venha" na
    base de "HOMENS" por construção (ver a mesma receita na v2.html) */
-.ceh-head{ display:flex; align-items:flex-end; gap:clamp(14px,3.5vw,32px); }
+.ceh-head{ display:flex; align-items:flex-end; gap:clamp(14px,3.5cqw,32px); }
 .ceh-title{ flex:0 0 auto;
   font-family:"Archivo",sans-serif; font-weight:900; font-stretch:100%;
   text-transform:uppercase; letter-spacing:-.01em; line-height:.98;
-  font-size:clamp(2.1rem,11.5vw,3.9rem); color:#fff;
+  font-size:clamp(2.1rem,11.5cqw,3.9rem); color:#fff;
   text-shadow:0 1px 3px rgba(0,0,0,.85), 0 4px 18px rgba(0,0,0,.4); }
 .ceh-rule{ width:20.3%; height:4px; background:rgba(255,255,255,.75); margin:clamp(12px,2.6vh,18px) 0; }
 /* UM keyframe pro subtítulo (via `color`) e pro letreiro do botão (via
@@ -1312,7 +1331,7 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   animation:cehAccentCycle 34.4s linear infinite;
   text-shadow:0 1px 3px rgba(0,0,0,.7); }
 .ceh-lede{ max-width:53.5%;
-  font-family:var(--sans); font-weight:300; font-size:clamp(.82rem,3.2vw,.94rem);
+  font-family:var(--sans); font-weight:300; font-size:clamp(.82rem,3.2cqw,.94rem);
   line-height:1.05; margin-top:clamp(10px,2.2vh,16px); color:rgba(255,255,255,.9);
   text-shadow:0 1px 4px rgba(0,0,0,.65); }
 .ceh-cta-wrap{ flex:1 1 auto; min-width:0; }
