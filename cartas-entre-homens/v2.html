@@ -84,8 +84,10 @@
     align-items:center; }
   .cover-bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
   /* escurece de forma parelha (era um degradê pensado pro texto morar SÓ
-     embaixo; agora o bloco de texto pode ficar em qualquer altura) */
-  .cover-scrim{ position:absolute; inset:0; z-index:1; background:rgba(20,16,12,.46); }
+     embaixo; agora o bloco de texto pode ficar em qualquer altura).
+     ⚠️ Daniel achou o fundo "mais escuro que o original" com .46 — o vídeo
+     original é claro/vívido (colagem em papel creme), reduzido pra .22. */
+  .cover-scrim{ position:absolute; inset:0; z-index:1; background:rgba(20,16,12,.22); }
   /* posições em % vieram do mockup .idml do Daniel (medi os TextFrames de
      verdade no arquivo — não é chute visual): título e texto ficam numa
      coluna à esquerda; o CTA "venha" flutua sozinho à direita, na altura do
@@ -94,26 +96,29 @@
      então os % também valem em cima do vídeo. */
   .cover-content{ position:absolute; inset:0; z-index:2; color:#fff; --ac:#E8703B; }
   .cover-left{ position:absolute; left:7%; top:12.5%; width:46%; }
-  .cover-bar{ width:52px; height:8px; background:#E8703B; margin-bottom:clamp(14px,3vh,22px); }
+  /* a barrinha decorativa saiu — o vídeo já tem uma barra vermelha própria
+     (parte da colagem/arte), a nossa duplicava e confundia (marcado pelo
+     Daniel no print). */
   .cover-title{ font-family:"Archivo",sans-serif; font-weight:900; text-transform:uppercase;
     letter-spacing:-.01em; line-height:.98; font-size:clamp(2.1rem,11.5vw,3.9rem); color:#fff;
-    text-shadow:0 2px 14px rgba(0,0,0,.5); }
+    text-shadow:0 1px 3px rgba(0,0,0,.85), 0 4px 18px rgba(0,0,0,.4); }
   .cover-rule{ height:2px; background:rgba(255,255,255,.75); margin:clamp(12px,2.6vh,18px) 0; }
   .cover-sub{ font-family:"Archivo",sans-serif; font-weight:900; font-size:.82rem;
-    letter-spacing:.06em; text-transform:uppercase; color:#E8703B; text-shadow:0 1px 4px rgba(0,0,0,.4); }
+    letter-spacing:.06em; text-transform:uppercase; color:#E8703B; text-shadow:0 1px 3px rgba(0,0,0,.7); }
   .cover-lede{ font-family:var(--serif); font-weight:300; font-size:clamp(.82rem,3.2vw,.94rem);
     line-height:1.5; margin-top:clamp(10px,2.2vh,16px); color:rgba(255,255,255,.9);
-    text-shadow:0 1px 6px rgba(0,0,0,.45); }
+    text-shadow:0 1px 4px rgba(0,0,0,.65); }
   /* CTA flutuando à direita — não é filho do fluxo da coluna esquerda */
   .cover-cta-wrap{ position:absolute; left:54%; top:28%; width:38%; }
   /* reaproveita o .cta que já existe na página (pílula tracejada + halo
      pulsando) — cor branca por cima do vídeo, em vez do --ac laranja (que
      no fundo escuro fica ok pro título/sub, mas o CTA precisa de mais
      contraste porque o vídeo varia de tom pela cena). */
-  .cover-cta-wrap .cta{ color:#fff; border-color:rgba(255,255,255,.7); white-space:nowrap; }
+  .cover-cta-wrap .cta{ color:#fff; border-color:rgba(255,255,255,.7); white-space:nowrap;
+    text-shadow:0 1px 3px rgba(0,0,0,.7); background:rgba(0,0,0,.12); }
   .cover-cta-wrap .cta:hover{ background:rgba(255,255,255,.16); }
   .cover-cta-note{ margin-top:10px; font-family:var(--serif); font-style:italic; font-size:.78rem;
-    color:rgba(255,255,255,.85); text-shadow:0 1px 4px rgba(0,0,0,.4); }
+    color:rgba(255,255,255,.9); text-shadow:0 1px 3px rgba(0,0,0,.6); }
 
   /* wrapper leva a sombra (o mask do selo recortaria um box-shadow).
      will-change promove CADA selo-wrap a sua própria camada de composição:
@@ -218,6 +223,9 @@
      bottom = centro do vão; translateY(50%) centra a própria barra nesse ponto. */
   .tit-bar{ position:fixed; left:0; right:0; bottom:12dvh; transform:translateY(50%);
     z-index:5; pointer-events:none; padding:0 clamp(20px,7vw,44px); text-align:center; }
+  /* a capa já tem "Tudo Quer Viver" gigante — some com o título deslizante
+     do rodapé só nela (pedido do Daniel: duplicava/ficava feio) */
+  body.on-cover .tit-bar{ display:none; }
   .clip{ overflow:hidden; }
   /* sombra: sem o gradiente, o branco precisa segurar nos fundos claros (mostarda/sage) */
   .tit-cap{ display:block; font-family:var(--type); font-size:9px; letter-spacing:.28em;
@@ -254,7 +262,6 @@
       <div class="cover-scrim" aria-hidden="true"></div>
       <div class="cover-content">
         <div class="cover-left">
-          <div class="cover-bar" aria-hidden="true"></div>
           <h1 class="cover-title">Tudo<br>Quer<br>Viver</h1>
           <div class="cover-rule" aria-hidden="true"></div>
           <p class="cover-sub">Cartas entre Homens</p>
@@ -410,6 +417,11 @@
       var s=slots[i];
       slots.forEach(function(x,k){ x.classList.toggle('on',k===i); });
       document.documentElement.style.setProperty('--bg', s.getAttribute('data-bg'));
+      /* a capa já mostra "Tudo Quer Viver"/"Cartas entre Homens" gigante —
+         o título deslizante do rodapé (pensado pros selos, que não têm
+         título próprio) ficaria duplicado e feio em cima dela. Escondido
+         só nela (ver .tit-bar, CSS). */
+      document.body.classList.toggle('on-cover', s.classList.contains('cover'));
       slide(titCap, s.getAttribute('data-cap'), 0);
       slide(tit,    s.getAttribute('data-tit'), 60);
     }
@@ -436,6 +448,7 @@
     /* estado inicial sem animar (evita o 1º slide "do nada") */
     slots[0].classList.add('on'); cur=0;
     document.documentElement.style.setProperty('--bg', slots[0].getAttribute('data-bg'));
+    document.body.classList.toggle('on-cover', slots[0].classList.contains('cover'));
   })();
   </script>
 </body>
