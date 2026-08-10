@@ -18,7 +18,11 @@ window.enVoltou=(function(){
   }catch(err){ return false; }
 })();
 if('scrollRestoration' in history){ history.scrollRestoration='manual'; }
-if(!window.enVoltou) scrollTo(0,0);
+/* ⚠️ `!location.hash`: sem essa guarda, quem chega por uma âncora — ex.: o
+   menu das páginas de Embarque, que aponta pra home-fluxo.html#quem — era
+   jogado pro topo, porque este scrollTo roda DEPOIS de o navegador ter
+   pulado pra âncora. O forçar-topo só deve valer pra visita sem destino. */
+if(!window.enVoltou && !location.hash) scrollTo(0,0);
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Elaine Narcizo</title>
@@ -1543,8 +1547,9 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   <a class="mi" style="--i:2" href="#radio"><small>02</small>Rádio Tinhosa</a>
   <a class="mi" style="--i:3" href="#formacoes"><small>03</small>Formações</a>
   <a class="mi" style="--i:4" href="#cartaz"><small>04</small>Bilheteria</a>
-  <a class="mi" style="--i:5" href="#conectar"><small>05</small>Conectar</a>
-  <a class="mi" style="--i:6" href="#informacoes"><small>06</small>Informações gerais</a>
+  <a class="mi" style="--i:5" href="#reflexoes"><small>05</small>Reflexões</a>
+  <a class="mi" style="--i:6" href="#conectar"><small>06</small>Conectar</a>
+  <a class="mi" style="--i:7" href="#informacoes"><small>07</small>Informações gerais</a>
   <div class="mfoot">
     <a href="https://www.instagram.com/elaine.c.narcizo/" target="_blank" rel="noopener">Instagram</a>
     <a href="https://www.youtube.com/@elainenarc" target="_blank" rel="noopener">YouTube</a>
@@ -1936,7 +1941,7 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
        cabeçalhos de CORS, então o pedido é bloqueado. Pra atualizar sozinho
        seria preciso uma função no Vercel buscando o feed pelo servidor.
        Enquanto isso: texto novo = cartão novo aqui. -->
-  <div class="sheet w s-textos">
+  <div class="sheet w s-textos" id="reflexoes">
     <div class="wrap">
       <h2 class="txt-title r in-io" style="--r:0">Considerações <em>finais</em></h2>
       <p class="txt-lede r in-io" style="--r:1">Textos sobre tempo, descanso e autonomia — publicados a cada duas semanas.</p>
@@ -2008,7 +2013,7 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   <!-- fundo saiu do `.y` (amarelo da casa) pro `.lm` (lima) a pedido do
        Daniel — a mesma cor da capa da Bilheteria. -->
   <section class="cover c-cta lm" id="conectar">
-    <span class="idx r" style="--r:0">[05] — Conectar</span>
+    <span class="idx r" style="--r:0">[06] — Conectar</span>
     <h2 class="giant split r" style="--r:1">Vamos <em>conversar</em>?</h2>
     <p class="lead r" style="--r:2">Se você procura um encontro que una escuta, arte e movimento —
       vamos fazer algo memorável.</p>
@@ -2043,6 +2048,7 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
             <li><a href="#radio">Rádio Tinhosa</a></li>
             <li><a href="#formacoes">Formações</a></li>
             <li><a href="#cartaz">Bilheteria</a></li>
+            <li><a href="#reflexoes">Reflexões</a></li>
             <li><a href="#conectar">Conectar</a></li>
           </ul>
         </div>
@@ -2069,10 +2075,36 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   if(window.enVoltou){
     var enY=+(function(){ try{ return sessionStorage.getItem('en_scroll'); }catch(e){ return 0; } })()||0;
     if(enY>0){ scrollTo(0,enY); addEventListener('load',function(){ scrollTo(0,enY); }); }
-  }else{
+  }else if(!location.hash){   /* mesma guarda do <head>: âncora manda mais */
     scrollTo(0,0);
   }
   addEventListener('pagehide',function(){ try{ sessionStorage.setItem('en_scroll', scrollY); }catch(e){} });
+
+  /* ═══ ÂNCORAS EM SEÇÃO PRESA (sticky) ═══════════════════════════════════
+     🔴 BUG que isto resolve: clicar em "Home" no menu não levava a lugar
+     nenhum — a pessoa ficava onde estava (nas Formações, por exemplo) e
+     parecia que o link mandava pra lá.
+     CAUSA: `#inicio` é a capa, que é `position:sticky` e fica PRESA no topo
+     da tela durante a cena 1 inteira. O navegador, ao seguir a âncora, olha
+     onde o elemento ESTÁ na tela — e ele já estava no topo, então concluía
+     "já está à vista" e não rolava nada. Vale pra toda seção presa
+     (Bilheteria dentro da cena 2, Conectar dentro da cena 3).
+     FIX: rolar pela posição de LAYOUT, que o sticky não altera. `offsetTop`
+     somado pela cadeia de offsetParent dá essa posição — ao contrário de
+     getBoundingClientRect(), que devolve justamente a posição presa. */
+  (function(){
+    function posDeLayout(el){ var y=0; while(el){ y+=el.offsetTop; el=el.offsetParent; } return y; }
+    document.addEventListener('click',function(e){
+      var a=e.target.closest && e.target.closest('a[href^="#"]');
+      if(!a) return;
+      var id=a.getAttribute('href').slice(1);
+      if(!id) return;
+      var alvo=document.getElementById(id);
+      if(!alvo) return;
+      e.preventDefault();
+      scrollTo({ top:posDeLayout(alvo), behavior:'smooth' });
+    });
+  })();
 
   /* PIN (o padrão de transição — ver receita no CSS de .pin): calcula o
      top do sticky de cada lâmina .pin = min(0, tela − altura da lâmina).
