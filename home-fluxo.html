@@ -815,15 +815,39 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
    pra o swipe na ponta não disparar o "voltar" do iOS, e o realce de toque
    por JS. Tudo isso já foi calibrado e aprovado no iPhone — não faz sentido
    reinventar. Aqui só mudam os ACABAMENTOS de cada cartão. */
-.s-textos{ background:#fff; }
+.s-textos{
+  background:#fff;
+  /* 🔑 UMA RÉGUA SÓ pra toda a seção: `--txt-gap` é a distância que já havia
+     entre o título e o texto de apoio, promovida a padrão. Todo espaço em
+     branco daqui (topo → título, título → apoio, apoio → carrossel,
+     carrossel → botão, botão → base) usa esta mesma medida.
+     De onde vem o número: aquela distância era a soma de duas coisas — o
+     `gap` do `.wrap` (clamp(22px,4vh,44px)) mais o `margin-top` do apoio
+     (clamp(16px,3vh,26px)). Somados: 38px no piso, 7vh no meio, 70px no
+     teto — que é exatamente este clamp. Ou seja, o espaçamento que ele
+     aprovou não mudou; só virou o padrão dos outros. */
+  --txt-gap:clamp(38px,7vh,70px);
+  padding-top:var(--txt-gap);
+  padding-bottom:var(--txt-gap);
+  /* sobe 10px por cima da lâmina anterior (pedido do Daniel) — o canto
+     arredondado e a sombra de `.sheet` fazem o resto da leitura de "carta
+     por cima". Funciona sem mexer em z-index: as duas lâminas têm o mesmo,
+     e a que vem depois no HTML pinta por cima. */
+  margin-top:-10px;
+}
+.s-textos .wrap{ gap:var(--txt-gap); }
 .s-textos .txt-title{
   font-family:var(--sans); font-weight:200; letter-spacing:-.035em; line-height:.98;
   font-size:clamp(2.1rem,11vw,4.2rem); color:var(--ink); margin:0; }
 .s-textos .txt-title em{ font-style:italic; font-weight:300; }
+/* os espaçamentos próprios destes três saem de cena: quem separa tudo agora
+   é o `gap` do `.wrap`, pra não somar duas medidas no mesmo vão */
 .s-textos .txt-lede{
   font-family:var(--sans); font-weight:300; font-size:clamp(1.02rem,4.2vw,1.25rem);
   line-height:1.5; color:rgba(15,14,12,.78); max-width:34ch;
-  margin-top:clamp(16px,3vh,26px); text-wrap:pretty; }
+  margin-top:0; text-wrap:pretty; }
+.s-textos .fcar-wrap{ margin-top:0; }
+.s-textos .fcar-cta-wrap{ padding:0; }
 /* cartão de texto: data em cima, título no meio, chamada embaixo.
    Sem `justify-content:space-between` como os de Formações — aqui o título
    é longo e variável, então ele fica colado na data e o rodapé é empurrado
