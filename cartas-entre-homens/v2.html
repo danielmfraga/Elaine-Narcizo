@@ -74,31 +74,40 @@
      centralizar. O `.rail` continua a MESMA engrenagem de sempre
      (scroll-snap nativo + `nearest()` genérico no JS) — só ganhou um 1º
      slot maior; nada mudou pros outros 6.
-     ⚠️ 2ª versão (mockup do Daniel): trocou vídeo full-bleed por papel +
-     tipografia — mesma textura --paper dos selos, texto à esquerda, título
-     GIGANTE em grotesco pesado (Archivo 900, a única sem-serifa da página).
-     O vídeo em si NÃO entrou nesta versão — perguntar se ele quer em outro
-     lugar antes de descartar de vez. */
+     ⚠️ 3ª versão: o mockup do Daniel era só REFERÊNCIA DE LETTERING (o
+     título gigante em grotesco pesado, a barra, a linha divisória) — o
+     FUNDO em vídeo da 1ª versão já estava certo, não era pra trocar por
+     papel. Ficou: vídeo full-bleed (2ª versão) + tipografia nova (mockup),
+     texto à esquerda em vez de centralizado. */
   .slot.cover{ height:100dvh; margin-top:-12dvh; padding:0;
     position:relative; overflow:hidden; scroll-snap-align:start;
-    align-items:center; background:var(--paper); }
+    align-items:center; }
+  .cover-bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+  /* escurece de forma parelha (era um degradê pensado pro texto morar SÓ
+     embaixo; agora o bloco de texto pode ficar em qualquer altura) */
+  .cover-scrim{ position:absolute; inset:0; z-index:1; background:rgba(20,16,12,.46); }
   .cover-content{ position:relative; z-index:2; width:100%; max-width:420px;
-    padding:0 clamp(24px,8vw,48px); color:var(--ink); text-align:left;
-    --ac:#C1481F; }   /* o .cta reaproveitado lê --ac; sem isso ficaria sem cor/borda */
-  .cover-bar{ width:64px; height:9px; background:#C1481F; margin-bottom:clamp(18px,4vh,30px); }
+    padding:0 clamp(24px,8vw,48px); color:#fff; text-align:left;
+    --ac:#E8703B; }   /* o .cta reaproveitado lê --ac; sem isso ficaria sem cor/borda */
+  .cover-bar{ width:64px; height:9px; background:#E8703B; margin-bottom:clamp(18px,4vh,30px); }
   .cover-title{ font-family:"Archivo",sans-serif; font-weight:900; text-transform:uppercase;
-    letter-spacing:-.01em; line-height:.98; font-size:clamp(2.6rem,13vw,4.6rem); color:var(--ink); }
-  .cover-rule{ height:2px; background:var(--ink); margin:clamp(16px,3.6vh,26px) 0; opacity:.85; }
+    letter-spacing:-.01em; line-height:.98; font-size:clamp(2.6rem,13vw,4.6rem); color:#fff;
+    text-shadow:0 2px 14px rgba(0,0,0,.5); }
+  .cover-rule{ height:2px; background:rgba(255,255,255,.75); margin:clamp(16px,3.6vh,26px) 0; }
   .cover-sub{ font-family:"Archivo",sans-serif; font-weight:900; font-size:.92rem;
-    letter-spacing:.06em; text-transform:uppercase; color:#C1481F; }
+    letter-spacing:.06em; text-transform:uppercase; color:#E8703B; text-shadow:0 1px 4px rgba(0,0,0,.4); }
   .cover-lede{ font-family:var(--serif); font-weight:300; font-size:clamp(.92rem,3.6vw,1.02rem);
-    line-height:1.55; max-width:32ch; margin-top:clamp(14px,3vh,20px); color:var(--ink-soft); }
+    line-height:1.55; max-width:32ch; margin-top:clamp(14px,3vh,20px); color:rgba(255,255,255,.9);
+    text-shadow:0 1px 6px rgba(0,0,0,.45); }
   .cover-cta-wrap{ margin-top:clamp(20px,4vh,30px); }
   /* reaproveita o .cta que já existe na página (pílula tracejada + halo
-     pulsando) — aqui já nasce com a cor certa (--ac, escura), não precisa
-     de override como precisava sobre o vídeo da 1ª versão. */
+     pulsando) — cor branca por cima do vídeo, em vez do --ac laranja (que
+     no fundo escuro fica ok pro título/sub, mas o CTA precisa de mais
+     contraste porque o vídeo varia de tom pela cena). */
+  .cover-cta-wrap .cta{ color:#fff; border-color:rgba(255,255,255,.7); }
+  .cover-cta-wrap .cta:hover{ background:rgba(255,255,255,.16); }
   .cover-cta-note{ margin-top:10px; font-family:var(--serif); font-style:italic; font-size:.82rem;
-    color:var(--mute); }
+    color:rgba(255,255,255,.85); text-shadow:0 1px 4px rgba(0,0,0,.4); }
 
   /* wrapper leva a sombra (o mask do selo recortaria um box-shadow).
      will-change promove CADA selo-wrap a sua própria camada de composição:
@@ -229,12 +238,14 @@
   <div class="rail" id="rail">
 
     <!-- 00 · CAPA — preâmbulo antes da série de selos, pedido do Daniel
-         (ago/2026). 2ª versão: papel + tipografia (mockup dele), substituiu
-         a 1ª versão em vídeo full-bleed. ⚠️ O vídeo `assets/video/
-         cartas-capa.mp4` continua no repo, só não está em uso aqui — perguntar
-         antes de apagar o arquivo, pode voltar em outro formato/lugar. -->
-    <section class="slot cover" data-bg="#F2E9D8" data-ac="#C1481F"
+         (ago/2026). Vídeo full-bleed (mudo, loop) + tipografia do mockup
+         (o mockup era só referência de lettering, o fundo em vídeo já
+         estava certo). -->
+    <section class="slot cover" data-bg="#141210" data-ac="#E8703B"
              data-cap="cartas entre homens" data-tit="Tudo Quer Viver">
+      <video class="cover-bg" src="../assets/video/cartas-capa.mp4" poster="../assets/video/cartas-capa-poster.jpg"
+        autoplay muted loop playsinline></video>
+      <div class="cover-scrim" aria-hidden="true"></div>
       <div class="cover-content">
         <div class="cover-bar" aria-hidden="true"></div>
         <h1 class="cover-title">Tudo Quer Viver</h1>
