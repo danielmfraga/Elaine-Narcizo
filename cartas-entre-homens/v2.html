@@ -86,27 +86,33 @@
   /* escurece de forma parelha (era um degradê pensado pro texto morar SÓ
      embaixo; agora o bloco de texto pode ficar em qualquer altura) */
   .cover-scrim{ position:absolute; inset:0; z-index:1; background:rgba(20,16,12,.46); }
-  .cover-content{ position:relative; z-index:2; width:100%; max-width:420px;
-    padding:0 clamp(24px,8vw,48px); color:#fff; text-align:left;
-    --ac:#E8703B; }   /* o .cta reaproveitado lê --ac; sem isso ficaria sem cor/borda */
-  .cover-bar{ width:64px; height:9px; background:#E8703B; margin-bottom:clamp(18px,4vh,30px); }
+  /* posições em % vieram do mockup .idml do Daniel (medi os TextFrames de
+     verdade no arquivo — não é chute visual): título e texto ficam numa
+     coluna à esquerda; o CTA "venha" flutua sozinho à direita, na altura do
+     título — não embaixo do texto de apoio, como eu tinha colocado antes.
+     O canvas do mockup (1080×1920) tem a MESMA proporção 9:16 do vídeo,
+     então os % também valem em cima do vídeo. */
+  .cover-content{ position:absolute; inset:0; z-index:2; color:#fff; --ac:#E8703B; }
+  .cover-left{ position:absolute; left:7%; top:12.5%; width:46%; }
+  .cover-bar{ width:52px; height:8px; background:#E8703B; margin-bottom:clamp(14px,3vh,22px); }
   .cover-title{ font-family:"Archivo",sans-serif; font-weight:900; text-transform:uppercase;
-    letter-spacing:-.01em; line-height:.98; font-size:clamp(2.6rem,13vw,4.6rem); color:#fff;
+    letter-spacing:-.01em; line-height:.98; font-size:clamp(2.1rem,11.5vw,3.9rem); color:#fff;
     text-shadow:0 2px 14px rgba(0,0,0,.5); }
-  .cover-rule{ height:2px; background:rgba(255,255,255,.75); margin:clamp(16px,3.6vh,26px) 0; }
-  .cover-sub{ font-family:"Archivo",sans-serif; font-weight:900; font-size:.92rem;
+  .cover-rule{ height:2px; background:rgba(255,255,255,.75); margin:clamp(12px,2.6vh,18px) 0; }
+  .cover-sub{ font-family:"Archivo",sans-serif; font-weight:900; font-size:.82rem;
     letter-spacing:.06em; text-transform:uppercase; color:#E8703B; text-shadow:0 1px 4px rgba(0,0,0,.4); }
-  .cover-lede{ font-family:var(--serif); font-weight:300; font-size:clamp(.92rem,3.6vw,1.02rem);
-    line-height:1.55; max-width:32ch; margin-top:clamp(14px,3vh,20px); color:rgba(255,255,255,.9);
+  .cover-lede{ font-family:var(--serif); font-weight:300; font-size:clamp(.82rem,3.2vw,.94rem);
+    line-height:1.5; margin-top:clamp(10px,2.2vh,16px); color:rgba(255,255,255,.9);
     text-shadow:0 1px 6px rgba(0,0,0,.45); }
-  .cover-cta-wrap{ margin-top:clamp(20px,4vh,30px); }
+  /* CTA flutuando à direita — não é filho do fluxo da coluna esquerda */
+  .cover-cta-wrap{ position:absolute; left:54%; top:28%; width:38%; }
   /* reaproveita o .cta que já existe na página (pílula tracejada + halo
      pulsando) — cor branca por cima do vídeo, em vez do --ac laranja (que
      no fundo escuro fica ok pro título/sub, mas o CTA precisa de mais
      contraste porque o vídeo varia de tom pela cena). */
-  .cover-cta-wrap .cta{ color:#fff; border-color:rgba(255,255,255,.7); }
+  .cover-cta-wrap .cta{ color:#fff; border-color:rgba(255,255,255,.7); white-space:nowrap; }
   .cover-cta-wrap .cta:hover{ background:rgba(255,255,255,.16); }
-  .cover-cta-note{ margin-top:10px; font-family:var(--serif); font-style:italic; font-size:.82rem;
+  .cover-cta-note{ margin-top:10px; font-family:var(--serif); font-style:italic; font-size:.78rem;
     color:rgba(255,255,255,.85); text-shadow:0 1px 4px rgba(0,0,0,.4); }
 
   /* wrapper leva a sombra (o mask do selo recortaria um box-shadow).
@@ -247,11 +253,13 @@
         autoplay muted loop playsinline></video>
       <div class="cover-scrim" aria-hidden="true"></div>
       <div class="cover-content">
-        <div class="cover-bar" aria-hidden="true"></div>
-        <h1 class="cover-title">Tudo Quer Viver</h1>
-        <div class="cover-rule" aria-hidden="true"></div>
-        <p class="cover-sub">Cartas entre Homens</p>
-        <p class="cover-lede">Um projeto gratuito que aposta na força dos encontros improváveis. Homens que não se conhecem escrevem cartas e criam, pela palavra, possibilidades de diálogo e conexão.</p>
+        <div class="cover-left">
+          <div class="cover-bar" aria-hidden="true"></div>
+          <h1 class="cover-title">Tudo<br>Quer<br>Viver</h1>
+          <div class="cover-rule" aria-hidden="true"></div>
+          <p class="cover-sub">Cartas entre Homens</p>
+          <p class="cover-lede">Um projeto gratuito que aposta na força dos encontros improváveis. Homens que não se conhecem escrevem cartas e criam, pela palavra, possibilidades de diálogo e conexão.</p>
+        </div>
         <div class="cover-cta-wrap">
           <a class="cta" href="#" data-cta>Venha</a>
           <p class="cover-cta-note">Para participar é simples.</p>
