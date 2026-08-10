@@ -10,9 +10,26 @@
 <!-- Título/subtítulo da capa voltaram pro Archivo 900 (pedido do Daniel);
      DM Sans ficou só no texto de apoio + nota do CTA. Os dois convivem. -->
 <link href="https://fonts.googleapis.com/css2?family=Homemade+Apple&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..440&family=Special+Elite&family=Archivo:wght@900&family=DM+Sans:ital,opsz,wght@0,9..40,200..700;1,9..40,200..700&display=swap" rel="stylesheet">
-<script>if(window!==window.top)document.documentElement.classList.add('embedded');</script>
+<script>
+  if(window!==window.top)document.documentElement.classList.add('embedded');
+  /* ?capa=1 → modo "só a capa": é assim que a home-fluxo embute esta página
+     no card do Portão 02, em vez de manter uma CÓPIA do código da capa lá.
+     Fonte única de verdade: o que muda aqui aparece lá sozinho. */
+  try{ if(new URLSearchParams(location.search).get('capa')==='1')
+    document.documentElement.classList.add('so-capa'); }catch(e){}
+</script>
 <style>
   html.embedded,html.embedded body{ overscroll-behavior-y:contain; }
+  /* ── MODO "SÓ A CAPA" (?capa=1) ──────────────────────────────────────
+     Mostra apenas a capa e deixa o documento SEM NADA PRA ROLAR. Isso é o
+     que faz o gesto do dedo "atravessar" o iframe e rolar a página-mãe no
+     iOS: um iframe só sequestra o scroll quando tem overflow próprio. */
+  html.so-capa, html.so-capa body{ height:100%; overflow:hidden; }
+  html.so-capa .rail{ height:100dvh; overflow:hidden; padding:0; scroll-snap-type:none; }
+  html.so-capa .slot:not(.cover){ display:none; }
+  /* o -12dvh existia só pra cancelar o padding do .rail, que aqui é 0 */
+  html.so-capa .slot.cover{ margin-top:0; }
+  html.so-capa .tit-bar{ display:none; }
   /* ═══════════════════════════════════════════════════════════
      CARTAS ENTRE HOMENS · "Tudo Quer Viver" — V2 "SÉRIE DE SELOS"
      Conceito (Daniel, a partir do francobollimontilessini):
