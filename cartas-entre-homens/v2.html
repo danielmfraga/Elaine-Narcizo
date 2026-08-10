@@ -130,15 +130,16 @@
   /* ciclo de cor (mesmo efeito do botão "navegue"/título Bilheteria do
      home-fluxo — 4 cores da casa, 34.4s, linear). Aqui não tem as custom
      properties --lilas/--oliva/--laranja (são só do home-fluxo), então os
-     hex vêm direto. Compartilhado entre .cover-sub e o .cta (ver abaixo) —
-     o .cta também anima border-color, que o .cover-sub simplesmente ignora
-     (não tem border). */
+     hex vêm direto. UM keyframe só, usado pelo `.cover-sub` (via `color`) e
+     pelo letreiro do botão venha (via `fill`, porque é SVG) — cada um lê a
+     propriedade que lhe serve e ignora a outra. 🔑 Compartilhar o keyframe
+     mantém os dois SEMPRE em fase, sem sincronização manual. */
   @keyframes coverAccentCycle{
-    0%,2%  { color:#B9A7DC; border-color:#B9A7DC; }
-    25%    { color:#F5D731; border-color:#F5D731; }
-    50%    { color:#BBC24C; border-color:#BBC24C; }
-    75%    { color:#F2A25A; border-color:#F2A25A; }
-    100%   { color:#B9A7DC; border-color:#B9A7DC; }
+    0%,2%  { color:#B9A7DC; border-color:#B9A7DC; fill:#B9A7DC; }
+    25%    { color:#F5D731; border-color:#F5D731; fill:#F5D731; }
+    50%    { color:#BBC24C; border-color:#BBC24C; fill:#BBC24C; }
+    75%    { color:#F2A25A; border-color:#F2A25A; fill:#F2A25A; }
+    100%   { color:#B9A7DC; border-color:#B9A7DC; fill:#B9A7DC; }
   }
   /* +20% no tamanho, ciclo de cor no lugar do amarelo fixo, e nunca quebra
      linha (pedido do Daniel). */
@@ -159,26 +160,39 @@
      `min-width:0` deixa a nota quebrar em 2 linhas em telas estreitas em
      vez de empurrar o título. */
   .cover-cta-wrap{ flex:1 1 auto; min-width:0; }
-  /* .cta original é datilografado (--type) com halo pulsando no ::after —
-     aqui troca pra DM Sans 200 (igual ao "Listas de espera" de Formações)
-     e ganha o efeito de cor completo: ciclo (acima) + brilho contínuo
-     (::before — o ::after já está ocupado pelo halo) igual ao que
-     consertamos na Bilheteria (varredura linear sem pausa, não a versão
-     antiga que travava). */
-  .cover-cta-wrap .cta{ position:relative; overflow:hidden; white-space:nowrap;
-    font-family:"DM Sans",sans-serif; font-weight:700; letter-spacing:0;
-    animation:coverAccentCycle 34.4s linear infinite;
-    text-shadow:0 1px 3px rgba(0,0,0,.7); background:rgba(0,0,0,.12); }
-  .cover-cta-wrap .cta::before{
+  /* ═══ BOTÃO "VENHA" — vetor do Daniel (`venha 3.svg`) ═══
+     Substituiu a pílula tracejada genérica que eu vinha reaproveitando dos
+     selos (classe `.cta`). Mesmo padrão do botão "navegue" da home: pílula
+     clara em `<rect>` + letreiro desenhado em `<path>`, tudo inline no HTML
+     (não `<img>`) pra o letreiro poder ser pintado/animado por CSS.
+     ⚠️ Não usa mais a classe `.cta` — o halo pulsante e a borda tracejada
+     daquela classe são do vocabulário dos SELOS, não deste botão. */
+  .btn-venha{ position:relative; display:block; overflow:hidden;
+    width:min(100%,180px);
+    /* replica o rx=10.15 do vetor em QUALQUER tamanho renderizado:
+       rx/largura = 10.15/104.76 ≈ 9.7% · rx/altura = 10.15/33.26 ≈ 30.5%.
+       Precisa estar no <a> (e não no <svg>) porque é ele que recorta o
+       brilho do ::after. */
+    border-radius:9.7% / 30.5%;
+    -webkit-tap-highlight-color:transparent; }
+  .btn-venha svg{ display:block; width:100%; height:auto; }
+  .btn-venha .bv-bg{ fill:#fff; }
+  /* letreiro ciclando pelas 4 cores da casa, em fase com o "TUDO QUER VIVER"
+     (mesmo keyframe, mesma duração — ver coverAccentCycle acima) */
+  .btn-venha .bv-word{ fill:#B9A7DC; animation:coverAccentCycle 34.4s linear infinite; }
+  /* brilho varrendo o botão — versão CONTÍNUA (a que consertamos na
+     Bilheteria), não a antiga que ficava parada e dava um pulo */
+  .btn-venha::after{
     content:''; position:absolute; inset:0; pointer-events:none;
-    background:linear-gradient(115deg, transparent 30%, rgba(255,255,255,.5) 48%, transparent 66%);
+    background:linear-gradient(115deg, transparent 30%, rgba(255,255,255,.55) 48%, transparent 66%);
     background-size:300% 100%;
     animation:coverCtaShine 4s linear infinite;
   }
   @keyframes coverCtaShine{ from{ background-position:200% 0; } to{ background-position:-200% 0; } }
-  .cover-cta-wrap .cta:hover{ background:rgba(255,255,255,.16); }
-  .cover-cta-note{ margin-top:10px; font-family:"DM Sans",sans-serif; font-weight:300; font-style:italic; font-size:.78rem;
-    color:rgba(255,255,255,.9); text-shadow:0 1px 3px rgba(0,0,0,.6); }
+  /* nota do CTA: caixa-baixa e sem itálico, seguindo o mockup novo (antes
+     era "Para participar é simples." em itálico) */
+  .cover-cta-note{ margin-top:9px; font-family:"DM Sans",sans-serif; font-weight:400; font-size:.78rem;
+    line-height:1.25; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.6); }
 
   /* wrapper leva a sombra (o mask do selo recortaria um box-shadow).
      will-change promove CADA selo-wrap a sua própria camada de composição:
@@ -302,6 +316,9 @@
     .typed span{ opacity:1; transition:none; }
     .carimbo{ transform:rotate(-9deg); opacity:.8; transition:none; }
     .cta::after{ animation:none; }
+    /* capa: para o ciclo de cor e o brilho, mas mantém tudo legível
+       (o letreiro fica no lilás inicial, que já é o fill declarado) */
+    .cover-sub,.btn-venha .bv-word,.btn-venha::after{ animation:none; }
   }
 </style>
 </head>
@@ -328,8 +345,22 @@
           <div class="cover-head">
             <h1 class="cover-title">Cartas<br>Entre<br>Homens</h1>
             <div class="cover-cta-wrap">
-              <a class="cta" href="#" data-cta>Venha</a>
-              <p class="cover-cta-note">Para participar é simples.</p>
+              <!-- botão "venha": vetor do Daniel (`venha 3.svg`), inline pra o
+                   letreiro poder ciclar de cor por CSS. O <rect> é a pílula,
+                   os 5 <path> são as letras (v-e-n-h-a). -->
+              <a class="btn-venha" href="#" data-cta aria-label="Venha">
+                <svg viewBox="0 0 104.76 33.26" aria-hidden="true">
+                  <rect class="bv-bg" width="104.76" height="33.26" rx="10.15" ry="10.15"/>
+                  <g class="bv-word">
+                    <path d="M8.7,10.48h9.8c-.29,2.13-.43,3.47-.43,4.61,0,.87.36,1.48.98,1.48s.98-.6.98-1.48c0-1.14-.13-2.48-.43-4.61h7.99c-.67,5.19-4.03,9.65-4.03,13.43h-10.86c-.45-3.81-3.36-8.28-4.03-13.43Z"/>
+                    <path d="M27.21,18.11c0-3.83,2.98-6.29,7.61-6.29,4.07,0,6.87,1.66,6.87,5.51h-7.21c-.58,0-.85.18-.85.54,0,.65,1.28,1.12,3.72,1.12,1.52,0,3.2-.22,4.57-.6-.29,3.81-3.4,5.98-7.32,5.98-4.63,0-7.39-2.46-7.39-6.24ZM35.94,14.97c0-.74-.36-1.41-1.12-1.41s-1.07.67-1.07,1.41c0,.65.31,1.21,1.07,1.21s1.12-.56,1.12-1.21Z"/>
+                    <path d="M42.59,12.27h7.83c-.16.76-.31,1.81-.31,2.28,0,.4.2.67.49.67.27,0,.56-.22.72-.58.6-1.37,1.61-2.82,3.87-2.82,2.78,0,4.03,1.66,4.03,4.9,0,2.8-.51,4.97.18,7.18h-7.72c.36-2.62.51-4.66.51-5.84,0-.96-.54-1.32-1.05-1.32-.47,0-1.1.36-1.1,1.54,0,1.34.11,3.42.49,5.62h-7.72c.38-3.87.29-7.77-.22-11.64Z"/>
+                    <path d="M60.11,8.91h7.83c-.16,1.43-.31,4.05-.31,5.64,0,.4.2.67.49.67.27,0,.56-.22.72-.58.6-1.37,1.61-2.82,3.87-2.82,2.78,0,4.03,1.66,4.03,4.9,0,2.8-.51,4.97.18,7.18h-7.72c.36-2.62.51-4.66.51-5.84,0-.96-.54-1.32-1.05-1.32-.47,0-1.1.36-1.1,1.54,0,1.34.11,3.42.49,5.62h-7.72c.38-4.63.29-10.14-.22-15Z"/>
+                    <path d="M77.79,18.33c0-3.92,2.1-6.51,5.42-6.51,2.48,0,3.81,1.68,4.41,3.04.16.36.34.6.65.6.29,0,.47-.22.47-.56,0-.54-.11-1.77-.25-2.64h7.34c-.38,3.87-.29,7.77.22,11.64h-7.77c.11-.6.22-1.75.22-2.39,0-.36-.13-.56-.43-.56-.27,0-.43.18-.58.47-.81,1.41-2.13,2.93-4.61,2.93-3.09,0-5.1-2.33-5.1-6.02ZM88.09,17.57c0-.65-.43-1.07-1.07-1.07-1.01,0-1.81.87-1.81,1.81,0,.67.45,1.12,1.12,1.12.98,0,1.77-.9,1.77-1.86Z"/>
+                  </g>
+                </svg>
+              </a>
+              <p class="cover-cta-note">para participar é simples</p>
             </div>
           </div>
           <div class="cover-rule" aria-hidden="true"></div>
