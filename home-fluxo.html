@@ -2089,11 +2089,25 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
      onde o elemento ESTÁ na tela — e ele já estava no topo, então concluía
      "já está à vista" e não rolava nada. Vale pra toda seção presa
      (Bilheteria dentro da cena 2, Conectar dentro da cena 3).
-     FIX: rolar pela posição de LAYOUT, que o sticky não altera. `offsetTop`
-     somado pela cadeia de offsetParent dá essa posição — ao contrário de
-     getBoundingClientRect(), que devolve justamente a posição presa. */
+     FIX: rolar pela posição de LAYOUT, que o sticky não altera (como se
+     mede isso está logo abaixo, em `posDeLayout`). */
   (function(){
-    function posDeLayout(el){ var y=0; while(el){ y+=el.offsetTop; el=el.offsetParent; } return y; }
+    /* 🔴 2ª TENTATIVA. A 1ª somava `offsetTop` pela cadeia de offsetParent
+       apostando que ele fosse puramente de layout. NÃO É: num elemento
+       preso, o `offsetTop` acompanha a posição PRESA. E aí a conta dava
+       exatamente onde a pessoa já estava — o alvo virava o próprio ponto
+       atual e a tela não saía do lugar. Batia com o sintoma: da capa
+       funcionava (nada está preso em scrollY=0) e do meio do site não.
+       Agora a medida é definitivamente de layout: tira o `sticky` do
+       elemento, mede, e devolve. Ler o retângulo força o cálculo na hora,
+       e como nada é pintado entre uma coisa e outra, não pisca. */
+    function posDeLayout(el){
+      var antes=el.style.position;
+      el.style.position='static';
+      var y=el.getBoundingClientRect().top + scrollY;
+      el.style.position=antes;
+      return y;
+    }
     document.addEventListener('click',function(e){
       var a=e.target.closest && e.target.closest('a[href^="#"]');
       if(!a) return;
