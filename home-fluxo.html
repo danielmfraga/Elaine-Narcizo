@@ -1476,12 +1476,17 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
 
 <!-- MENU overlay -->
 <div class="menu" id="menu" aria-hidden="true">
-  <a class="mi" style="--i:0" href="#inicio"><small>00</small>Início</a>
+  <!-- índice na ORDEM REAL da rolagem (ago/2026). Antes "Em cartaz" vinha
+       como 02, antes da Rádio, mas na página ela aparece DEPOIS de
+       Formações — menu e página divergiam. Agora a numeração é a mesma nos
+       dois lugares e nos olhos [NN] das seções. -->
+  <a class="mi" style="--i:0" href="#inicio"><small>00</small>Home</a>
   <a class="mi" style="--i:1" href="#quem"><small>01</small>Quem sou eu</a>
-  <a class="mi" style="--i:2" href="#cartaz"><small>02</small>Em cartaz</a>
-  <a class="mi" style="--i:3" href="#radio"><small>03</small>Rádio</a>
-  <a class="mi" style="--i:4" href="#formacoes"><small>04</small>Formações</a>
+  <a class="mi" style="--i:2" href="#radio"><small>02</small>Rádio Tinhosa</a>
+  <a class="mi" style="--i:3" href="#formacoes"><small>03</small>Formações</a>
+  <a class="mi" style="--i:4" href="#cartaz"><small>04</small>Bilheteria</a>
   <a class="mi" style="--i:5" href="#conectar"><small>05</small>Conectar</a>
+  <a class="mi" style="--i:6" href="#informacoes"><small>06</small>Informações gerais</a>
   <div class="mfoot">
     <a href="https://www.instagram.com/elaine.c.narcizo/" target="_blank" rel="noopener">Instagram</a>
     <a href="https://www.youtube.com/@elainenarc" target="_blank" rel="noopener">YouTube</a>
@@ -1715,7 +1720,7 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
     <span class="stamp" aria-hidden="true"></span>
     <div class="wrap">
       <!-- só o número: a palavra "Formações" já vem logo abaixo, no título -->
-      <span class="idx r in-io" style="--r:0">[04]</span>
+      <span class="idx r in-io" style="--r:0">[03]</span>
       <!-- "Forma" + "ções" colados (sem espaço): uma palavra, duas texturas -->
       <h2 class="form-title r in-io" style="--r:1">Forma<em>ções</em></h2>
       <p class="form-lede r in-io" style="--r:2">Propostas formativas para ampliar repertórios e transformar práticas.</p>
@@ -1873,7 +1878,7 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   <!-- fundo saiu do `.y` (amarelo da casa) pro `.lm` (lima) a pedido do
        Daniel — a mesma cor da capa da Bilheteria. -->
   <section class="cover c-cta lm" id="conectar">
-    <span class="idx r" style="--r:0">[04] — Conectar</span>
+    <span class="idx r" style="--r:0">[05] — Conectar</span>
     <h2 class="giant split r" style="--r:1">Vamos <em>conversar</em>?</h2>
     <p class="lead r" style="--r:2">Se você procura um encontro que una escuta, arte e movimento —
       vamos fazer algo memorável.</p>
@@ -1884,7 +1889,8 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   </section>
 
   <!-- ══ FOOTER (endereço · contato · nav · fechamento) ══ -->
-  <footer class="sheet k ftr">
+  <!-- id novo: é o destino do item 06 "Informações gerais" do menu -->
+  <footer class="sheet k ftr" id="informacoes">
     <div class="wrap">
       <div class="grid">
         <div>
@@ -1896,7 +1902,6 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
           <p class="cap">Contato</p>
           <ul>
             <li><a href="https://api.whatsapp.com/send?phone=5516991595707" target="_blank" rel="noopener">WhatsApp</a></li>
-            <li><a href="#" data-todo="email real">E-mail</a></li>
             <li><a href="https://www.instagram.com/elaine.c.narcizo/" target="_blank" rel="noopener">Instagram</a></li>
             <li><a href="https://www.youtube.com/@elainenarc" target="_blank" rel="noopener">YouTube</a></li>
           </ul>
@@ -1905,10 +1910,10 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
           <p class="cap">Navegar</p>
           <ul>
             <li><a href="#quem">Quem sou eu</a></li>
-            <li><a href="#cartaz">Em cartaz</a></li>
-            <li><a href="#radio">Rádio</a></li>
+            <li><a href="#radio">Rádio Tinhosa</a></li>
             <li><a href="#formacoes">Formações</a></li>
-            <li><a href="repertorios-sensiveis/">Repertórios Sensíveis</a></li>
+            <li><a href="#cartaz">Bilheteria</a></li>
+            <li><a href="#conectar">Conectar</a></li>
           </ul>
         </div>
       </div>
