@@ -110,27 +110,52 @@
      sem navegador ao vivo) — se não bater exato, me passa a % certa.
      Espessura dobrada (2px→4px), a pedido. */
   .cover-rule{ width:38%; height:4px; background:rgba(255,255,255,.75); margin:clamp(12px,2.6vh,18px) 0; }
-  /* laranja (#E8703B) trocado por amarelo — o Daniel achou o laranja "meio
-     escuro"/pouco contraste em cima do vídeo escurecido. #F5D731 é o mesmo
-     --amarelo já usado no resto do site (home-fluxo). +20% no tamanho. */
+  /* ciclo de cor (mesmo efeito do botão "navegue"/título Bilheteria do
+     home-fluxo — 4 cores da casa, 34.4s, linear). Aqui não tem as custom
+     properties --lilas/--oliva/--laranja (são só do home-fluxo), então os
+     hex vêm direto. Compartilhado entre .cover-sub e o .cta (ver abaixo) —
+     o .cta também anima border-color, que o .cover-sub simplesmente ignora
+     (não tem border). */
+  @keyframes coverAccentCycle{
+    0%,2%  { color:#B9A7DC; border-color:#B9A7DC; }
+    25%    { color:#F5D731; border-color:#F5D731; }
+    50%    { color:#BBC24C; border-color:#BBC24C; }
+    75%    { color:#F2A25A; border-color:#F2A25A; }
+    100%   { color:#B9A7DC; border-color:#B9A7DC; }
+  }
+  /* +20% no tamanho, ciclo de cor no lugar do amarelo fixo, e nunca quebra
+     linha (pedido do Daniel). */
   .cover-sub{ font-family:"Archivo",sans-serif; font-weight:900; font-size:.984rem;
-    letter-spacing:.06em; text-transform:uppercase; color:#F5D731; text-shadow:0 1px 3px rgba(0,0,0,.7); }
+    letter-spacing:.06em; text-transform:uppercase; white-space:nowrap;
+    animation:coverAccentCycle 34.4s linear infinite;
+    text-shadow:0 1px 3px rgba(0,0,0,.7); }
   /* entrelinhas -30% (1.5 → 1.05) */
   .cover-lede{ font-family:"DM Sans",sans-serif; font-weight:300; font-size:clamp(.82rem,3.2vw,.94rem);
     line-height:1.05; margin-top:clamp(10px,2.2vh,16px); color:rgba(255,255,255,.9);
     text-shadow:0 1px 4px rgba(0,0,0,.65); }
-  /* CTA flutuando à direita — não é filho do fluxo da coluna esquerda */
-  .cover-cta-wrap{ position:absolute; left:54%; top:28%; width:38%; }
-  /* reaproveita o .cta que já existe na página (pílula tracejada + halo
-     pulsando) — cor branca por cima do vídeo, em vez do --ac laranja (que
-     no fundo escuro fica ok pro título/sub, mas o CTA precisa de mais
-     contraste porque o vídeo varia de tom pela cena). */
-  /* o .cta original é datilografado (--type); aqui troca pra DM Sans 200,
-     igual ao botão "Listas de espera" de Formações — mesmo raciocínio do
-     título/corpo acima. */
-  .cover-cta-wrap .cta{ color:#fff; border-color:rgba(255,255,255,.7); white-space:nowrap;
+  /* CTA flutuando à direita, alinhado com a BASE de "Homens" (última linha
+     do título) — top:30% é a estimativa dessa base (mesmo raciocínio do
+     .cover-rule: sem navegador ao vivo pra medir a caixa de texto real).
+     left subiu de 54%→58% pra não acavalar com "Homens", que aos 46% de
+     largura da coluna esquerda quase encosta ali. */
+  .cover-cta-wrap{ position:absolute; left:58%; top:30%; width:34%; }
+  /* .cta original é datilografado (--type) com halo pulsando no ::after —
+     aqui troca pra DM Sans 200 (igual ao "Listas de espera" de Formações)
+     e ganha o efeito de cor completo: ciclo (acima) + brilho contínuo
+     (::before — o ::after já está ocupado pelo halo) igual ao que
+     consertamos na Bilheteria (varredura linear sem pausa, não a versão
+     antiga que travava). */
+  .cover-cta-wrap .cta{ position:relative; overflow:hidden; white-space:nowrap;
     font-family:"DM Sans",sans-serif; font-weight:200; letter-spacing:0;
+    animation:coverAccentCycle 34.4s linear infinite;
     text-shadow:0 1px 3px rgba(0,0,0,.7); background:rgba(0,0,0,.12); }
+  .cover-cta-wrap .cta::before{
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(115deg, transparent 30%, rgba(255,255,255,.5) 48%, transparent 66%);
+    background-size:300% 100%;
+    animation:coverCtaShine 4s linear infinite;
+  }
+  @keyframes coverCtaShine{ from{ background-position:200% 0; } to{ background-position:-200% 0; } }
   .cover-cta-wrap .cta:hover{ background:rgba(255,255,255,.16); }
   .cover-cta-note{ margin-top:10px; font-family:"DM Sans",sans-serif; font-weight:300; font-style:italic; font-size:.78rem;
     color:rgba(255,255,255,.9); text-shadow:0 1px 3px rgba(0,0,0,.6); }
