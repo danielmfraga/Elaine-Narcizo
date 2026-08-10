@@ -7,7 +7,10 @@
 <meta name="description" content="Tudo Quer Viver — uma experiência de troca de cartas entre homens, mantida pela escrita." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Homemade+Apple&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..440&family=Special+Elite&display=swap" rel="stylesheet">
+<!-- Archivo entrou pro título gigante da nova capa (mockup do Daniel pediu um
+     grotesco bem pesado — sem-serifa, não tem nada assim no resto da página,
+     que é toda datilografada/manuscrita/serifada). Peso 900, sem esticar. -->
+<link href="https://fonts.googleapis.com/css2?family=Homemade+Apple&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..440&family=Special+Elite&family=Archivo:wght@900&display=swap" rel="stylesheet">
 <script>if(window!==window.top)document.documentElement.classList.add('embedded');</script>
 <style>
   html.embedded,html.embedded body{ overscroll-behavior-y:contain; }
@@ -62,41 +65,40 @@
     display:flex; align-items:center; justify-content:center;
     padding:0 clamp(20px,7vw,44px); }
 
-  /* ═══ CAPA — vídeo full-bleed, adicionada como preâmbulo da série de selos
-     (pedido do Daniel, ago/2026). Não é um selo (sem `.val`, fora da
-     numeração 01–06) — é a tela ANTES da série começar.
-     Distinta de todo `.slot`: ocupa a TELA INTEIRA (100dvh), não os 76dvh
-     dos selos — por isso cancela com margin-top negativo o
+  /* ═══ CAPA — preâmbulo antes da série de selos (pedido do Daniel, ago/2026).
+     Não é um selo (sem `.val`, fora da numeração 01–06) — é a tela ANTES da
+     série começar. Distinta de todo `.slot`: ocupa a TELA INTEIRA (100dvh),
+     não os 76dvh dos selos — por isso cancela com margin-top negativo o
      `padding-top:12dvh` do `.rail` (que só existe pra centralizar os selos
      menores) e trava no TOPO (`scroll-snap-align:start`) em vez de
      centralizar. O `.rail` continua a MESMA engrenagem de sempre
      (scroll-snap nativo + `nearest()` genérico no JS) — só ganhou um 1º
-     slot maior; nada mudou pros outros 6. */
+     slot maior; nada mudou pros outros 6.
+     ⚠️ 2ª versão (mockup do Daniel): trocou vídeo full-bleed por papel +
+     tipografia — mesma textura --paper dos selos, texto à esquerda, título
+     GIGANTE em grotesco pesado (Archivo 900, a única sem-serifa da página).
+     O vídeo em si NÃO entrou nesta versão — perguntar se ele quer em outro
+     lugar antes de descartar de vez. */
   .slot.cover{ height:100dvh; margin-top:-12dvh; padding:0;
     position:relative; overflow:hidden; scroll-snap-align:start;
-    align-items:flex-end; }
-  .cover-bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
-  /* escurece progressivamente de cima pra baixo — o texto mora embaixo,
-     onde a imagem precisa segurar mais contraste; cor = --ink da página
-     (mesmo tom quente escuro usado no resto do site, não um preto neutro) */
-  .cover-scrim{ position:absolute; inset:0; z-index:1;
-    background:linear-gradient(180deg, rgba(42,38,32,.12) 0%, rgba(42,38,32,.22) 45%, rgba(42,38,32,.74) 100%); }
-  .cover-content{ position:relative; z-index:2; width:100%;
-    padding:0 clamp(20px,7vw,44px) clamp(48px,9vh,84px); color:#fff; text-align:center; }
-  .cover-title{ font-family:var(--type); font-weight:400; text-transform:uppercase; letter-spacing:.08em;
-    font-size:clamp(2.3rem,10.5vw,3.6rem); line-height:1.05; text-shadow:0 2px 10px rgba(0,0,0,.5); }
-  .cover-sub{ margin-top:10px; font-family:var(--type); font-size:10px; letter-spacing:.26em; text-transform:uppercase;
-    color:rgba(255,255,255,.82); text-shadow:0 1px 4px rgba(0,0,0,.5); }
-  .cover-lede{ font-family:var(--serif); font-weight:300; font-size:clamp(.92rem,3.8vw,1.08rem);
-    line-height:1.6; max-width:38ch; margin:18px auto 0; text-shadow:0 1px 6px rgba(0,0,0,.45); }
-  .cover-cta-wrap{ margin-top:22px; }
+    align-items:center; background:var(--paper); }
+  .cover-content{ position:relative; z-index:2; width:100%; max-width:420px;
+    padding:0 clamp(24px,8vw,48px); color:var(--ink); text-align:left;
+    --ac:#C1481F; }   /* o .cta reaproveitado lê --ac; sem isso ficaria sem cor/borda */
+  .cover-bar{ width:64px; height:9px; background:#C1481F; margin-bottom:clamp(18px,4vh,30px); }
+  .cover-title{ font-family:"Archivo",sans-serif; font-weight:900; text-transform:uppercase;
+    letter-spacing:-.01em; line-height:.98; font-size:clamp(2.6rem,13vw,4.6rem); color:var(--ink); }
+  .cover-rule{ height:2px; background:var(--ink); margin:clamp(16px,3.6vh,26px) 0; opacity:.85; }
+  .cover-sub{ font-family:"Archivo",sans-serif; font-weight:900; font-size:.92rem;
+    letter-spacing:.06em; text-transform:uppercase; color:#C1481F; }
+  .cover-lede{ font-family:var(--serif); font-weight:300; font-size:clamp(.92rem,3.6vw,1.02rem);
+    line-height:1.55; max-width:32ch; margin-top:clamp(14px,3vh,20px); color:var(--ink-soft); }
+  .cover-cta-wrap{ margin-top:clamp(20px,4vh,30px); }
   /* reaproveita o .cta que já existe na página (pílula tracejada + halo
-     pulsando), só troca a cor pro branco (o original é --ac, escuro,
-     pensado pra ficar sobre o papel creme do selo — aqui é sobre vídeo). */
-  .cover-cta-wrap .cta{ color:#fff; border-color:rgba(255,255,255,.7); }
-  .cover-cta-wrap .cta:hover{ background:rgba(255,255,255,.16); }
+     pulsando) — aqui já nasce com a cor certa (--ac, escura), não precisa
+     de override como precisava sobre o vídeo da 1ª versão. */
   .cover-cta-note{ margin-top:10px; font-family:var(--serif); font-style:italic; font-size:.82rem;
-    color:rgba(255,255,255,.82); text-shadow:0 1px 4px rgba(0,0,0,.45); }
+    color:var(--mute); }
 
   /* wrapper leva a sombra (o mask do selo recortaria um box-shadow).
      will-change promove CADA selo-wrap a sua própria camada de composição:
@@ -226,16 +228,17 @@
 
   <div class="rail" id="rail">
 
-    <!-- 00 · CAPA (vídeo) — preâmbulo antes da série de selos, pedido do
-         Daniel (ago/2026). Vídeo dele, mudo e em loop (tinha áudio no
-         arquivo original — só o `muted` já resolve, sem precisar reencodar). -->
-    <section class="slot cover" data-bg="#141210" data-ac="#141210"
+    <!-- 00 · CAPA — preâmbulo antes da série de selos, pedido do Daniel
+         (ago/2026). 2ª versão: papel + tipografia (mockup dele), substituiu
+         a 1ª versão em vídeo full-bleed. ⚠️ O vídeo `assets/video/
+         cartas-capa.mp4` continua no repo, só não está em uso aqui — perguntar
+         antes de apagar o arquivo, pode voltar em outro formato/lugar. -->
+    <section class="slot cover" data-bg="#F2E9D8" data-ac="#C1481F"
              data-cap="cartas entre homens" data-tit="Tudo Quer Viver">
-      <video class="cover-bg" src="../assets/video/cartas-capa.mp4" poster="../assets/video/cartas-capa-poster.jpg"
-        autoplay muted loop playsinline></video>
-      <div class="cover-scrim" aria-hidden="true"></div>
       <div class="cover-content">
+        <div class="cover-bar" aria-hidden="true"></div>
         <h1 class="cover-title">Tudo Quer Viver</h1>
+        <div class="cover-rule" aria-hidden="true"></div>
         <p class="cover-sub">Cartas entre Homens</p>
         <p class="cover-lede">Um projeto gratuito que aposta na força dos encontros improváveis. Homens que não se conhecem escrevem cartas e criam, pela palavra, possibilidades de diálogo e conexão.</p>
         <div class="cover-cta-wrap">
