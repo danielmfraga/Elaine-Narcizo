@@ -808,6 +808,40 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
 }
 .fcar-cta.press,.fcar-cta:active{ background:rgba(15,14,12,.10); }
 @media(hover:hover){ .fcar-cta:hover{ background:rgba(15,14,12,.06); } }
+
+/* ═══ CONSIDERAÇÕES FINAIS — carrossel dos textos do Medium ═══════════════
+   🔑 Reusa o MOTOR do carrossel de Formações (`.fcar*`): rolagem horizontal
+   nativa, snap `proximity` (o que devolveu a inércia), `overscroll-behavior-x`
+   pra o swipe na ponta não disparar o "voltar" do iOS, e o realce de toque
+   por JS. Tudo isso já foi calibrado e aprovado no iPhone — não faz sentido
+   reinventar. Aqui só mudam os ACABAMENTOS de cada cartão. */
+.s-textos{ background:#fff; }
+.s-textos .txt-title{
+  font-family:var(--sans); font-weight:200; letter-spacing:-.035em; line-height:.98;
+  font-size:clamp(2.1rem,11vw,4.2rem); color:var(--ink); margin:0; }
+.s-textos .txt-title em{ font-style:italic; font-weight:300; }
+.s-textos .txt-lede{
+  font-family:var(--sans); font-weight:300; font-size:clamp(1.02rem,4.2vw,1.25rem);
+  line-height:1.5; color:rgba(15,14,12,.78); max-width:34ch;
+  margin-top:clamp(16px,3vh,26px); text-wrap:pretty; }
+/* cartão de texto: data em cima, título no meio, chamada embaixo.
+   Sem `justify-content:space-between` como os de Formações — aqui o título
+   é longo e variável, então ele fica colado na data e o rodapé é empurrado
+   pelo `margin-top:auto`. */
+.txt-card > a{ justify-content:flex-start; text-align:left; gap:12px; }
+.txt-card .txt-data{
+  font-family:var(--sans); font-weight:200; font-size:10px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--ink); line-height:1.6; }
+.txt-card .txt-nome{
+  font-family:var(--sans); font-weight:300;
+  font-size:clamp(1rem,4.1vw,1.16rem); line-height:1.25; letter-spacing:-.015em;
+  /* títulos do Medium variam MUITO de tamanho — corta em 6 linhas com
+     reticências pra nenhum cartão estourar a caixa */
+  display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:6; overflow:hidden; }
+.txt-card .txt-ler{
+  margin-top:auto;
+  font-family:var(--sans); font-weight:200; font-size:10px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--ink); line-height:1.6; }
 /* ── TÍTULO: "Forma" romano + "ções" itálico ──
    A referência marca UMA palavra em itálico ("Repertórios <em>Sensíveis</em>").
    Como aqui o título é uma palavra só, o Daniel escolheu partir a própria
@@ -1870,6 +1904,78 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
       </div>
     </div>
   </div>
+
+  <!-- ══ CONSIDERAÇÕES FINAIS — os textos do Medium ══
+       Carrossel no mesmo motor do de Formações (ver CSS). ⚠️ Os 10 cartões
+       estão ESCRITOS À MÃO a partir do feed (medium.com/feed/@elainenarcizo).
+       Um navegador não consegue ler esse feed sozinho: o Medium não manda os
+       cabeçalhos de CORS, então o pedido é bloqueado. Pra atualizar sozinho
+       seria preciso uma função no Vercel buscando o feed pelo servidor.
+       Enquanto isso: texto novo = cartão novo aqui. -->
+  <div class="sheet w s-textos">
+    <div class="wrap">
+      <h2 class="txt-title r in-io" style="--r:0">Considerações <em>finais</em></h2>
+      <p class="txt-lede r in-io" style="--r:1">Textos sobre tempo, descanso e autonomia — publicados a cada duas semanas.</p>
+      <div class="fcar-wrap in-io">
+        <ul class="fcar" role="list">
+        <li class="fcar-card txt-card"><a href="https://medium.com/@elainenarcizo/quando-dizemos-parab%C3%A9ns-no-dia-da-mulher-estamos-celebrando-exatamente-o-qu%C3%AA-d16323c71383" target="_blank" rel="noopener">
+          <span class="txt-data">08 mar 2026</span>
+          <span class="txt-nome">Quando dizemos “parabéns” no Dia da Mulher, estamos celebrando exatamente o quê?</span>
+          <span class="txt-ler">Ler no Medium →</span>
+        </a></li>
+        <li class="fcar-card txt-card"><a href="https://medium.com/@elainenarcizo/o-rid%C3%ADculo-%C3%A9-um-dispositivo-que-pode-salvar-uma-mulher-cfeece96e707" target="_blank" rel="noopener">
+          <span class="txt-data">21 fev 2026</span>
+          <span class="txt-nome">O ridículo é um dispositivo que pode salvar uma mulher</span>
+          <span class="txt-ler">Ler no Medium →</span>
+        </a></li>
+        <li class="fcar-card txt-card"><a href="https://medium.com/@elainenarcizo/mulher-voc%C3%AA-j%C3%A1-pensou-que-na-maior-parte-da-sua-vida-passa-respondendo-perguntas-que-nunca-dc272d616bd8" target="_blank" rel="noopener">
+          <span class="txt-data">07 fev 2026</span>
+          <span class="txt-nome">Mulher, você já pensou que passa a vida respondendo perguntas que nunca fez?</span>
+          <span class="txt-ler">Ler no Medium →</span>
+        </a></li>
+        <li class="fcar-card txt-card"><a href="https://medium.com/@elainenarcizo/descanso-e-mulheres-n%C3%A3o-basta-igualdade-na-corrida-quando-ningu%C3%A9m-pode-parar-907e36336652" target="_blank" rel="noopener">
+          <span class="txt-data">24 jan 2026</span>
+          <span class="txt-nome">Descanso e mulheres: não basta igualdade na corrida quando ninguém pode parar</span>
+          <span class="txt-ler">Ler no Medium →</span>
+        </a></li>
+        <li class="fcar-card txt-card"><a href="https://medium.com/@elainenarcizo/deser%C3%A7%C3%A3o-das-l%C3%A1grimas-um-sonho-para-2026-0d23c25f76b4" target="_blank" rel="noopener">
+          <span class="txt-data">20 dez 2025</span>
+          <span class="txt-nome">Deserção das lágrimas: um sonho para 2026</span>
+          <span class="txt-ler">Ler no Medium →</span>
+        </a></li>
+        <li class="fcar-card txt-card"><a href="https://medium.com/@elainenarcizo/reescrevendo-o-agora-o-papel-estrutural-do-planejamento-feminino-2c5089c17dac" target="_blank" rel="noopener">
+          <span class="txt-data">06 dez 2025</span>
+          <span class="txt-nome">Reescrevendo o agora: o papel estrutural do planejamento feminino</span>
+          <span class="txt-ler">Ler no Medium →</span>
+        </a></li>
+        <li class="fcar-card txt-card"><a href="https://medium.com/@elainenarcizo/se-voc%C3%AA-estiver-cansada-talvez-isso-seja-para-voc%C3%AA-fe1bcc9fdf22" target="_blank" rel="noopener">
+          <span class="txt-data">22 nov 2025</span>
+          <span class="txt-nome">Se você estiver cansada, talvez isso seja para você</span>
+          <span class="txt-ler">Ler no Medium →</span>
+        </a></li>
+        <li class="fcar-card txt-card"><a href="https://medium.com/@elainenarcizo/a-tristeza-aleat%C3%B3ria-fea4e9c705e5" target="_blank" rel="noopener">
+          <span class="txt-data">08 nov 2025</span>
+          <span class="txt-nome">A Tristeza Aleatória</span>
+          <span class="txt-ler">Ler no Medium →</span>
+        </a></li>
+        <li class="fcar-card txt-card"><a href="https://medium.com/@elainenarcizo/originar-se-territ%C3%B3rios-de-forma%C3%A7%C3%A3o-d8faaa09ca7c" target="_blank" rel="noopener">
+          <span class="txt-data">03 out 2025</span>
+          <span class="txt-nome">Originar-se: territórios de formação</span>
+          <span class="txt-ler">Ler no Medium →</span>
+        </a></li>
+        <li class="fcar-card txt-card"><a href="https://medium.com/@elainenarcizo/quero-ter-um-filho-quero-dar-a-morte-para-algu%C3%A9m-pensando-sobre-o-amor-e-finitude-1eaa1f8e53ea" target="_blank" rel="noopener">
+          <span class="txt-data">13 set 2025</span>
+          <span class="txt-nome">“Quero ter um filho, quero dar a morte para alguém…” — sobre o amor e a finitude</span>
+          <span class="txt-ler">Ler no Medium →</span>
+        </a></li>
+        </ul>
+      </div>
+      <div class="fcar-cta-wrap in-io">
+        <a class="fcar-cta" href="https://medium.com/@elainenarcizo" target="_blank" rel="noopener">Todos os textos</a>
+      </div>
+    </div>
+  </div>
+
   </div><!-- /scene 2 -->
 
   <!-- CENA 3 -->
@@ -2424,24 +2530,30 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   (function(){
     /* escuta na SEÇÃO, não no scroller: o botão de baixo fica fora do fio e
        precisa do mesmo estado de toque pra o conjunto ler como uma família */
-    var area=document.querySelector('.s-form');
-    if(!area) return;
+    /* ⚠️ Era `querySelector('.s-form')` (uma seção só). Virou lista porque o
+       carrossel de "Considerações finais" usa o mesmo motor e precisa do
+       mesmo realce — sem isto os cartões de lá ficariam sem resposta ao
+       toque no iOS, que é justamente o que este bloco existe pra resolver. */
+    var areas=document.querySelectorAll('.s-form, .s-textos');
+    if(!areas.length) return;
     var TOCAVEIS='.fcar-card > a, .fcar-cta';
     var alvo=null, x0=0, y0=0;
     function solta(){ if(alvo){ alvo.classList.remove('press'); alvo=null; } }
-    area.addEventListener('touchstart',function(e){
-      var a=e.target.closest && e.target.closest(TOCAVEIS);
-      if(!a) return;
-      alvo=a; x0=e.touches[0].clientX; y0=e.touches[0].clientY;
-      a.classList.add('press');
-    },{passive:true});
-    area.addEventListener('touchmove',function(e){
-      if(!alvo) return;
-      var t=e.touches[0];
-      if(Math.abs(t.clientX-x0)>8 || Math.abs(t.clientY-y0)>8) solta();
-    },{passive:true});
-    area.addEventListener('touchend',solta,{passive:true});
-    area.addEventListener('touchcancel',solta,{passive:true});
+    [].forEach.call(areas,function(area){
+      area.addEventListener('touchstart',function(e){
+        var a=e.target.closest && e.target.closest(TOCAVEIS);
+        if(!a) return;
+        alvo=a; x0=e.touches[0].clientX; y0=e.touches[0].clientY;
+        a.classList.add('press');
+      },{passive:true});
+      area.addEventListener('touchmove',function(e){
+        if(!alvo) return;
+        var t=e.touches[0];
+        if(Math.abs(t.clientX-x0)>8 || Math.abs(t.clientY-y0)>8) solta();
+      },{passive:true});
+      area.addEventListener('touchend',solta,{passive:true});
+      area.addEventListener('touchcancel',solta,{passive:true});
+    });
   })();
 })();
 </script>
