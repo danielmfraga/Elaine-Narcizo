@@ -288,13 +288,27 @@ main{ position:relative; }
    vira um "Bilheteria" fantasma clipado nos GLIFOS via
    `background-clip:text` (o botão clipava um retângulo pela pílula com
    `overflow:hidden`; aqui não precisa, o clip-to-text já faz esse trabalho). */
-.c-bilhe .giant{ position:relative; color:var(--lilas); animation:bilheColor 34.4s linear infinite; }
-@keyframes bilheColor{
+.c-bilhe .giant{ position:relative; color:var(--lilas); animation:casaCiclo 34.4s linear infinite; }
+/* ═══ O CICLO DE COR DA CASA ═══════════════════════════════════════════════
+   O efeito do botão "navegue": 4 cores, 34.4s, linear. Duas variantes porque
+   cada elemento pinta numa propriedade diferente — `casaCiclo` para texto e
+   `casaCicloBg` para fundo. (O `bnColor`, do letreiro em SVG, usa `fill` e
+   segue separado.) 🔑 Todas com a MESMA duração, então tudo anda EM FASE:
+   quando o botão "navegue" está no amarelo, a Bilheteria e o Conectar também
+   estão. Renomeado de `bilheColor` quando deixou de ser só da Bilheteria. */
+@keyframes casaCiclo{
   0%,2%  { color:var(--lilas); }
   25%    { color:var(--amarelo); }
   50%    { color:var(--oliva); }
   75%    { color:var(--laranja); }
   100%   { color:var(--lilas); }
+}
+@keyframes casaCicloBg{
+  0%,2%  { background-color:var(--lilas); }
+  25%    { background-color:var(--amarelo); }
+  50%    { background-color:var(--oliva); }
+  75%    { background-color:var(--laranja); }
+  100%   { background-color:var(--lilas); }
 }
 .c-bilhe .giant::after{
   content:"Bilheteria"; position:absolute; inset:0; pointer-events:none;
@@ -371,7 +385,11 @@ html.sdt .mq-esq{
 .mq-esq{ transform:translateX(-12%); }
 
 .y{ background:var(--amarelo); color:var(--ink); }
-.lm{ background:var(--lima); color:var(--ink); }   /* lima — hoje só a capa Conectar */
+.lm{ background:var(--lima); color:var(--ink); }   /* lima — base estática do Conectar */
+/* Conectar cicla pelas 4 cores da casa (o "efeito do navegue" que o Daniel
+   pediu). O `.lm` acima fica de piso: com `prefers-reduced-motion` a
+   animação não roda e a capa continua lima, sem ficar sem cor. */
+.c-cta{ animation:casaCicloBg 34.4s linear infinite; }
 .k{ background:var(--ink); color:var(--paper); }
 .w{ background:var(--paper); color:var(--ink); }
 
@@ -1176,8 +1194,10 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
    ⚠️ `:active` no iOS só é confiável fora de um scroller — este botão está
    no fluxo normal da página, então funciona; se um dia entrar num carrossel,
    vai precisar da classe `.press` por JS (ver o padrão em `.fcar-card`). */
+/* sem `align-self`: como item da coluna flex do `.work`, ele ESTICA até a
+   largura da caixa de cima — igual ao chip do "Portão", que é assim por
+   ser um <span> em flex sem align-self (era `flex-start`, que encolhia). */
 .btn-embarque{
-  align-self:flex-start;
   font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
   padding:7px 13px; border-radius:999px;
   background:var(--ink); color:var(--white);
@@ -1368,9 +1388,10 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
 .ftr ul a:hover{ opacity:1; color:var(--amarelo); }
 .ftr .close{ margin-top:clamp(36px,7vh,72px); padding-top:22px; border-top:1px solid rgba(250,248,243,.12);
   display:flex; flex-wrap:wrap; gap:12px 26px; align-items:baseline; justify-content:space-between; }
-/* "Vamos tecer o futuro" — lima em vez do amarelo, acompanhando a capa
-   Conectar logo acima (pedido do Daniel) */
-.ftr .close .tag{ font-weight:820; font-stretch:115%; text-transform:uppercase; font-size:clamp(1.1rem,3.4vw,1.7rem); color:var(--lima); }
+/* "Vamos tecer o futuro" — cicla pelas 4 cores da casa, em fase com a capa
+   Conectar logo acima. O `color` fixo fica de piso pro reduced-motion. */
+.ftr .close .tag{ font-weight:820; font-stretch:115%; text-transform:uppercase; font-size:clamp(1.1rem,3.4vw,1.7rem);
+  color:var(--lima); animation:casaCiclo 34.4s linear infinite; }
 .ftr .fine{ font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; color:rgba(250,248,243,.4); }
 
 /* ── revelação ao entrar (progressive enhancement) ──
