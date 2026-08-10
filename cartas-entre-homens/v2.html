@@ -21,11 +21,24 @@
 <style>
   html.embedded,html.embedded body{ overscroll-behavior-y:contain; }
   /* ── MODO "SÓ A CAPA" (?capa=1) ──────────────────────────────────────
-     Mostra apenas a capa e deixa o documento SEM NADA PRA ROLAR. Isso é o
-     que faz o gesto do dedo "atravessar" o iframe e rolar a página-mãe no
-     iOS: um iframe só sequestra o scroll quando tem overflow próprio. */
-  html.so-capa, html.so-capa body{ height:100%; overflow:hidden; }
-  html.so-capa .rail{ height:100dvh; overflow:hidden; padding:0; scroll-snap-type:none; }
+     Mostra apenas a capa e deixa o documento SEM NADA PRA ROLAR, pra o
+     gesto do dedo atravessar o iframe e rolar a página-mãe.
+     🔴 O QUE TRAVAVA A TELA (achado depois do Daniel testar no iPhone):
+     não bastava tirar o overflow. `overscroll-behavior-y:contain` é
+     EXATAMENTE o mecanismo que impede a rolagem de passar de um iframe pra
+     página de fora — e ele estava declarado em TRÊS lugares que valem aqui:
+       1. `html.embedded` (linha acima) — escrito pro caso ANTIGO, quando
+          esta página era embutida como uma experiência ROLÁVEL dentro da
+          home-mapa. Ali conter era o certo; aqui é o oposto.
+       2. `.rail{ overscroll-behavior-y:contain }`
+       3. `.rail{ -webkit-overflow-scrolling:touch }`, que ainda promove a
+          faixa a camada de rolagem própria no iOS.
+     ⚠️ Vale mesmo com o conteúdo não rolando: o `contain` age no viewport
+     do iframe, que é container de rolagem por definição — logo bloqueia o
+     encadeamento mesmo sem ter o que rolar. Por isso os três são desfeitos. */
+  html.so-capa, html.so-capa body{ height:100%; overflow:hidden; overscroll-behavior:auto; }
+  html.so-capa .rail{ height:100dvh; overflow:hidden; padding:0; scroll-snap-type:none;
+    overscroll-behavior:auto; -webkit-overflow-scrolling:auto; }
   html.so-capa .slot:not(.cover){ display:none; }
   /* o -12dvh existia só pra cancelar o padding do .rail, que aqui é 0 */
   html.so-capa .slot.cover{ margin-top:0; }
