@@ -94,13 +94,27 @@
      O canvas do mockup (1080×1920) tem a MESMA proporção 9:16 do vídeo,
      então os % também valem em cima do vídeo. */
   .cover-content{ position:absolute; inset:0; z-index:2; color:#fff; --ac:#F5D731; }
-  .cover-left{ position:absolute; left:7%; top:12.5%; width:46%; }
+  /* 🔑 A caixa agora abraça título E CTA (era 46%, só o texto da esquerda) —
+     7% + 86% = 93%, sobrando a mesma margem de 7% do outro lado. Quem mantém
+     o texto na coluna estreita de antes são os `max-width` de rule/sub/lede
+     logo abaixo (53.5% de 86% = os mesmos 46% da tela de antes). */
+  .cover-left{ position:absolute; left:7%; top:12.5%; width:86%; }
+  /* 🔑 TÍTULO + CTA lado a lado, alinhados pela BASE (`flex-end`) — é isto
+     que põe o CTA "na base da palavra HOMENS", e por CONSTRUÇÃO: vale em
+     qualquer tela, sem número mágico.
+     ⚠️ Por que a versão anterior (top:30% absoluto) não funcionava: o
+     título escala pela LARGURA (`clamp(...,11.5vw,...)`) e o CTA estava
+     presurado a uma % da ALTURA da tela. São réguas diferentes — o número
+     que acerta num aparelho erra no outro, e foi por isso que "quase não
+     mudou" quando eu ajustei a %. */
+  .cover-head{ display:flex; align-items:flex-end; gap:clamp(14px,3.5vw,32px); }
   /* a barrinha decorativa saiu — o vídeo já tem uma barra vermelha própria
      (parte da colagem/arte), a nossa duplicava e confundia (marcado pelo
      Daniel no print). */
   /* título/subtítulo voltaram pro Archivo 900 (pedido do Daniel, revertendo
      a troca pra DM Sans) — texto de apoio e nota do CTA ficaram em DM Sans. */
-  .cover-title{ font-family:"Archivo",sans-serif; font-weight:900; text-transform:uppercase;
+  .cover-title{ flex:0 0 auto;   /* largura natural = a da linha "HOMENS" */
+    font-family:"Archivo",sans-serif; font-weight:900; text-transform:uppercase;
     letter-spacing:-.01em; line-height:.98; font-size:clamp(2.1rem,11.5vw,3.9rem); color:#fff;
     text-shadow:0 1px 3px rgba(0,0,0,.85), 0 4px 18px rgba(0,0,0,.4); }
   /* largura reduzida pra ficar do tamanho de "HO" (início de "Homens", a
@@ -108,8 +122,11 @@
      batia com o H hoje, então só encurtei o fim. ⚠️ Estimativa visual, não
      medida (largura de 2 letras num font-size responsivo não dá pra medir
      sem navegador ao vivo) — se não bater exato, me passa a % certa.
-     Espessura dobrada (2px→4px), a pedido. */
-  .cover-rule{ width:38%; height:4px; background:rgba(255,255,255,.75); margin:clamp(12px,2.6vh,18px) 0; }
+     Espessura dobrada (2px→4px), a pedido.
+     ⚠️ 20.3% e não 38%: a caixa-mãe passou de 46% da tela pra 86% (ver
+     `.cover-left`), então a % foi reconvertida — 20.3% de 86% = os mesmos
+     ~17.5% da tela de antes. O fio NÃO mudou de tamanho na tela. */
+  .cover-rule{ width:20.3%; height:4px; background:rgba(255,255,255,.75); margin:clamp(12px,2.6vh,18px) 0; }
   /* ciclo de cor (mesmo efeito do botão "navegue"/título Bilheteria do
      home-fluxo — 4 cores da casa, 34.4s, linear). Aqui não tem as custom
      properties --lilas/--oliva/--laranja (são só do home-fluxo), então os
@@ -129,16 +146,19 @@
     letter-spacing:.06em; text-transform:uppercase; white-space:nowrap;
     animation:coverAccentCycle 34.4s linear infinite;
     text-shadow:0 1px 3px rgba(0,0,0,.7); }
-  /* entrelinhas -30% (1.5 → 1.05) */
-  .cover-lede{ font-family:"DM Sans",sans-serif; font-weight:300; font-size:clamp(.82rem,3.2vw,.94rem);
+  /* entrelinhas -30% (1.5 → 1.05). O `max-width` devolve a coluna estreita
+     de antes (53.5% de 86% = os mesmos 46% da tela) — sem ele o texto
+     esticaria até embaixo do CTA agora que a caixa-mãe ficou larga. */
+  .cover-lede{ max-width:53.5%;
+    font-family:"DM Sans",sans-serif; font-weight:300; font-size:clamp(.82rem,3.2vw,.94rem);
     line-height:1.05; margin-top:clamp(10px,2.2vh,16px); color:rgba(255,255,255,.9);
     text-shadow:0 1px 4px rgba(0,0,0,.65); }
-  /* CTA flutuando à direita, alinhado com a BASE de "Homens" (última linha
-     do título) — top:30% é a estimativa dessa base (mesmo raciocínio do
-     .cover-rule: sem navegador ao vivo pra medir a caixa de texto real).
-     left subiu de 54%→58% pra não acavalar com "Homens", que aos 46% de
-     largura da coluna esquerda quase encosta ali. */
-  .cover-cta-wrap{ position:absolute; left:58%; top:30%; width:34%; }
+  /* CTA: irmão do título na linha flex, alinhado pela base (ver
+     `.cover-head`). Ocupa o que sobrar à direita do título — sem `left`/
+     `top` próprios, é o `align-items:flex-end` que faz o trabalho.
+     `min-width:0` deixa a nota quebrar em 2 linhas em telas estreitas em
+     vez de empurrar o título. */
+  .cover-cta-wrap{ flex:1 1 auto; min-width:0; }
   /* .cta original é datilografado (--type) com halo pulsando no ::after —
      aqui troca pra DM Sans 200 (igual ao "Listas de espera" de Formações)
      e ganha o efeito de cor completo: ciclo (acima) + brilho contínuo
@@ -302,14 +322,19 @@
       <div class="cover-scrim" aria-hidden="true"></div>
       <div class="cover-content">
         <div class="cover-left">
-          <h1 class="cover-title">Cartas<br>Entre<br>Homens</h1>
+          <!-- título e CTA na MESMA linha flex, alinhados pela base — é o que
+               põe o "Venha" na base de "Homens" em qualquer tela (antes o CTA
+               era absoluto, numa régua diferente da do título; ver .cover-head) -->
+          <div class="cover-head">
+            <h1 class="cover-title">Cartas<br>Entre<br>Homens</h1>
+            <div class="cover-cta-wrap">
+              <a class="cta" href="#" data-cta>Venha</a>
+              <p class="cover-cta-note">Para participar é simples.</p>
+            </div>
+          </div>
           <div class="cover-rule" aria-hidden="true"></div>
           <p class="cover-sub">Tudo Quer Viver</p>
           <p class="cover-lede">Um projeto gratuito que aposta na força dos encontros improváveis. Homens que não se conhecem escrevem cartas e criam, pela palavra, possibilidades de diálogo e conexão.</p>
-        </div>
-        <div class="cover-cta-wrap">
-          <a class="cta" href="#" data-cta>Venha</a>
-          <p class="cover-cta-note">Para participar é simples.</p>
         </div>
       </div>
     </section>
