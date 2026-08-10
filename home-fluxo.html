@@ -1375,7 +1375,16 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
 .svc .go{ font-family:var(--mono); font-size:11.5px; letter-spacing:.12em; text-transform:uppercase; font-weight:700; }
 
 /* ── CTA final ── */
-.c-cta{ justify-content:center; align-items:flex-start; gap:clamp(18px,3vh,28px); }
+/* -50px no espaço de cima. 🔑 O conteúdo é CENTRADO (justify-content:center),
+   então tirar 50px só do padding-top moveria ele apenas 25px — a folga se
+   redistribui pelos dois lados. Passando os 50px do topo PARA a base, o
+   bloco sobe os 50px exatos e a caixa continua com 100svh.
+   ⚠️ Encurtar a caixa (min-height) seria o caminho errado: esta é a última
+   `.cover` do baralho, e uma capa menor que a tela abriria uma fresta na
+   base até o rodapé subir e cobrir — o velho bug do vão. */
+.c-cta{ justify-content:center; align-items:flex-start; gap:clamp(18px,3vh,28px);
+  padding-top:calc(72px + 4vh - 50px);
+  padding-bottom:calc(clamp(26px,5vh,56px) + 50px); }
 .c-cta .tagline{ font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase; opacity:.7; }
 
 /* ── FOOTER ── */
