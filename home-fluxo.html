@@ -805,13 +805,13 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   display:inline-flex; align-items:center; justify-content:center;
   padding:15px 30px;
   border:1px solid var(--ink); border-radius:999px;
-  background:#fff; color:var(--ink); text-decoration:none;
+  background:var(--ink); color:var(--white); text-decoration:none;
   font-family:var(--sans); font-weight:200; font-size:15px; letter-spacing:-.01em;
   transition:background .16s var(--ease);
   -webkit-tap-highlight-color:transparent;
 }
-.fcar-cta.press,.fcar-cta:active{ background:rgba(15,14,12,.10); }
-@media(hover:hover){ .fcar-cta:hover{ background:rgba(15,14,12,.06); } }
+.fcar-cta.press,.fcar-cta:active{ background:#26241f; }
+@media(hover:hover){ .fcar-cta:hover{ background:#2c2a24; } }
 
 /* ═══ CONSIDERAÇÕES FINAIS — carrossel dos textos do Medium ═══════════════
    🔑 Reusa o MOTOR do carrossel de Formações (`.fcar*`): rolagem horizontal
@@ -1934,73 +1934,74 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
     </div>
   </div>
 
-  <!-- ══ CONSIDERAÇÕES FINAIS — os textos do Medium ══
-       Carrossel no mesmo motor do de Formações (ver CSS). ⚠️ Os 10 cartões
+  <!-- ══ CONSIDERAÇÕES FINAIS — porta de entrada do BLOG ══
+       Carrossel no mesmo motor do de Formações (ver CSS). Os 10 títulos
        estão ESCRITOS À MÃO a partir do feed (medium.com/feed/@elainenarcizo).
-       Um navegador não consegue ler esse feed sozinho: o Medium não manda os
-       cabeçalhos de CORS, então o pedido é bloqueado. Pra atualizar sozinho
-       seria preciso uma função no Vercel buscando o feed pelo servidor.
-       Enquanto isso: texto novo = cartão novo aqui. -->
+       ⚠️ ESTÁGIO ATUAL (ago/2026, pedido do Daniel): todos os cards e o botão
+       apontam pro BLOG NATIVO — enquanto só há 1 texto migrado, TODOS levam a
+       /blog/o-poder-da-palavra/. Conforme cada texto for migrado, trocar o
+       href do card correspondente pelo /blog/<slug>/ dele. O botão "Blog"
+       leva à lista /blog/. (Nada mais aponta pro Medium daqui.) -->
   <div class="sheet w s-textos" id="reflexoes">
     <div class="wrap">
       <h2 class="txt-title r in-io" style="--r:0">Considerações <em>finais</em></h2>
       <p class="txt-lede r in-io" style="--r:1">Textos sobre tempo, descanso e autonomia — publicados a cada duas semanas.</p>
       <div class="fcar-wrap in-io">
         <ul class="fcar" role="list">
-        <li class="fcar-card txt-card"><a href="https://medium.com/@elainenarcizo/quando-dizemos-parab%C3%A9ns-no-dia-da-mulher-estamos-celebrando-exatamente-o-qu%C3%AA-d16323c71383" target="_blank" rel="noopener">
+        <li class="fcar-card txt-card"><a href="/blog/o-poder-da-palavra/">
           <span class="txt-data">08 mar 2026</span>
           <span class="txt-nome">Quando dizemos “parabéns” no Dia da Mulher, estamos celebrando exatamente o quê?</span>
-          <span class="txt-ler">Ler no Medium →</span>
+          <span class="txt-ler">Ler o texto →</span>
         </a></li>
-        <li class="fcar-card txt-card"><a href="https://medium.com/@elainenarcizo/o-rid%C3%ADculo-%C3%A9-um-dispositivo-que-pode-salvar-uma-mulher-cfeece96e707" target="_blank" rel="noopener">
+        <li class="fcar-card txt-card"><a href="/blog/o-poder-da-palavra/">
           <span class="txt-data">21 fev 2026</span>
           <span class="txt-nome">O ridículo é um dispositivo que pode salvar uma mulher</span>
-          <span class="txt-ler">Ler no Medium →</span>
+          <span class="txt-ler">Ler o texto →</span>
         </a></li>
-        <li class="fcar-card txt-card"><a href="https://medium.com/@elainenarcizo/mulher-voc%C3%AA-j%C3%A1-pensou-que-na-maior-parte-da-sua-vida-passa-respondendo-perguntas-que-nunca-dc272d616bd8" target="_blank" rel="noopener">
+        <li class="fcar-card txt-card"><a href="/blog/o-poder-da-palavra/">
           <span class="txt-data">07 fev 2026</span>
           <span class="txt-nome">Mulher, você já pensou que passa a vida respondendo perguntas que nunca fez?</span>
-          <span class="txt-ler">Ler no Medium →</span>
+          <span class="txt-ler">Ler o texto →</span>
         </a></li>
-        <li class="fcar-card txt-card"><a href="https://medium.com/@elainenarcizo/descanso-e-mulheres-n%C3%A3o-basta-igualdade-na-corrida-quando-ningu%C3%A9m-pode-parar-907e36336652" target="_blank" rel="noopener">
+        <li class="fcar-card txt-card"><a href="/blog/o-poder-da-palavra/">
           <span class="txt-data">24 jan 2026</span>
           <span class="txt-nome">Descanso e mulheres: não basta igualdade na corrida quando ninguém pode parar</span>
-          <span class="txt-ler">Ler no Medium →</span>
+          <span class="txt-ler">Ler o texto →</span>
         </a></li>
-        <li class="fcar-card txt-card"><a href="https://medium.com/@elainenarcizo/deser%C3%A7%C3%A3o-das-l%C3%A1grimas-um-sonho-para-2026-0d23c25f76b4" target="_blank" rel="noopener">
+        <li class="fcar-card txt-card"><a href="/blog/o-poder-da-palavra/">
           <span class="txt-data">20 dez 2025</span>
           <span class="txt-nome">Deserção das lágrimas: um sonho para 2026</span>
-          <span class="txt-ler">Ler no Medium →</span>
+          <span class="txt-ler">Ler o texto →</span>
         </a></li>
-        <li class="fcar-card txt-card"><a href="https://medium.com/@elainenarcizo/reescrevendo-o-agora-o-papel-estrutural-do-planejamento-feminino-2c5089c17dac" target="_blank" rel="noopener">
+        <li class="fcar-card txt-card"><a href="/blog/o-poder-da-palavra/">
           <span class="txt-data">06 dez 2025</span>
           <span class="txt-nome">Reescrevendo o agora: o papel estrutural do planejamento feminino</span>
-          <span class="txt-ler">Ler no Medium →</span>
+          <span class="txt-ler">Ler o texto →</span>
         </a></li>
-        <li class="fcar-card txt-card"><a href="https://medium.com/@elainenarcizo/se-voc%C3%AA-estiver-cansada-talvez-isso-seja-para-voc%C3%AA-fe1bcc9fdf22" target="_blank" rel="noopener">
+        <li class="fcar-card txt-card"><a href="/blog/o-poder-da-palavra/">
           <span class="txt-data">22 nov 2025</span>
           <span class="txt-nome">Se você estiver cansada, talvez isso seja para você</span>
-          <span class="txt-ler">Ler no Medium →</span>
+          <span class="txt-ler">Ler o texto →</span>
         </a></li>
-        <li class="fcar-card txt-card"><a href="https://medium.com/@elainenarcizo/a-tristeza-aleat%C3%B3ria-fea4e9c705e5" target="_blank" rel="noopener">
+        <li class="fcar-card txt-card"><a href="/blog/o-poder-da-palavra/">
           <span class="txt-data">08 nov 2025</span>
           <span class="txt-nome">A Tristeza Aleatória</span>
-          <span class="txt-ler">Ler no Medium →</span>
+          <span class="txt-ler">Ler o texto →</span>
         </a></li>
-        <li class="fcar-card txt-card"><a href="https://medium.com/@elainenarcizo/originar-se-territ%C3%B3rios-de-forma%C3%A7%C3%A3o-d8faaa09ca7c" target="_blank" rel="noopener">
+        <li class="fcar-card txt-card"><a href="/blog/o-poder-da-palavra/">
           <span class="txt-data">03 out 2025</span>
           <span class="txt-nome">Originar-se: territórios de formação</span>
-          <span class="txt-ler">Ler no Medium →</span>
+          <span class="txt-ler">Ler o texto →</span>
         </a></li>
-        <li class="fcar-card txt-card"><a href="https://medium.com/@elainenarcizo/quero-ter-um-filho-quero-dar-a-morte-para-algu%C3%A9m-pensando-sobre-o-amor-e-finitude-1eaa1f8e53ea" target="_blank" rel="noopener">
+        <li class="fcar-card txt-card"><a href="/blog/o-poder-da-palavra/">
           <span class="txt-data">13 set 2025</span>
           <span class="txt-nome">“Quero ter um filho, quero dar a morte para alguém…” — sobre o amor e a finitude</span>
-          <span class="txt-ler">Ler no Medium →</span>
+          <span class="txt-ler">Ler o texto →</span>
         </a></li>
         </ul>
       </div>
       <div class="fcar-cta-wrap in-io">
-        <a class="fcar-cta" href="https://medium.com/@elainenarcizo" target="_blank" rel="noopener">Todos os textos</a>
+        <a class="fcar-cta" href="/blog/">Blog</a>
       </div>
     </div>
   </div>
