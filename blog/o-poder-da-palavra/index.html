@@ -44,7 +44,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=DM+Sans:opsz,wght@9..40,300..500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=DM+Sans:opsz,wght@9..40,300..500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
 <!-- Schema.org Article — ajuda o Google a entender que é um artigo, com autor e data -->
 <script type="application/ld+json">
@@ -89,23 +89,42 @@ a{ color:inherit; }
 ::selection{ background:var(--accent); color:var(--ink); }
 
 /* ── Barra de progresso de leitura ── */
-.progress{ position:fixed; top:0; left:0; height:3px; width:0; background:var(--accent); z-index:50; transition:width .06s linear; }
+.progress{ position:fixed; top:0; left:0; height:3px; width:0; background:var(--accent); z-index:90; transition:width .06s linear; }
 
-/* ── Cabeçalho do site ── */
-.site{
-  position:sticky; top:0; z-index:40;
-  display:flex; align-items:center; justify-content:space-between; gap:16px;
-  padding:14px var(--pad);
-  background:var(--paper);          /* fallback sólido se color-mix não existir */
-  background:color-mix(in srgb, var(--paper) 88%, transparent);
-  backdrop-filter:saturate(1.2) blur(8px);
-  border-bottom:1px solid var(--line);
+/* ── Cabeçalho padrão do site (portado de home-fluxo.html) ── */
+.hdr{
+  position:fixed; top:0; left:0; right:0; z-index:80;
+  display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:16px;
+  padding:10px var(--pad); background:transparent; color:var(--paper);
+  transition:background .35s var(--ease), color .35s var(--ease), padding .35s var(--ease), box-shadow .35s var(--ease);
 }
-.brand{ font-family:var(--disp); font-weight:800; font-size:1.05rem; letter-spacing:-.01em; text-decoration:none; }
-.brand span{ color:var(--mute); font-weight:700; }
-.site nav{ display:flex; gap:18px; font-family:var(--mono); font-size:.74rem; text-transform:uppercase; letter-spacing:.06em; }
-.site nav a{ text-decoration:none; color:var(--mute); }
-.site nav a:hover{ color:var(--ink); }
+.hdr.scrolled{ background:var(--white); color:var(--ink); padding:8px var(--pad); box-shadow:0 1px 0 var(--line); }
+.hdr.menu-open{ background:transparent; color:var(--paper); box-shadow:none; }
+.hdr .wordmark{ display:flex; align-items:center; color:currentColor; flex-shrink:0; text-decoration:none; }
+.hdr .wordmark svg{ display:block; height:46px; width:auto; fill:currentColor; }
+.hdr-right{ display:flex; align-items:center; justify-content:center; gap:26px; }
+.hdr-ic{ display:flex; align-items:center; justify-content:center; width:20px; height:20px; flex-shrink:0; opacity:.85; transition:opacity .2s; color:currentColor; }
+.hdr-ic:hover{ opacity:1; }
+.hdr-ic svg{ width:100%; height:100%; }
+.burger{ border:0; background:none; cursor:pointer; color:currentColor; display:flex; align-items:center; gap:10px; padding:0; flex-shrink:0; justify-self:end; }
+.burger .b-label{ font-family:var(--disp); font-weight:560; font-stretch:100%; font-size:16px; }
+.burger .b-bars{ width:20px; height:14px; position:relative; }
+.burger .b-bars i{ display:block; position:absolute; left:0; width:20px; height:2px; background:currentColor; transition:transform .3s var(--ease), opacity .3s; }
+.burger .b-bars i:nth-child(1){ top:0; }
+.burger .b-bars i:nth-child(2){ top:6px; }
+.burger .b-bars i:nth-child(3){ top:12px; }
+.burger.open .b-bars i:nth-child(1){ top:6px; transform:rotate(45deg); }
+.burger.open .b-bars i:nth-child(2){ opacity:0; }
+.burger.open .b-bars i:nth-child(3){ top:6px; transform:rotate(-45deg); }
+.menu{ position:fixed; inset:0; z-index:75; background:var(--ink); color:var(--paper); display:flex; flex-direction:column; justify-content:center; padding:0 var(--pad); opacity:0; visibility:hidden; pointer-events:none; transition:opacity .38s var(--ease), visibility .38s; }
+.menu.open{ opacity:1; visibility:visible; pointer-events:auto; }
+.menu a.mi{ display:flex; align-items:baseline; gap:18px; padding:clamp(8px,1.6vh,16px) 0; border-bottom:1px solid rgba(250,248,243,.08); font-family:var(--disp); font-weight:820; font-stretch:115%; text-transform:uppercase; letter-spacing:-.01em; font-size:clamp(1.9rem,7.5vw,4rem); line-height:1; color:rgba(250,248,243,.5); text-decoration:none; opacity:0; transform:translateY(14px); transition:transform .4s var(--ease), opacity .4s, color .2s; transition-delay:calc(var(--i)*45ms); }
+.menu.open a.mi{ opacity:1; transform:none; }
+.menu a.mi:hover{ color:var(--amarelo); }
+.menu a.mi small{ font-family:var(--mono); font-weight:400; font-size:11px; letter-spacing:.14em; color:rgba(250,248,243,.35); flex:0 0 30px; }
+.menu .mfoot{ margin-top:5vh; font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:rgba(250,248,243,.4); display:flex; gap:22px; flex-wrap:wrap; }
+.menu .mfoot a{ color:inherit; text-decoration:none; }
+.menu .mfoot a:hover{ color:var(--amarelo); }
 
 /* ── Capa em vídeo (full-bleed) ── */
 .post-hero{
@@ -203,22 +222,64 @@ footer{
 .foot-in a{ color:var(--paper); text-decoration:none; opacity:.82; }
 .foot-in a:hover{ opacity:1; text-decoration:underline; }
 
-@media (max-width:520px){
-  .site nav a.hide-sm{ display:none; }
-}
 </style>
 </head>
 <body>
 
 <div class="progress" id="progress"></div>
 
-<header class="site">
-  <a class="brand" href="/">Elaine <span>Narcizo</span></a>
-  <nav>
-    <a href="/blog/">Reflexões</a>
-    <a class="hide-sm" href="https://www.instagram.com/elaine.c.narcizo/" target="_blank" rel="noopener">Instagram</a>
-  </nav>
+<header class="hdr" id="hdr">
+  <a class="wordmark" href="/home-fluxo.html#inicio" aria-label="Elaine Narcizo">
+    <svg viewBox="378 -10 480 227" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M657.71,130.97c-4.21.02-8.44.85-12.49,2.55-12.93,5.42-21.33,18.51-21.37,32.97-.03,14.46,8.28,27.61,21.18,33.11,12.95,5.52,27.76,2.18,37.41-8.33.88-.96.82-2.45-.14-3.34l-1.74-1.6c-.96-.88-2.45-.81-3.34.14-7.63,8.33-19.3,10.9-29.4,6.6-10.16-4.34-16.91-14.82-16.87-26.55.03-11.73,6.85-22.16,17.03-26.43,10.13-4.25,21.74-1.6,29.33,6.77.88.97,2.37,1.03,3.34.16l1.76-1.58c.98-.88,1.07-2.39.19-3.37-4.78-5.27-10.87-8.8-17.4-10.3-2.46-.56-4.98-.82-7.49-.81"/>
+      <path d="M555.23,131.37c-5.11.05-10.05.9-14.8,2.78-4.7,1.86-8.72,4.37-12.07,7.54-.96.92-.98,2.44-.05,3.39l1.77,1.77c.9.91,2.35.93,3.29.07,2.62-2.46,5.8-4.5,9.59-6.08,3.68-1.53,7.84-2.24,12.5-2.36,13.54-.36,19.71,12.13,9.86,19.1-3.75,2.65-5.87,3.44-14.2,3.85-8.7.42-10.99,1-14.48,2.74-3.71,1.76-6.56,4.18-8.37,7.4-1.63,2.97-2.41,6.21-2.41,9.69,0,4.02.98,7.66,3.04,10.89,2.12,3.19,5.13,5.59,8.93,7.26,3.81,1.67,8.31,2.43,13.41,2.43,7.18,0,13.27-1.65,18.12-5.2,1.87-1.34,2.84-3.37,4.27-5.06v7.52c0,1.31,1.05,2.36,2.36,2.37h2.53c1.31,0,2.36-1.06,2.36-2.37v-28.19c0-1.31-1.05-2.36-2.36-2.37h-2.53c-1.31,0-2.36,1.06-2.36,2.37v8.9c-1.95,4.77-4.69,8.47-8.31,11.05-3.52,2.5-8.18,3.88-14.08,3.88s-10.53-1.36-13.57-3.76c-2.98-2.43-4.55-5.73-4.55-9.86,0-3.66,1.32-6.66,3.85-8.91,2.59-2.32,7.16-3.67,14.27-3.67s13.31-1.61,18.14-5.24c16.38-12.29,5.38-32.12-14.15-31.93"/>
+      <path d="M698.29,132.51c-1.31,0-2.36,1.06-2.37,2.36v65c0,1.31,1.06,2.36,2.37,2.36h2.5c1.31,0,2.36-1.05,2.37-2.36v-65c0-1.3-1.06-2.36-2.37-2.36h-2.5ZM703.51,117.5s0,.05-.03.07l.12-.12s-.07.01-.1.05M703.43,109.75s.12.03.17.07l-.23-.23s.03.12.07.16h0ZM699.4,107.99c-1.5.04-2.71.69-3.71,1.67-1.17,1.06-1.79,2.32-1.79,3.96s.65,2.88,1.72,3.94c1.1,1.1,2.31,1.7,3.92,1.7s2.87-.56,3.97-1.77c1.04-1.07,1.67-2.37,1.67-3.88s-.6-2.82-1.74-3.88c-1.06-1.15-2.29-1.76-3.9-1.76,0,0-.07,0-.14,0"/>
+      <path d="M490.83,131.2c-7.43,0-13.82,1.74-18.97,5.42-2.85,1.98-4.08,5.26-5.94,8.03v-10.73c0-1.3-1.06-2.36-2.37-2.36h-2.5c-1.31,0-2.36,1.06-2.37,2.36v65c0,1.31,1.06,2.36,2.37,2.36h2.5c1.31,0,2.36-1.05,2.37-2.36v-35.32c0-5.21,1.04-9.64,3.01-13.37,1.96-3.76,4.8-6.68,8.5-8.72,3.68-2.11,8.16-3.2,13.53-3.2,6.87,0,12.01,1.96,15.55,5.56,3.53,3.61,5.48,9.09,5.48,16.71v38.33c0,1.31,1.06,2.36,2.36,2.36h2.53c1.31,0,2.37-1.05,2.37-2.36v-38.33c0-6.16-1.13-11.52-3.53-15.94-2.32-4.46-5.62-7.81-9.91-10.05-4.28-2.32-9.29-3.41-14.97-3.41"/>
+      <path d="M621.54,131.56c-7.02,0-13.04,1.69-17.96,5.22-2.49,1.78-3.51,4.88-5.19,7.4v-9.89c0-1.3-1.07-2.36-2.37-2.36h-2.51c-1.3,0-2.36,1.06-2.36,2.36v65c0,1.31,1.07,2.36,2.36,2.36h2.51c1.31,0,2.36-1.05,2.37-2.36v-34.95c0-8.2,2.07-14.4,5.96-18.81,3.78-4.37,9.29-6.73,16.44-6.73h.74c1.31,0,2.36-1.06,2.36-2.36v-2.51c0-1.31-1.06-2.36-2.36-2.36"/>
+      <path d="M721.97,131.74c-1.31,0-2.36,1.06-2.37,2.36v2.39c0,1.31,1.06,2.36,2.37,2.37h40.42l-42.95,56.91c-.31.41-.47.92-.46,1.44v1.88c0,1.31,1.06,2.36,2.37,2.36h49.91c1.3,0,2.36-1.05,2.36-2.36v-2.39c0-1.3-1.06-2.36-2.36-2.36h-41.65l42.92-56.92c.31-.41.47-.92.46-1.44v-1.88c0-1.3-1.06-2.36-2.36-2.36h-48.66Z"/>
+      <path d="M804.78,131.29c-7.97,1.1-15.56,5.11-21.17,11.81-11.19,13.37-11.26,33.32-.16,46.78,11.15,13.54,30.2,16.33,44.51,6.47,14.22-9.8,19.28-29.02,12.02-45.04-.55-1.18-1.94-1.72-3.13-1.18l-2.16.98c-1.18.54-1.72,1.93-1.18,3.13,5.88,12.96,1.72,28.48-9.58,36.27-11.24,7.74-26.12,5.59-34.97-5.15-8.91-10.81-8.85-26.92.13-37.66,8.93-10.66,23.82-12.71,34.99-4.87,1.08.76,2.56.5,3.32-.58l1.37-1.95c.75-1.07.5-2.57-.58-3.32-7.09-4.97-15.45-6.78-23.41-5.69"/>
+      <path d="M647.85,27.27c-5.11.05-10.05.9-14.8,2.78-4.7,1.86-8.72,4.38-12.07,7.54-.96.92-.98,2.45-.05,3.39l1.77,1.77c.9.91,2.35.93,3.29.07,2.62-2.46,5.8-4.5,9.59-6.08,3.68-1.53,7.84-2.24,12.5-2.36,13.54-.36,19.71,12.13,9.86,19.1-3.75,2.65-5.87,3.44-14.2,3.85-8.7.42-10.99,1-14.48,2.74-3.71,1.76-6.56,4.18-8.37,7.4-1.63,2.97-2.41,6.21-2.41,9.69,0,4.02.98,7.66,3.04,10.89,2.12,3.19,5.13,5.59,8.93,7.26,3.81,1.67,8.31,2.43,13.41,2.43,7.18,0,13.27-1.65,18.12-5.2,1.87-1.34,2.84-3.37,4.27-5.06v7.52c0,1.31,1.05,2.36,2.36,2.37h2.53c1.31,0,2.36-1.06,2.36-2.37v-28.19c0-1.31-1.05-2.36-2.36-2.37h-2.53c-1.31,0-2.36,1.06-2.36,2.37v8.9c-1.95,4.77-4.69,8.47-8.31,11.05-3.52,2.5-8.18,3.88-14.08,3.88s-10.53-1.36-13.57-3.76c-2.98-2.43-4.55-5.73-4.55-9.86,0-3.66,1.32-6.66,3.85-8.91,2.59-2.32,7.16-3.67,14.27-3.67s13.31-1.62,18.14-5.24c16.38-12.29,5.38-32.12-14.15-31.93"/>
+      <path d="M692.94,28.49c-1.31,0-2.36,1.06-2.37,2.36v64.99c0,1.31,1.06,2.36,2.37,2.36h2.5c1.31,0,2.36-1.06,2.37-2.36V30.85c0-1.3-1.06-2.36-2.37-2.36h-2.5ZM698.16,13.48s0,.05-.03.07l.12-.12s-.07.01-.1.05M698.08,5.73s.12.03.17.07l-.23-.23s.03.11.08.16h0ZM694.05,3.97c-1.5.04-2.71.69-3.71,1.67-1.17,1.06-1.79,2.32-1.79,3.96s.65,2.88,1.72,3.94c1.1,1.1,2.31,1.7,3.92,1.7s2.87-.56,3.97-1.77c1.04-1.07,1.67-2.37,1.67-3.88s-.6-2.82-1.74-3.88c-1.06-1.15-2.29-1.76-3.9-1.76,0,0-.07,0-.14,0"/>
+      <path d="M601.19,1c-1.31,0-2.36,1.06-2.36,2.36v93.28c0,1.31,1.05,2.36,2.36,2.36h2.51c1.3,0,2.36-1.05,2.36-2.36V3.36c0-1.3-1.06-2.36-2.36-2.36h-2.51Z"/>
+      <path d="M742.66,29.05c-7.43,0-13.82,1.74-18.98,5.42-2.85,1.98-4.08,5.26-5.94,8.03v-10.72c0-1.3-1.06-2.36-2.37-2.36h-2.5c-1.31,0-2.36,1.06-2.37,2.36v64.99c0,1.31,1.06,2.36,2.37,2.36h2.5c1.31,0,2.36-1.05,2.37-2.36v-35.31c0-5.21,1.04-9.64,3.01-13.37,1.96-3.77,4.8-6.69,8.5-8.72,3.68-2.1,8.16-3.2,13.53-3.2,6.87,0,12.01,1.96,15.55,5.56,3.53,3.61,5.48,9.09,5.48,16.71v38.33c0,1.31,1.06,2.36,2.36,2.36h2.53c1.31,0,2.37-1.05,2.37-2.36v-38.33c0-6.16-1.13-11.52-3.53-15.94-2.32-4.46-5.62-7.81-9.91-10.05-4.28-2.32-9.29-3.41-14.97-3.41"/>
+      <path d="M556.65,26.86c-14.18.05-27.04,9.38-31.93,23.55-5.47,15.88.45,33.69,14.3,42.53,13.93,8.9,31.91,6.17,42.88-6.4.86-.99.76-2.48-.23-3.34l-1.78-1.56c-.99-.85-2.48-.75-3.34.23-8.7,9.96-22.74,12.04-33.67,5.06-11-7.02-15.83-21.34-11.4-34.2,4.43-12.82,16.71-20.41,29.31-18.4,6.21.99,10.9,4.15,14.2,8.77,2.64,3.7,3.71,8.93,4.43,14.36h-39.7c-1.3,0-2.36,1.07-2.36,2.37v2.39c0,1.31,1.06,2.36,2.36,2.36h45.69c1.36,0,2.44-1.14,2.36-2.5l-.07-1.23c-.36-8.18-2.62-15.83-6.92-21.86-4.36-6.1-10.71-10.41-18.89-11.71-1.75-.28-3.5-.43-5.25-.42"/>
+      <path d="M812.15,26.86c-14.18.05-27.04,9.38-31.93,23.55-5.47,15.88.44,33.69,14.29,42.53,13.93,8.9,31.91,6.17,42.88-6.4.86-.99.76-2.48-.23-3.34l-1.79-1.56c-.99-.85-2.48-.75-3.34.23-8.7,9.96-22.74,12.04-33.67,5.06-11-7.02-15.83-21.34-11.4-34.2,4.43-12.82,16.71-20.41,29.31-18.4,6.21.99,10.9,4.15,14.2,8.77,2.64,3.7,3.71,8.93,4.43,14.36h-39.7c-1.3,0-2.36,1.07-2.36,2.37v2.39c0,1.31,1.06,2.36,2.36,2.36h45.69c1.36,0,2.44-1.14,2.36-2.5l-.07-1.23c-.36-8.18-2.62-15.83-6.92-21.86-4.36-6.1-10.71-10.41-18.89-11.71-1.75-.28-3.5-.43-5.25-.42"/>
+      <path d="M508.97,59.06c-.14-.65-.35-1.31-.35-1.96.02-1.24-1.31-2.09-.91-3.41.02-.07-.09-.2-.17-.29-.46-.51-.94-1-1.38-1.52-.1-.12-.18-.33-.16-.49.1-.93-.46-1.5-1.11-1.99-.63-.48-1.34-.84-1.58-1.69-.04-.15-.23-.33-.39-.38-1.42-.4-2.83-.99-4.27-1.12-6.08-.57-12.18-1.01-18.27-1.49-.34-.03-.68-.04-1.03-.07-.58-.04-.53-.28-.19-.62.83-.84,1.68-1.67,2.49-2.53,2.97-3.18,5.89-6.4,8.9-9.54,1.23-1.29.89-2.86,1.09-4.34.02-.15-.16-.33-.26-.49-.4-.6-.52-1.19-.18-1.89.42-.87.25-1.17-.78-1.39-.5-.1-.61-.24-.48-.76.08-.33-.09-1.02-.23-1.05-.73-.13-1.29-.51-1.9-.87-1.03-.62-2.15-1.07-3.2-1.66-.81-.45-1.51-1.1-2.56-.9-.16.03-.38-.17-.55-.28-.18-.12-.36-.38-.52-.37-.72.05-1.45.11-2.15.28-.72.18-1.39.47-2.17.22-.24-.08-.66.13-.89.32-3.54,2.91-7.07,5.83-10.57,8.78-1.4,1.18-2.71,2.47-4.07,3.7-.13.12-.32.16-.48.24-.02-.18-.06-.36-.05-.53.16-1.52.35-3.03.5-4.56.13-1.4.25-2.8.31-4.21.04-1.07.94-14.01.14-17.58-.53-2.34-2.16-.86-2.77-1.06-.21-.07-.48-.4-.47-.6.04-.71-.22-1.07-.93-1.15-.25-.03-.54-.15-.71-.33-.96-1.04-2.59-.44-3.54-1.48-.04-.04-.22.07-.32.05-.82-.18-1.55.2-2.33.34-.54.09-1.11-.03-1.67-.08-.34-.04-.7-.08-1.02-.2-1.16-.42-2.15.99-3.33.31-.02-.01-.07.02-.1.04-.53.51-1,1.13-1.61,1.51-.69.43-1.34.83-1.55,1.67,0,.02-.06.04-.1.04-.93.02-.93.72-1.02,1.37-1.15,7.74-2.56,15.45-3.13,23.27-.01.21-.11.41-.16.61-.17-.14-.34-.28-.49-.44-.13-.14-.24-.3-.36-.45-2.52-3.17-4.97-6.39-7.58-9.48-1.29-1.53-2.42-3.19-4.45-4.11-1.28-.58-2.8-.53-3.88-1.54-.02-.02-.07-.01-.11,0-.85.13-1.81-.14-2.52.41-.61.47-1.2.36-1.77.19-.7-.21-.96.02-1.19.64-.09.24-.43.51-.68.53-.6.06-.92.28-.95.9,0,.14-.2.4-.28.38-1.27-.18-1.38.59-1.34,1.54.01.37-.09.75-.1,1.13-.02.44-.12.72-.66.7-.61-.02-.77.37-.71.92.06.48.31,1.07.12,1.43-.59,1.11.74,2.27-.16,3.33-.06.07.1.35.2.51,1.22,2.01,2.02,4.24,3.47,6.14,3.23,4.22,6.36,8.5,9.53,12.76.17.23.29.51.44.76-.28.08-.56.2-.85.22-2.44.18-4.88.31-7.31.52-5.9.5-11.79,1.05-17.69,1.53-2.46.2-4.54,1.06-6.14,2.97-.09.11-.25.2-.39.22-1.04.14-1.26.94-1.45,1.77-.14.63-.26,1.26-.97,1.58-.42.19-.56.54-.06.86.7.46.88,1.19,1.05,1.94.14.62.82,1.21.1,1.89,0,0,.28.42.48.54.9.54,1.19,1.47,1.28,2.36.05.51.12.78.51,1.11s.85.9.83,1.34c-.06,1.15.91,1.62,1.46,2.13.75.69,1.96.91,2.99,1.28,2.5.89,5.13.83,7.71.85,4.89.04,9.78-.14,14.66-.22.25,0,.51.06.76.09-.14.21-.26.43-.42.62-3.78,4.35-7.59,8.68-11.34,13.06-1.43,1.67-2.7,3.49-4.13,5.16-.47.55-.92,1.02-.78,1.77.14.75.15,1.47-.02,2.23-.06.28.29.64.41.98.07.2.15.52.05.62-.49.53-.79,1.01-.08,1.61.23.19.36.5.53.75.39.6,1.07,1.04.78,1.97-.16.5.21.82.75.55.65-.31,1.1-.21,1.57.37.17.22.75.31,1.05.2,1.69-.61,3.17,1.04,4.84.4.03,0,.08,0,.11.03,1.41.84,2.76.4,4.08-.23,2.99-1.43,5.6-3.41,8.15-5.49,3.26-2.65,6.52-5.3,9.78-7.94.23-.19.5-.32.76-.49.09.32.19.63.26.95.04.19.03.38.06.57.38,3.22.68,6.46,1.17,9.67,1.09,7.28,1.42,8.29,4.09,14.18.19.42.39.92.99.64.87-.4,1.62.02,2.4.26.33.1.68.11,1.03.14.22.02.47-.07.65.01.78.35,1.61.34,2.42.3.77-.04,1.56-.23,2.3-.47,1.54-.48,2.64-1.58,3.5-2.87.49-.73,1-1.59,1.1-2.44.34-3.19.58-6.39.74-9.59.19-3.82.24-7.64.37-11.45,0-.25.1-.5.16-.74.2.17.41.32.59.5,2.57,2.56,5.11,5.14,7.7,7.68.71.69,1.51,1.28,2.3,1.88.48.36.98.4,1.61.22.53-.15,1.22-.08,1.73.14,1.14.49,2.08,1.22,3.55,1.02,1.16-.16,2.46.39,3.67.64,1.51.31,2.68,0,3.92-.66,1.17-.62,1.88-1.69,2.76-2.6,1.25-1.29,1.08-2.79.73-4.28-.15-.63-.45-1.13-.07-1.81.15-.27-.03-.85-.24-1.16-1.08-1.52-2.09-3.11-3.36-4.47-4.32-4.64-8.73-9.19-13.11-13.78-.17-.18-.27-.43-.4-.64.21-.04.42-.12.64-.12,5.3-.22,10.61-.43,15.91-.64,0,.04,0,.09,0,.14,3.44,0,6.87.02,10.31,0,2.4-.02,4.8-.1,7.2-.18,1.19-.04,1.66-1.29,2.67-1.65.05-.02.08-.13.1-.2.18-.81.72-1.17,1.49-1.35.89-.21,1.09-.59.66-1.4-.32-.59-.08-.71.39-.85.44-.13.74-.37.62-.91"/>
+    </svg>
+  </a>
+  <div class="hdr-right">
+    <a class="hdr-ic" href="https://www.instagram.com/elaine.c.narcizo/" target="_blank" rel="noopener" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none"/></svg>
+    </a>
+    <a class="hdr-ic" href="https://open.spotify.com/show/3yCNwDaO1KVVuyfAbxXbXV" target="_blank" rel="noopener" aria-label="Spotify">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9.3"/><path d="M7 9.6c3.6-1 7.2-.6 10 1.1M7.3 13c3-.8 5.9-.5 8.3.9M7.6 16.2c2.4-.6 4.7-.4 6.6.7"/></svg>
+    </a>
+  </div>
+  <button class="burger" id="burger" aria-label="Menu" aria-expanded="false">
+    <span class="b-label">Menu</span>
+    <span class="b-bars"><i></i><i></i><i></i></span>
+  </button>
 </header>
+
+<div class="menu" id="menu" aria-hidden="true">
+  <!-- índice na ORDEM REAL da rolagem (ago/2026). Antes "Em cartaz" vinha
+       como 02, antes da Rádio, mas na página ela aparece DEPOIS de
+       Formações — menu e página divergiam. Agora a numeração é a mesma nos
+       dois lugares e nos olhos [NN] das seções. -->
+  <a class="mi" style="--i:0" href="/home-fluxo.html#inicio"><small>00</small>Home</a>
+  <a class="mi" style="--i:1" href="/home-fluxo.html#quem"><small>01</small>Quem sou eu</a>
+  <a class="mi" style="--i:2" href="/home-fluxo.html#radio"><small>02</small>Rádio Tinhosa</a>
+  <a class="mi" style="--i:3" href="/home-fluxo.html#formacoes"><small>03</small>Formações</a>
+  <a class="mi" style="--i:4" href="/home-fluxo.html#cartaz"><small>04</small>Bilheteria</a>
+  <a class="mi" style="--i:5" href="/blog/"><small>05</small>Reflexões</a>
+  <a class="mi" style="--i:6" href="/home-fluxo.html#conectar"><small>06</small>Conectar</a>
+  <a class="mi" style="--i:7" href="/home-fluxo.html#informacoes"><small>07</small>Informações gerais</a>
+  <div class="mfoot">
+    <a href="https://www.instagram.com/elaine.c.narcizo/" target="_blank" rel="noopener">Instagram</a>
+    <a href="https://www.youtube.com/@elainenarc" target="_blank" rel="noopener">YouTube</a>
+    <a href="https://api.whatsapp.com/send?phone=5516991595707" target="_blank" rel="noopener">WhatsApp</a>
+  </div>
+</div>
 
 <section class="post-hero">
   <video class="hero-vid" autoplay muted loop playsinline preload="metadata" poster="capa.jpg">
@@ -314,6 +375,27 @@ footer{
 </footer>
 
 <script>
+/* HEADER: escurece ao rolar + MENU overlay (padrão do site) */
+(function(){
+  var hdr=document.getElementById('hdr'),
+      burger=document.getElementById('burger'),
+      menu=document.getElementById('menu');
+  if(!hdr) return;
+  addEventListener('scroll',function(){ hdr.classList.toggle('scrolled', scrollY>40); },{passive:true});
+  if(burger&&menu){
+    var bLabel=burger.querySelector('.b-label');
+    function setMenu(open){
+      burger.classList.toggle('open',open); menu.classList.toggle('open',open);
+      hdr.classList.toggle('menu-open',open);
+      burger.setAttribute('aria-expanded',open); menu.setAttribute('aria-hidden',!open);
+      if(bLabel) bLabel.textContent=open?'Fechar':'Menu';
+    }
+    burger.addEventListener('click',function(){ setMenu(!menu.classList.contains('open')); });
+    menu.addEventListener('click',function(e){ if(e.target.closest('a')) setMenu(false); });
+    addEventListener('keydown',function(e){ if(e.key==='Escape') setMenu(false); });
+  }
+})();
+
 /* barra de progresso de leitura */
 (function(){
   var bar=document.getElementById('progress');
