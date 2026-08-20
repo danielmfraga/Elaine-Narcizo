@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     BLOG NATIVO — MODELO DE PÁGINA-LISTA (protótipo, ago/2026)
+     Destaque = o(s) texto(s) já migrado(s) pro site (link nativo /blog/<slug>/).
+     Grade = os textos ainda no Medium (link externo, status quo do carrossel).
+     🔑 Conforme cada texto for migrado, o card dele passa de "Ler no Medium →"
+     pra link nativo — é a régua de migração, um por um.
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<title>Reflexões — Elaine Narcizo</title>
+<meta name="description" content="Textos de Elaine Narcizo sobre tempo, descanso, autonomia e o cotidiano das mulheres — publicados a cada duas semanas." />
+<meta name="author" content="Elaine Narcizo" />
+<link rel="canonical" href="https://elainenarcizo.com.br/blog/" />
+
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="pt_BR" />
+<meta property="og:site_name" content="Elaine Narcizo" />
+<meta property="og:title" content="Reflexões — Elaine Narcizo" />
+<meta property="og:description" content="Textos sobre tempo, descanso, autonomia e o cotidiano das mulheres — publicados a cada duas semanas." />
+<meta property="og:url" content="https://elainenarcizo.com.br/blog/" />
+
+<link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=DM+Sans:opsz,wght@9..40,300..500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --amarelo:#F5D731; --rosa:#F4AACF; --laranja:#F2A25A;
+  --oliva:#BBC24C; --lilas:#B9A7DC; --roxo:#6C4BB6;
+  --ink:#0F0E0C; --paper:#F3EEE0; --white:#FFFFFF;
+  --mute:#6E6A60; --line:rgba(15,14,12,.14);
+  --disp:"Archivo",sans-serif;
+  --sans:"DM Sans",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  --mono:"Space Mono",ui-monospace,monospace;
+  --accent:var(--lilas);
+  --pad:clamp(20px,5vw,56px);
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+html,body{ background:var(--paper); }
+body{
+  font-family:var(--sans); color:var(--ink); font-size:1.05rem; line-height:1.6;
+  -webkit-font-smoothing:antialiased; overflow-x:clip;
+}
+a{ color:inherit; }
+::selection{ background:var(--accent); color:var(--ink); }
+
+.site{
+  position:sticky; top:0; z-index:40;
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:14px var(--pad);
+  background:var(--paper);          /* fallback sólido se color-mix não existir */
+  background:color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter:saturate(1.2) blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.brand{ font-family:var(--disp); font-weight:800; font-size:1.05rem; letter-spacing:-.01em; text-decoration:none; }
+.brand span{ color:var(--mute); font-weight:700; }
+.site nav{ display:flex; gap:18px; font-family:var(--mono); font-size:.74rem; text-transform:uppercase; letter-spacing:.06em; }
+.site nav a{ text-decoration:none; color:var(--mute); }
+.site nav a:hover{ color:var(--ink); }
+
+/* hero */
+.hero{ max-width:900px; margin:0 auto; padding:clamp(48px,10vw,104px) var(--pad) clamp(30px,6vw,52px); }
+.hero .kick{ font-family:var(--mono); font-size:.78rem; text-transform:uppercase; letter-spacing:.12em; color:var(--mute); display:flex; align-items:center; gap:10px; margin-bottom:20px; }
+.hero .kick .dot{ width:5px; height:5px; border-radius:50%; background:var(--accent); }
+.hero h1{
+  font-family:var(--disp); font-weight:800; line-height:.98; letter-spacing:-.02em;
+  font-size:clamp(3rem,15vw,7rem); font-variation-settings:"wght" 800,"wdth" 112;
+}
+.hero p{ margin-top:22px; max-width:44ch; color:var(--mute); font-size:clamp(1.05rem,3.6vw,1.25rem); line-height:1.55; }
+
+main{ max-width:1080px; margin:0 auto; padding:0 var(--pad) clamp(56px,10vw,96px); }
+
+/* card destaque (nativo) */
+.feature{
+  display:block; text-decoration:none; color:inherit; margin:8px 0 44px;
+  padding:clamp(24px,5vw,44px); border-radius:22px; background:var(--white);
+  border:1px solid var(--line); position:relative; overflow:hidden;
+  transition:transform .18s var(--ease), box-shadow .18s var(--ease);
+}
+.feature:hover{ transform:translateY(-3px); box-shadow:0 18px 40px rgba(15,14,12,.10); }
+.feature::before{ content:""; position:absolute; inset:0 auto 0 0; width:6px; background:var(--accent); }
+.feature .badge{ display:inline-block; font-family:var(--mono); font-size:.68rem; text-transform:uppercase; letter-spacing:.1em; color:var(--roxo); border:1px solid var(--roxo); padding:4px 10px; border-radius:999px; margin-bottom:18px; }
+.feature .meta{ font-family:var(--mono); font-size:.76rem; color:var(--mute); text-transform:uppercase; letter-spacing:.06em; margin-bottom:12px; }
+.feature h2{ font-family:var(--disp); font-weight:800; line-height:1.05; letter-spacing:-.01em; font-size:clamp(1.9rem,6vw,3rem); }
+.feature .exc{ margin-top:16px; max-width:52ch; color:#3a382f; font-size:1.1rem; line-height:1.55; }
+.feature .go{ display:inline-flex; margin-top:22px; font-family:var(--disp); font-weight:700; }
+.feature .go span{ margin-left:6px; transition:transform .18s var(--ease); }
+.feature:hover .go span{ transform:translateX(5px); }
+
+/* faixa divisória */
+.rule{ display:flex; align-items:center; gap:16px; margin:8px 0 26px; }
+.rule .txt{ font-family:var(--mono); font-size:.74rem; text-transform:uppercase; letter-spacing:.1em; color:var(--mute); white-space:nowrap; }
+.rule .ln{ height:1px; background:var(--line); flex:1; }
+
+/* grade dos textos ainda no Medium */
+.grid{ list-style:none; display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr)); gap:18px; }
+.grid a{
+  display:flex; flex-direction:column; height:100%; text-decoration:none; color:inherit;
+  padding:24px 22px 20px; border-radius:18px; background:var(--white); border:1px solid var(--line);
+  transition:transform .16s var(--ease), box-shadow .16s var(--ease);
+}
+.grid a:hover{ transform:translateY(-3px); box-shadow:0 14px 30px rgba(15,14,12,.09); }
+.grid .d{ font-family:var(--mono); font-size:.72rem; color:var(--mute); text-transform:uppercase; letter-spacing:.05em; margin-bottom:12px; }
+.grid .t{ font-family:var(--disp); font-weight:700; font-size:1.18rem; line-height:1.25; letter-spacing:-.01em; }
+.grid .r{ margin-top:auto; padding-top:18px; font-family:var(--mono); font-size:.76rem; color:var(--mute); }
+
+footer{ background:var(--ink); color:var(--paper); padding:clamp(40px,8vw,72px) var(--pad); }
+.foot-in{ max-width:1080px; margin:0 auto; display:flex; flex-wrap:wrap; gap:24px 40px; justify-content:space-between; align-items:flex-end; }
+.foot-in .sig{ font-family:var(--disp); font-weight:800; font-size:1.6rem; letter-spacing:-.01em; }
+.foot-in .links{ display:flex; gap:20px; font-family:var(--mono); font-size:.8rem; }
+.foot-in a{ color:var(--paper); text-decoration:none; opacity:.82; }
+.foot-in a:hover{ opacity:1; text-decoration:underline; }
+
+@media (max-width:520px){ .site nav a.hide-sm{ display:none; } }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <a class="brand" href="/">Elaine <span>Narcizo</span></a>
+  <nav>
+    <a href="/blog/">Reflexões</a>
+    <a class="hide-sm" href="https://www.instagram.com/elaine.c.narcizo/" target="_blank" rel="noopener">Instagram</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="kick"><span>Textos</span><span class="dot"></span><span>desde 2025</span></div>
+  <h1>Reflexões</h1>
+  <p>Textos sobre tempo, descanso, autonomia e o cotidiano das mulheres — publicados a cada duas semanas.</p>
+</section>
+
+<main>
+  <!-- ══ DESTAQUE: texto já migrado pro site (link nativo) ══ -->
+  <a class="feature" href="/blog/o-poder-da-palavra/">
+    <span class="badge">Aqui no site</span>
+    <div class="meta">14 jun 2025 · 3 min</div>
+    <h2>O poder da palavra</h2>
+    <p class="exc">O que buscamos no “poder da palavra” nem sempre é fuga nem delírio — é uma das experiências humanas mais fundamentais. E o incômodo com a fé na palavra talvez não seja crítica, mas distância social.</p>
+    <span class="go">Ler o texto <span>→</span></span>
+  </a>
+
+  <!-- ══ AINDA NO MEDIUM (migrar um a um; cada um vira link nativo ao migrar) ══ -->
+  <div class="rule"><span class="txt">Também no Medium</span><span class="ln"></span></div>
+  <ul class="grid" role="list">
+    <li><a href="https://medium.com/@elainenarcizo/quando-dizemos-parab%C3%A9ns-no-dia-da-mulher-estamos-celebrando-exatamente-o-qu%C3%AA-d16323c71383" target="_blank" rel="noopener">
+      <span class="d">08 mar 2026</span><span class="t">Quando dizemos “parabéns” no Dia da Mulher, estamos celebrando exatamente o quê?</span><span class="r">Ler no Medium →</span></a></li>
+    <li><a href="https://medium.com/@elainenarcizo/o-rid%C3%ADculo-%C3%A9-um-dispositivo-que-pode-salvar-uma-mulher-cfeece96e707" target="_blank" rel="noopener">
+      <span class="d">21 fev 2026</span><span class="t">O ridículo é um dispositivo que pode salvar uma mulher</span><span class="r">Ler no Medium →</span></a></li>
+    <li><a href="https://medium.com/@elainenarcizo/mulher-voc%C3%AA-j%C3%A1-pensou-que-na-maior-parte-da-sua-vida-passa-respondendo-perguntas-que-nunca-dc272d616bd8" target="_blank" rel="noopener">
+      <span class="d">07 fev 2026</span><span class="t">Mulher, você já pensou que passa a vida respondendo perguntas que nunca fez?</span><span class="r">Ler no Medium →</span></a></li>
+    <li><a href="https://medium.com/@elainenarcizo/descanso-e-mulheres-n%C3%A3o-basta-igualdade-na-corrida-quando-ningu%C3%A9m-pode-parar-907e36336652" target="_blank" rel="noopener">
+      <span class="d">24 jan 2026</span><span class="t">Descanso e mulheres: não basta igualdade na corrida quando ninguém pode parar</span><span class="r">Ler no Medium →</span></a></li>
+    <li><a href="https://medium.com/@elainenarcizo/deser%C3%A7%C3%A3o-das-l%C3%A1grimas-um-sonho-para-2026-0d23c25f76b4" target="_blank" rel="noopener">
+      <span class="d">20 dez 2025</span><span class="t">Deserção das lágrimas: um sonho para 2026</span><span class="r">Ler no Medium →</span></a></li>
+    <li><a href="https://medium.com/@elainenarcizo/reescrevendo-o-agora-o-papel-estrutural-do-planejamento-feminino-2c5089c17dac" target="_blank" rel="noopener">
+      <span class="d">06 dez 2025</span><span class="t">Reescrevendo o agora: o papel estrutural do planejamento feminino</span><span class="r">Ler no Medium →</span></a></li>
+    <li><a href="https://medium.com/@elainenarcizo/se-voc%C3%AA-estiver-cansada-talvez-isso-seja-para-voc%C3%AA-fe1bcc9fdf22" target="_blank" rel="noopener">
+      <span class="d">22 nov 2025</span><span class="t">Se você estiver cansada, talvez isso seja para você</span><span class="r">Ler no Medium →</span></a></li>
+    <li><a href="https://medium.com/@elainenarcizo/a-tristeza-aleat%C3%B3ria-fea4e9c705e5" target="_blank" rel="noopener">
+      <span class="d">08 nov 2025</span><span class="t">A Tristeza Aleatória</span><span class="r">Ler no Medium →</span></a></li>
+    <li><a href="https://medium.com/@elainenarcizo/originar-se-territ%C3%B3rios-de-forma%C3%A7%C3%A3o-d8faaa09ca7c" target="_blank" rel="noopener">
+      <span class="d">03 out 2025</span><span class="t">Originar-se: territórios de formação</span><span class="r">Ler no Medium →</span></a></li>
+    <li><a href="https://medium.com/@elainenarcizo/quero-ter-um-filho-quero-dar-a-morte-para-algu%C3%A9m-pensando-sobre-o-amor-e-finitude-1eaa1f8e53ea" target="_blank" rel="noopener">
+      <span class="d">13 set 2025</span><span class="t">“Quero ter um filho, quero dar a morte para alguém…” — sobre o amor e a finitude</span><span class="r">Ler no Medium →</span></a></li>
+  </ul>
+</main>
+
+<footer>
+  <div class="foot-in">
+    <div class="sig">Elaine Narcizo</div>
+    <div class="links">
+      <a href="https://www.instagram.com/elaine.c.narcizo/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://api.whatsapp.com/send?phone=5516991595707" target="_blank" rel="noopener">WhatsApp</a>
+      <a href="/">Início</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

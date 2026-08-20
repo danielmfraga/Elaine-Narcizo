@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     BLOG NATIVO — MODELO DE PÁGINA DE POST (protótipo, ago/2026)
+     Primeiro texto migrado do Medium pra fechar o formato antes de multiplicar.
+     🔑 O texto vive ESCRITO no HTML (não montado por JS) — é isso que faz o
+     Google ler e dar o crédito de SEO pro domínio dela, não pro Medium.
+     Estrutura de URL: /blog/<slug>/  (pasta + index.html = URL limpa).
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<title>O poder da palavra — Elaine Narcizo</title>
+<meta name="description" content="Sobre a palavra como uma das experiências humanas mais fundamentais — e por que o incômodo com a fé na palavra é, no fundo, uma questão de distância social." />
+<meta name="author" content="Elaine Narcizo" />
+<meta name="keywords" content="poder da palavra, saúde mental, reflexão, pensamento, arte, linguagem, desigualdade" />
+
+<!-- Canonical APONTA PRO PRÓPRIO SITE (self-canonical) — dizemos ao Google que
+     ESTA é a versão oficial. ⚠️ Se a decisão for MANTER o Medium no ar, aqui é
+     onde entraria o dilema de cópia (ver plano do blog). Por ora: o site vence. -->
+<link rel="canonical" href="https://elainenarcizo.com.br/blog/o-poder-da-palavra/" />
+
+<!-- Open Graph (preview bonito no WhatsApp/Instagram/Facebook) -->
+<meta property="og:type" content="article" />
+<meta property="og:locale" content="pt_BR" />
+<meta property="og:site_name" content="Elaine Narcizo" />
+<meta property="og:title" content="O poder da palavra" />
+<meta property="og:description" content="Sobre a palavra como uma das experiências humanas mais fundamentais — e por que o incômodo com a fé na palavra é, no fundo, uma questão de distância social." />
+<meta property="og:url" content="https://elainenarcizo.com.br/blog/o-poder-da-palavra/" />
+<meta property="article:published_time" content="2025-06-14" />
+<meta property="article:author" content="Elaine Narcizo" />
+<meta property="article:section" content="Reflexão" />
+<!-- TODO(Daniel): og:image 1200×630 — sem isso o preview no WhatsApp fica sem
+     miniatura. Dá pra gerar um cartão tipográfico na identidade da casa depois. -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="O poder da palavra" />
+<meta name="twitter:description" content="Sobre a palavra como uma das experiências humanas mais fundamentais." />
+
+<link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=DM+Sans:opsz,wght@9..40,300..500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- Schema.org Article — ajuda o Google a entender que é um artigo, com autor e data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "O poder da palavra",
+  "author": { "@type": "Person", "name": "Elaine Narcizo", "url": "https://elainenarcizo.com.br/" },
+  "publisher": { "@type": "Person", "name": "Elaine Narcizo" },
+  "datePublished": "2025-06-14",
+  "mainEntityOfPage": "https://elainenarcizo.com.br/blog/o-poder-da-palavra/",
+  "articleSection": "Reflexão",
+  "keywords": "Saúde Mental, Reflexão, Pensamento, Arte",
+  "inLanguage": "pt-BR"
+}
+</script>
+
+<style>
+:root{
+  --amarelo:#F5D731; --rosa:#F4AACF; --laranja:#F2A25A;
+  --oliva:#BBC24C; --lilas:#B9A7DC; --roxo:#6C4BB6;
+  --ink:#0F0E0C; --paper:#F3EEE0; --white:#FFFFFF;
+  --mute:#6E6A60; --line:rgba(15,14,12,.14);
+  --disp:"Archivo",sans-serif;
+  --sans:"DM Sans",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  --mono:"Space Mono",ui-monospace,monospace;
+  --accent:var(--lilas);           /* cada texto pode ter seu acento; este = lilás */
+  --measure:40rem;                  /* largura da coluna de leitura (~640px) */
+  --pad:clamp(20px,5vw,56px);
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+html,body{ background:var(--paper); }
+body{
+  font-family:var(--sans); color:var(--ink);
+  font-size:clamp(1.05rem,1rem + .35vw,1.2rem); line-height:1.75;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  overflow-x:clip;
+}
+a{ color:inherit; }
+::selection{ background:var(--accent); color:var(--ink); }
+
+/* ── Barra de progresso de leitura ── */
+.progress{ position:fixed; top:0; left:0; height:3px; width:0; background:var(--accent); z-index:50; transition:width .06s linear; }
+
+/* ── Cabeçalho do site ── */
+.site{
+  position:sticky; top:0; z-index:40;
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:14px var(--pad);
+  background:var(--paper);          /* fallback sólido se color-mix não existir */
+  background:color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter:saturate(1.2) blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.brand{ font-family:var(--disp); font-weight:800; font-size:1.05rem; letter-spacing:-.01em; text-decoration:none; }
+.brand span{ color:var(--mute); font-weight:700; }
+.site nav{ display:flex; gap:18px; font-family:var(--mono); font-size:.74rem; text-transform:uppercase; letter-spacing:.06em; }
+.site nav a{ text-decoration:none; color:var(--mute); }
+.site nav a:hover{ color:var(--ink); }
+
+/* ── Artigo ── */
+main{ padding:clamp(40px,8vw,88px) var(--pad) 0; }
+.post{ max-width:var(--measure); margin:0 auto; }
+
+.kicker{
+  font-family:var(--mono); font-size:.76rem; text-transform:uppercase; letter-spacing:.12em;
+  color:var(--mute); display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:22px;
+}
+.kicker .dot{ width:5px; height:5px; border-radius:50%; background:var(--accent); }
+.kicker .tag0{ color:var(--ink); font-weight:700; }
+
+h1.title{
+  font-family:var(--disp); font-weight:800; line-height:1.04; letter-spacing:-.02em;
+  font-size:clamp(2.4rem,9vw,4.2rem); margin-bottom:26px;
+  font-variation-settings:"wght" 800,"wdth" 108;
+}
+.byline{
+  display:flex; align-items:center; gap:12px; padding-bottom:30px; margin-bottom:8px;
+  border-bottom:1px solid var(--line);
+}
+.byline .who{ font-family:var(--disp); font-weight:700; }
+.byline .avatar{
+  width:38px; height:38px; border-radius:50%; flex:none;
+  background:linear-gradient(135deg,var(--accent),var(--rosa));
+  display:grid; place-items:center; font-family:var(--disp); font-weight:800; color:var(--ink); font-size:.95rem;
+}
+.byline .meta{ color:var(--mute); font-size:.9rem; line-height:1.3; }
+
+/* corpo */
+.lede{
+  font-family:var(--disp); font-weight:500; font-size:clamp(1.3rem,4.4vw,1.7rem);
+  line-height:1.4; letter-spacing:-.01em; margin:36px 0 30px;
+}
+.body > p{ margin:0 0 1.35em; }
+.body > p:first-of-type::first-letter{
+  font-family:var(--disp); font-weight:800; float:left;
+  font-size:3.4em; line-height:.78; padding:.04em .1em 0 0; color:var(--accent);
+}
+.body em{ font-style:italic; }
+.body .src{ color:var(--mute); font-size:.85em; }
+.body .close{
+  font-family:var(--disp); font-weight:500; font-size:1.15em; line-height:1.5;
+  margin-top:1.6em; padding-top:1.4em; border-top:1px solid var(--line);
+}
+
+/* chips de tema */
+.chips{ display:flex; flex-wrap:wrap; gap:10px; margin:44px 0 0; }
+.chip{
+  font-family:var(--mono); font-size:.72rem; text-transform:uppercase; letter-spacing:.06em;
+  padding:7px 13px; border:1px solid var(--line); border-radius:999px; color:var(--mute);
+}
+
+/* rodapé do post: compartilhar + voltar */
+.post-foot{ margin:40px 0 0; padding:26px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+.post-foot .lbl{ font-family:var(--mono); font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; color:var(--mute); margin-bottom:14px; }
+.share{ display:flex; flex-wrap:wrap; gap:10px; }
+.share a{
+  display:inline-flex; align-items:center; gap:8px; text-decoration:none;
+  font-family:var(--disp); font-weight:700; font-size:.95rem;
+  padding:11px 18px; border-radius:999px; border:1.5px solid var(--ink); background:var(--ink); color:var(--paper);
+  transition:transform .15s var(--ease);
+}
+.share a.ghost{ background:transparent; color:var(--ink); }
+.share a:hover{ transform:translateY(-2px); }
+
+.backline{ max-width:var(--measure); margin:34px auto 0; }
+.backline a{ font-family:var(--mono); font-size:.82rem; text-decoration:none; color:var(--mute); }
+.backline a:hover{ color:var(--ink); }
+
+/* ── Rodapé ── */
+footer{
+  margin-top:clamp(56px,12vw,110px); background:var(--ink); color:var(--paper);
+  padding:clamp(40px,8vw,72px) var(--pad);
+}
+.foot-in{ max-width:var(--measure); margin:0 auto; display:flex; flex-wrap:wrap; gap:24px 40px; justify-content:space-between; align-items:flex-end; }
+.foot-in .sig{ font-family:var(--disp); font-weight:800; font-size:1.6rem; letter-spacing:-.01em; }
+.foot-in .links{ display:flex; gap:20px; font-family:var(--mono); font-size:.8rem; }
+.foot-in a{ color:var(--paper); text-decoration:none; opacity:.82; }
+.foot-in a:hover{ opacity:1; text-decoration:underline; }
+
+@media (max-width:520px){
+  .site nav a.hide-sm{ display:none; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<header class="site">
+  <a class="brand" href="/">Elaine <span>Narcizo</span></a>
+  <nav>
+    <a href="/blog/">Reflexões</a>
+    <a class="hide-sm" href="https://www.instagram.com/elaine.c.narcizo/" target="_blank" rel="noopener">Instagram</a>
+  </nav>
+</header>
+
+<main>
+  <article class="post">
+    <div class="kicker">
+      <span class="tag0">Reflexão</span>
+      <span class="dot"></span>
+      <time datetime="2025-06-14">14 de junho de 2025</time>
+      <span class="dot"></span>
+      <span>3 min de leitura</span>
+    </div>
+
+    <h1 class="title">O poder da palavra</h1>
+
+    <div class="byline">
+      <span class="avatar" aria-hidden="true">E</span>
+      <div>
+        <div class="who">Elaine Narcizo</div>
+        <div class="meta">Educadora, arteterapeuta e pesquisadora</div>
+      </div>
+    </div>
+
+    <p class="lede">O que vem à sua mente quando ouve a frase: “O poder da palavra”?</p>
+
+    <div class="body">
+      <p>Quando pensamos em poder da palavra, geralmente, não pensamos no poder da palavra da filosofia, da poesia, das ciências, ou das canções, mas daqueles que vivem guiados por ela — especialmente pela fé, como quem vê nela um caminho. A palavra, quando aparece como fé, como prática cotidiana de sobrevivência, como guia, geralmente começa a incomodar.</p>
+
+      <p>Quem vive longe deste tipo de relação com a palavra costuma olhar para essa forma de apego à palavra com desconfiança, até mesmo desprezo. A fé na palavra, quando não vem embalada em livro, conceito ou arte, é muitas vezes tida como “fanatismo”, “superstição”, “delírio”.</p>
+
+      <p>Mas, o que as pessoas buscam no poder da palavra nem sempre é fuga, nem delírio. Na verdade, antes de mais nada, é algo fundamentalmente humano: o encontro com a palavra e com seu poder. Ou seja, as pessoas que acreditam no poder da palavra estão enraizadas numa das experiências humanas mais fundamentais e profundas que existem.</p>
+
+      <p>Mudar essa chave — a ideia de que as pessoas não estão recorrendo a coisas “arcaicas” — e reconhecer que elas estão, na verdade, no coração da experiência humana pode nos ajudar a não estranhar o fundamento dessa busca.</p>
+
+      <p>Precisamos parar de desqualificar como atraso algo que não é raso. E não se trata da experiência mística ou religiosa — é anterior a isso. É a palavra como parte do que é estar no mundo — uma condição ancestral que nos dá um lugar comum: somos, todos, seres da linguagem.</p>
+
+      <p>Por isso, é importante dizer com todas as letras: esse incômodo não é de uma razão crítica, é de classe. Não se trata do diferente, nem do desconhecido. Se trata do distante. E essa distância não é simbólica — é material.</p>
+
+      <p>Segundo dados do IBGE, a renda domiciliar per capita média no Brasil foi de R$ 1.893 em 2023 <span class="src">(liv102174_informativo.pdf)</span>. Isso significa que, em média, cada pessoa vive com pouco mais de um salário mínimo por mês. A desigualdade é tamanha que, se você ganha R$ 3.500 mensais, provavelmente já está entre os 20% com maior rendimento do país. Mas a maioria de nós não percebe isso. Ganhar R$ 3.500 nos faz sentir “classe média”, mas estatisticamente nos aproxima muito mais dos ricos do que dos pobres. E essa ilusão atrapalha qualquer tentativa real de enxergar — e enfrentar — as distâncias sociais.</p>
+
+      <p>É perfeitamente possível viver no Brasil sem nunca ter conversado, de igual pra igual, com a realidade da maioria, a não ser uma convivência com faxineiras, entregadores, prestadores de serviços. Relações atravessadas por subordinação. Não há troca real. Não há escuta. Só distância — econômica, simbólica e afetiva. E essa distância, esse abismo, cria uma ilusão perigosa: achar que sabemos o que estamos dizendo, quando nem chegamos perto.</p>
+
+      <p>Ser mais coerente talvez passe por admitir que quem vive no centro talvez confunda o poder da palavra — que é central na vida humana — com delírio de quem não tem mais nada. Mas mesmo quem não tem mais nada não erra quando se ancora no que também sustenta a vida: a palavra.</p>
+
+      <p>Parece uma lógica torta? Torto é ancorar a lucidez no distanciamento social.</p>
+
+      <p>Não se trata de relativizar mentiras nem de legitimar manipulações religiosa. Trata-se de não confundir ignorância com distanciamento social, e crítica com desprezo.</p>
+
+      <p>Essa crítica ao “fanatismo” vem, muitas vezes, de um lugar que se diz racional, mas que é cínico. Usa a palavra para diagnosticar a loucura do outro — sem jamais admitir sua própria condição de isolamento, porque finge neutralidade, mas está entrincheirado. Denuncia o “fanatismo” como se fosse um vírus de ignorantes, mas não vê o dogmatismo do seu próprio distanciamento.</p>
+
+      <p>Trata-se, portanto, de reconhecer que, muitas vezes, o que chamamos de ignorância é só distância. Que desprezamos o que nunca tocamos.</p>
+
+      <p>Nós, que desejamos justiça social e igualdade, já percebemos que nossas palavras estão enfraquecidas. Mas talvez ainda não tenhamos compreendido por quê. Talvez, se quisermos mesmo provocar alguma mudança, precisemos admitir: o que esvazia nossas palavras é o afastamento da vida concreta de quem não se parece conosco.</p>
+
+      <p class="close">E, se for para recomeçar, terá que ser assim — com aproximação, gesto por gesto, palavra por palavra.</p>
+    </div>
+
+    <div class="chips" aria-label="Temas">
+      <span class="chip">Saúde mental</span>
+      <span class="chip">Reflexão</span>
+      <span class="chip">Pensamento</span>
+      <span class="chip">Arte</span>
+    </div>
+
+    <div class="post-foot">
+      <div class="lbl">Compartilhar</div>
+      <div class="share">
+        <a id="waShare" href="https://api.whatsapp.com/send?text=O%20poder%20da%20palavra%20%E2%80%94%20Elaine%20Narcizo%20https%3A%2F%2Felainenarcizo.com.br%2Fblog%2Fo-poder-da-palavra%2F" target="_blank" rel="noopener">WhatsApp</a>
+        <a class="ghost" id="copyLink" href="#">Copiar link</a>
+      </div>
+    </div>
+  </article>
+
+  <div class="backline">
+    <a href="/blog/">← Todos os textos</a>
+  </div>
+</main>
+
+<footer>
+  <div class="foot-in">
+    <div class="sig">Elaine Narcizo</div>
+    <div class="links">
+      <a href="https://www.instagram.com/elaine.c.narcizo/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://api.whatsapp.com/send?phone=5516991595707" target="_blank" rel="noopener">WhatsApp</a>
+      <a href="/blog/">Reflexões</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* barra de progresso de leitura */
+(function(){
+  var bar=document.getElementById('progress');
+  function upd(){
+    var h=document.documentElement, max=h.scrollHeight-h.clientHeight;
+    bar.style.width=(max>0?(h.scrollTop||document.body.scrollTop)/max*100:0)+'%';
+  }
+  addEventListener('scroll',upd,{passive:true}); addEventListener('resize',upd); upd();
+})();
+/* copiar link */
+document.getElementById('copyLink').addEventListener('click',function(e){
+  e.preventDefault(); var url='https://elainenarcizo.com.br/blog/o-poder-da-palavra/', b=this;
+  (navigator.clipboard?navigator.clipboard.writeText(url):Promise.reject())
+    .then(function(){b.textContent='Link copiado ✓';setTimeout(function(){b.textContent='Copiar link';},1800);})
+    .catch(function(){prompt('Copie o link:',url);});
+});
+</script>
+</body>
+</html>
