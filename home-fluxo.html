@@ -417,13 +417,17 @@ html.sdt .mq-esq{
 .perc-card-todo .lbl{ font-family:var(--mono); text-transform:uppercase; letter-spacing:.16em; font-size:.85rem; color:rgba(15,14,12,.6); margin-top:12px; }
 
 /* COM suporte a scroll-driven: pina + desliza na horizontal.
-   🔑 Padrão comprovado do arquivo: o RELÓGIO (view-timeline) mora num marcador
-   que NÃO gruda (.perc-timer, absoluto sobre a cena inteira), o nome é içado
-   pro contêiner via `timeline-scope`, e a faixa (que vive dentro do pino
-   sticky) só CONSOME — assim a linha do tempo não congela ao prender. */
+   🔑 Padrão comprovado do arquivo (o MESMO da subida lenta da Rádio e das
+   frases da Bilheteria, que rodam no iPhone do Daniel): o RELÓGIO (view-timeline)
+   mora num marcador de FLUXO NORMAL com footprint ZERO (height + margin-bottom
+   negativa), NUNCA absoluto — o Safari não anima view-timeline pendurada em
+   position:absolute (foi o bug: funcionava no Chrome, parava no iPhone). O nome
+   é içado pro contêiner via `timeline-scope` e a faixa (dentro do pino sticky)
+   só CONSOME. Marcador de 250svh ⇒ a fase `contain` (250−100=150svh) casa
+   exatamente com a duração em que o pino fica preso. */
 .perc-timer{ display:none; }
 html.sdt .percursos-scene{ height:250svh; timeline-scope:--percurso; }
-html.sdt .perc-timer{ display:block; position:absolute; inset:0; pointer-events:none; view-timeline-name:--percurso; view-timeline-axis:block; }
+html.sdt .perc-timer{ display:block; height:250svh; margin-bottom:-250svh; pointer-events:none; view-timeline-name:--percurso; view-timeline-axis:block; }
 html.sdt .perc-pin{ position:sticky; top:0; height:100svh; overflow:hidden; }
 html.sdt .perc-track{
   flex-direction:row; width:200vw; height:100%;
