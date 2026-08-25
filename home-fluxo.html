@@ -408,7 +408,10 @@ html.sdt .mq-esq{
    (Montserrat Light) à esquerda + ilustração da mulher (#464646) à direita →
    botão "Notificação de novos percursos" (#464646, Montserrat Regular). */
 .perc-card-vivona{ background:var(--paper); color:#464646; text-align:left; justify-content:center; padding-top:clamp(74px,10vh,108px); }
-.viv-inner{ width:100%; max-width:600px; margin:0 auto; display:flex; flex-direction:column; gap:clamp(14px,3vh,28px); }
+.viv-inner{ width:100%; max-width:600px; margin:0 auto; height:100%; display:flex; flex-direction:column; justify-content:space-between; gap:clamp(16px,3vh,30px); }
+.viv-top{ display:flex; flex-direction:column; gap:clamp(14px,3vh,28px); }
+.viv-foot{ display:flex; flex-direction:column; align-items:center; gap:clamp(10px,1.8vh,18px); }
+.viv-note{ font-family:"Montserrat",var(--sans); font-weight:300; color:#464646; font-size:clamp(.95rem,3.6vw,1.1rem); line-height:1.35; text-align:center; margin:0; }
 .viv-logo{ display:block; width:100%; max-width:520px; height:auto; }
 .viv-mid{ display:flex; align-items:center; gap:clamp(14px,4vw,34px); }
 .viv-sup{ flex:1 1 56%; font-family:"Montserrat",var(--sans); font-weight:300; color:#464646; font-size:clamp(1rem,4.2vw,1.2rem); line-height:1.32; text-wrap:pretty; margin:0; }
@@ -2012,6 +2015,7 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
       <div class="perc-track">
         <article class="perc-card perc-card-vivona">
           <div class="viv-inner">
+          <div class="viv-top">
           <svg class="viv-logo" role="img" aria-label="Vivona" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 835.47 481.17">
   <g>
     <g>
@@ -2169,8 +2173,12 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   <path d="M533.26,101.51l-.27,23.03c-3.92-8.13-3.8-17.06-1.69-26.27.56.27,1.98,2.38,1.97,3.24Z"/>
   <path d="M531.74,42.55l.37,11.19c-3.06-5.24-3.78-10.25-2.51-16.43.91,1.04,2.09,3.57,2.15,5.24Z"/>
 </svg></div>
+          </div><!-- /viv-mid -->
+          </div><!-- /viv-top -->
+          <div class="viv-foot">
+            <p class="viv-note">Avisamos a cada novo percurso que abrir.</p>
+            <a class="viv-cta" href="#" data-todo="lista de espera de percursos (form a definir)">Quero ser avisada</a>
           </div>
-          <a class="viv-cta" href="#" data-todo="destino da notificacao de novos percursos">Notificação de novos percursos</a>
           </div><!-- /viv-inner -->
         </article>
         <article class="perc-card perc-card-todo">
