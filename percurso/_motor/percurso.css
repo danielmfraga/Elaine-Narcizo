@@ -48,8 +48,20 @@ a{ color:inherit; }
 html.so-capa, html.so-capa body{
   height:100%; overflow:hidden; overscroll-behavior:auto;
 }
-html.so-capa .pc-capa{ height:100%; min-height:0; }
+html.so-capa .pc-capa{ height:100%; min-height:0; justify-content:center; }
 html.so-capa .pc-capa-sair{ display:none; }   /* dentro do cartaz não há "sair" */
+/* 🔑 O cabeçalho FIXO do site cobre o topo do cartaz. Ancorada embaixo, a capa
+   empurrava o título pra debaixo dele e o "PONTE" aparecia cortado. Aqui ela
+   centraliza e reserva o espaço do cabeçalho — a MESMA receita do cartaz 01
+   (.perc-card-vivona), pros dois cartazes ficarem no mesmo eixo. */
+html.so-capa .pc-capa-in{
+  padding-top:clamp(84px,11vh,112px);
+  padding-bottom:clamp(22px,5vh,44px);
+}
+html.so-capa .pc-capa-t{ font-size:clamp(2.8rem,16vw,5.4rem); }
+html.so-capa .pc-capa-ch{ margin-top:12px; }
+html.so-capa .pc-capa-acoes{ margin-top:20px; }
+html.so-capa .pc-capa-cred{ display:none; }   /* a autoria já está na home */
 
 /* ─── cabeçalho + progresso ─────────────────────────────────────────────── */
 .pc-top{
