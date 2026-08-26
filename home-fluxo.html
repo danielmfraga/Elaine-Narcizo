@@ -419,14 +419,18 @@ html.sdt .mq-esq{
 /* MOVIMENTO da ilustração (pedido do Daniel): sai o cinza fixo; a cor migra
    devagar entre tons escuros da paleta Vivona — leitura preservada no creme,
    transição suave, efeito "aperolado". `fill` no root cascateia p/ os paths. */
-.viv-art-svg{ width:100%; height:auto; display:block; fill:#0a7383; animation:vivArtCor 12s ease-in-out infinite; }
+.viv-art-svg{ width:100%; height:auto; display:block; fill:#079fb4; animation:vivArtCor 12s ease-in-out infinite; }
+/* 6 cores-mãe (âncoras) da paleta Vivona — a animação PASSA por cada uma
+   exatamente (um stop por cor), voltando à 1ª no fim do ciclo. */
 @keyframes vivArtCor{
-  0%,100%{ fill:#0a7383; }   /* teal */
-  25%{ fill:#4f7d2e; }        /* verde */
-  50%{ fill:#4a2f82; }        /* roxo */
-  75%{ fill:#0e6b88; }        /* azul */
+  0%,100%{ fill:#079fb4; }    /* 1 */
+  16.6%{ fill:#df5338; }       /* 2 */
+  33.3%{ fill:#81bb4b; }       /* 3 */
+  50%{ fill:#e2aa15; }         /* 4 */
+  66.6%{ fill:#6132a5; }       /* 5 */
+  83.3%{ fill:#0bc1ea; }       /* 6 */
 }
-@media (prefers-reduced-motion:reduce){ .viv-art-svg{ animation:none; fill:#3a4a52; } }
+@media (prefers-reduced-motion:reduce){ .viv-art-svg{ animation:none; fill:#079fb4; } }
 .viv-cta{ align-self:center; display:inline-flex; align-items:center; justify-content:center; text-align:center; max-width:100%; margin-top:clamp(6px,1.6vh,16px); padding:17px 28px; border-radius:18px; background:#464646; color:#fff; text-decoration:none; font-family:"Montserrat",var(--sans); font-weight:400; font-size:clamp(.8rem,3.4vw,.95rem); letter-spacing:.02em; text-transform:uppercase; line-height:1.2; transition:background .16s var(--ease); -webkit-tap-highlight-color:transparent; }
 @media(hover:hover){ .viv-cta:hover{ background:#333; } }
 .viv-cta:active{ background:#2a2a2a; }
