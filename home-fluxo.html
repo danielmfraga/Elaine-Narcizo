@@ -407,16 +407,26 @@ html.sdt .mq-esq{
 /* capa nova do cartaz Vivona (mockup do Daniel): logo no topo → texto de apoio
    (Montserrat Light) à esquerda + ilustração da mulher (#464646) à direita →
    botão "Notificação de novos percursos" (#464646, Montserrat Regular). */
-.perc-card-vivona{ background:var(--paper); color:#464646; text-align:left; justify-content:center; padding-top:clamp(74px,10vh,108px); }
-.viv-inner{ width:100%; max-width:600px; margin:0 auto; height:100%; display:flex; flex-direction:column; justify-content:flex-start; gap:clamp(12px,2.4vh,22px); }
-.viv-top{ display:flex; flex-direction:column; gap:clamp(14px,3vh,28px); }
-.viv-foot{ display:flex; flex-direction:column; align-items:center; gap:clamp(10px,1.8vh,18px); }
+.perc-card-vivona{ background:var(--paper); color:#464646; text-align:left; justify-content:center; padding-top:clamp(84px,11vh,112px); }
+.viv-inner{ width:100%; max-width:600px; margin:0 auto; height:100%; display:flex; flex-direction:column; justify-content:flex-start; gap:clamp(34px,7vh,60px); }
+.viv-top{ display:flex; flex-direction:column; gap:clamp(18px,3.5vh,32px); }
+.viv-foot{ display:flex; flex-direction:column; align-items:center; gap:clamp(12px,2.2vh,20px); }
 .viv-note{ font-family:"Montserrat",var(--sans); font-weight:300; color:#464646; font-size:clamp(.95rem,3.6vw,1.1rem); line-height:1.35; text-align:center; margin:0; }
 .viv-logo{ display:block; width:100%; max-width:520px; height:auto; }
 .viv-mid{ display:flex; align-items:center; gap:clamp(14px,4vw,34px); }
 .viv-sup{ flex:1 1 56%; font-family:"Montserrat",var(--sans); font-weight:300; color:#464646; font-size:clamp(1rem,4.2vw,1.2rem); line-height:1.32; text-wrap:pretty; margin:0; }
-.viv-art{ flex:0 0 40%; max-width:210px; }
-.viv-art-svg{ width:100%; height:auto; display:block; }
+.viv-art{ flex:0 0 44%; max-width:220px; }
+/* MOVIMENTO da ilustração (pedido do Daniel): sai o cinza fixo; a cor migra
+   devagar entre tons escuros da paleta Vivona — leitura preservada no creme,
+   transição suave, efeito "aperolado". `fill` no root cascateia p/ os paths. */
+.viv-art-svg{ width:100%; height:auto; display:block; fill:#0a7383; animation:vivArtCor 26s ease-in-out infinite; }
+@keyframes vivArtCor{
+  0%,100%{ fill:#0a7383; }   /* teal */
+  25%{ fill:#4f7d2e; }        /* verde */
+  50%{ fill:#4a2f82; }        /* roxo */
+  75%{ fill:#0e6b88; }        /* azul */
+}
+@media (prefers-reduced-motion:reduce){ .viv-art-svg{ animation:none; fill:#3a4a52; } }
 .viv-cta{ align-self:center; display:inline-flex; align-items:center; justify-content:center; text-align:center; max-width:100%; margin-top:clamp(6px,1.6vh,16px); padding:17px 28px; border-radius:18px; background:#464646; color:#fff; text-decoration:none; font-family:"Montserrat",var(--sans); font-weight:400; font-size:clamp(.8rem,3.4vw,.95rem); letter-spacing:.02em; text-transform:uppercase; line-height:1.2; transition:background .16s var(--ease); -webkit-tap-highlight-color:transparent; }
 @media(hover:hover){ .viv-cta:hover{ background:#333; } }
 .viv-cta:active{ background:#2a2a2a; }
