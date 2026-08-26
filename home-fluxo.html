@@ -431,9 +431,30 @@ html.sdt .mq-esq{
   83.3%{ fill:#0bc1ea; }       /* 6 */
 }
 @media (prefers-reduced-motion:reduce){ .viv-art-svg{ animation:none; fill:#079fb4; } }
-.viv-cta{ align-self:center; display:inline-flex; align-items:center; justify-content:center; text-align:center; max-width:100%; margin-top:clamp(6px,1.6vh,16px); padding:17px 28px; border-radius:18px; background:#464646; color:#fff; text-decoration:none; font-family:"Montserrat",var(--sans); font-weight:400; font-size:clamp(.8rem,3.4vw,.95rem); letter-spacing:.02em; text-transform:uppercase; line-height:1.2; transition:background .16s var(--ease); -webkit-tap-highlight-color:transparent; }
+.viv-cta{ align-self:center; display:inline-flex; align-items:center; justify-content:center; text-align:center; max-width:100%; margin-top:clamp(6px,1.6vh,16px); padding:17px 28px; border-radius:18px; background:#464646; color:#fff; border:0; cursor:pointer; text-decoration:none; font-family:"Montserrat",var(--sans); font-weight:400; font-size:clamp(.8rem,3.4vw,.95rem); letter-spacing:.02em; text-transform:uppercase; line-height:1.2; transition:background .16s var(--ease); -webkit-tap-highlight-color:transparent; }
 @media(hover:hover){ .viv-cta:hover{ background:#333; } }
 .viv-cta:active{ background:#2a2a2a; }
+
+/* ── Modal do formulário "Quero ser avisada" (envia pro Google Sheets via
+   Apps Script; NADA salvo no site). Overlay fixo, escapa do overflow do pino. */
+.vform-overlay{ position:fixed; inset:0; z-index:120; display:flex; align-items:center; justify-content:center; padding:20px; background:rgba(15,14,12,.55); opacity:0; visibility:hidden; transition:opacity .28s var(--ease), visibility .28s; }
+.vform-overlay.open{ opacity:1; visibility:visible; }
+.vform-card{ position:relative; width:100%; max-width:430px; max-height:90svh; overflow:auto; background:var(--paper); border-radius:22px; padding:clamp(26px,6vw,40px); transform:translateY(16px); transition:transform .3s var(--ease); }
+.vform-overlay.open .vform-card{ transform:none; }
+.vform-x{ position:absolute; top:12px; right:14px; border:0; background:none; font-size:19px; line-height:1; cursor:pointer; color:#464646; padding:6px; }
+.vform-h{ font-family:var(--disp); font-weight:820; font-stretch:108%; font-size:clamp(1.5rem,6vw,2rem); color:var(--ink); margin:0 0 8px; }
+.vform-sub{ font-family:"Montserrat",var(--sans); font-weight:300; color:#464646; font-size:.98rem; line-height:1.4; margin:0 0 22px; }
+.vform-field{ display:block; margin-bottom:14px; }
+.vform-field > span{ display:block; font-family:"Montserrat",var(--sans); font-weight:400; font-size:.8rem; color:#464646; margin-bottom:5px; }
+.vform-field input{ width:100%; font-family:"Montserrat",var(--sans); font-size:1rem; padding:12px 14px; border:1.5px solid rgba(70,70,70,.3); border-radius:12px; background:#fff; color:var(--ink); }
+.vform-field input:focus{ outline:none; border-color:#464646; }
+.vform-hp{ position:absolute !important; left:-9999px; width:1px; height:1px; opacity:0; pointer-events:none; }
+.vform-submit{ width:100%; margin-top:8px; padding:15px; border:0; border-radius:14px; background:#464646; color:#fff; font-family:"Montserrat",var(--sans); font-weight:400; font-size:.95rem; text-transform:uppercase; letter-spacing:.02em; cursor:pointer; transition:background .16s var(--ease); -webkit-tap-highlight-color:transparent; }
+.vform-submit:hover{ background:#333; }
+.vform-submit:disabled{ opacity:.6; cursor:default; }
+.vform-legal{ font-family:"Montserrat",var(--sans); font-weight:300; font-size:.72rem; color:var(--mute); text-align:center; line-height:1.35; margin:12px 0 0; }
+#vivDone{ text-align:center; }
+.vform-done-ic{ font-size:38px; color:#81bb4b; margin:0 0 4px; }
 /* o "sol" do logo gira devagar (transform-box:fill-box → gira no próprio centro) */
 .viv-sun{ transform-box:fill-box; transform-origin:center; animation:vivSun 42s linear infinite; }
 @keyframes vivSun{ to{ transform:rotate(360deg); } }
@@ -2191,7 +2212,7 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
           </div><!-- /viv-top -->
           <div class="viv-foot">
             <p class="viv-note">Avisamos a cada novo percurso que abrir.</p>
-            <a class="viv-cta" href="#" data-todo="lista de espera de percursos (form a definir)">Quero ser avisada</a>
+            <button class="viv-cta" id="vivAvisar" type="button">Quero ser avisada</button>
           </div>
           </div><!-- /viv-inner -->
         </article>
@@ -2336,6 +2357,33 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   </div><!-- /scene 3 -->
 
 </main>
+
+<!-- ══ FORMULÁRIO "Quero ser avisada" (modal) — envia pro Google Sheets via
+     Apps Script; NADA é salvo no site. ⚠️ Colar a URL /exec no FORM_ENDPOINT
+     do script no fim do <body>. Campo-isca `website` barra bots. -->
+<div class="vform-overlay" id="vivModal" aria-hidden="true">
+  <div class="vform-card" role="dialog" aria-modal="true" aria-labelledby="vform-h">
+    <button class="vform-x" id="vivClose" type="button" aria-label="Fechar">✕</button>
+    <div id="vivFormBody">
+      <h3 class="vform-h" id="vform-h">Quero ser avisada</h3>
+      <p class="vform-sub">Deixe seu contato — avisamos a cada novo percurso que abrir.</p>
+      <form id="vivForm">
+        <label class="vform-field"><span>Nome</span><input name="nome" type="text" required autocomplete="name" /></label>
+        <label class="vform-field"><span>E-mail</span><input name="email" type="email" required autocomplete="email" /></label>
+        <label class="vform-field"><span>WhatsApp</span><input name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="(00) 00000-0000" /></label>
+        <input class="vform-hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <button class="vform-submit" type="submit">Quero ser avisada</button>
+        <p class="vform-legal">Ao enviar, você concorda em receber avisos de novos percursos.</p>
+      </form>
+    </div>
+    <div id="vivDone" hidden>
+      <p class="vform-done-ic">✓</p>
+      <h3 class="vform-h">Prontinho!</h3>
+      <p class="vform-sub">Você será avisada quando abrir um novo percurso. 💛</p>
+      <button class="vform-submit" id="vivDoneClose" type="button">Fechar</button>
+    </div>
+  </div>
+</div>
 
 <script>
 (function(){
@@ -3184,6 +3232,42 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   ddFab.addEventListener('click',function(){ ddPanel.classList.contains('open')?ddClose():ddOpen(); });
   document.getElementById('dd-close').addEventListener('click',ddClose);
   ddRenderList();
+})();
+</script>
+
+<script>
+/* Formulário "Quero ser avisada" → Google Sheets via Apps Script.
+   ⚠️ COLE a URL /exec do teu Apps Script (deploy como App da Web) na linha
+   abaixo. Enquanto estiver vazio, o form só mostra o "Prontinho!" (pra ver
+   o visual) sem enviar nada. mode:'no-cors' = a linha entra na planilha mas
+   o navegador não lê a resposta (por isso o "enviado" é otimista). */
+(function(){
+  var FORM_ENDPOINT = ''; /* <<< COLE A URL /exec DO APPS SCRIPT AQUI (entre as aspas) */
+  var openBtn=document.getElementById('vivAvisar'), modal=document.getElementById('vivModal');
+  if(!openBtn||!modal) return;
+  var closeBtn=document.getElementById('vivClose'),
+      form=document.getElementById('vivForm'),
+      fbody=document.getElementById('vivFormBody'),
+      done=document.getElementById('vivDone'),
+      doneClose=document.getElementById('vivDoneClose'),
+      submit=form.querySelector('.vform-submit');
+  function openM(){ modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); setTimeout(function(){ var n=form.querySelector('input[name="nome"]'); if(n) n.focus(); },80); }
+  function closeM(){ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); }
+  openBtn.addEventListener('click',openM);
+  closeBtn.addEventListener('click',closeM);
+  if(doneClose) doneClose.addEventListener('click',closeM);
+  modal.addEventListener('click',function(e){ if(e.target===modal) closeM(); });
+  addEventListener('keydown',function(e){ if(e.key==='Escape'&&modal.classList.contains('open')) closeM(); });
+  function showDone(){ fbody.hidden=true; done.hidden=false; }
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    if(form.website && form.website.value){ closeM(); return; }   /* isca: provavelmente bot */
+    submit.disabled=true; submit.textContent='Enviando…';
+    if(!FORM_ENDPOINT){ showDone(); return; }                     /* sem endpoint ainda: só o visual */
+    fetch(FORM_ENDPOINT,{ method:'POST', mode:'no-cors', body:new FormData(form) })
+      .then(showDone)
+      .catch(function(){ submit.disabled=false; submit.textContent='Quero ser avisada'; alert('Não consegui enviar agora. Pode tentar de novo?'); });
+  });
 })();
 </script>
 </body>
