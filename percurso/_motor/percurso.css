@@ -48,6 +48,12 @@ a{ color:inherit; }
 html.so-capa, html.so-capa body{
   height:100%; overflow:hidden; overscroll-behavior:auto;
 }
+/* 🔑 O ELO QUE FALTAVA: `#percurso` é o pai direto da capa. Sem altura
+   definida NELE, o `height:100%` da capa não resolve (percentual contra pai
+   de altura automática vira `auto`) e a capa encolhia até o tamanho do
+   conteúdo — no cartaz da home ela ocupava só ~metade da tela. A corrente
+   precisa ser inteira: html → body → #percurso → .pc-capa. */
+html.so-capa #percurso{ height:100%; }
 html.so-capa .pc-capa{ height:100%; min-height:0; justify-content:center; }
 html.so-capa .pc-capa-sair{ display:none; }   /* dentro do cartaz não há "sair" */
 /* 🔑 O cabeçalho FIXO do site cobre o topo do cartaz. Ancorada embaixo, a capa
