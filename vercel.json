@@ -1,6 +1,6 @@
 {
   "redirects": [
-    { "source": "/", "destination": "/repertorios-sensiveis/", "permanent": false }
+    { "source": "/home-fluxo.html", "destination": "/", "permanent": false }
   ],
   "headers": [
     {

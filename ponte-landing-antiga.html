@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Elaine Narcizo — PONTE</title>
+  <meta name="description" content="Oficina PONTE para elaboração de projetos de vida — uma experiência guiada por Elaine Narcizo." />
+  <link rel="stylesheet" href="colors_and_type.css" />
+  <style>
+    html, body { margin: 0; padding: 0; min-height: 100vh; }
+    body {
+      background: var(--cream-100);
+      display: grid; grid-template-columns: 1fr;
+    }
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: grid; align-items: end;
+      padding: 56px 8vw 64px;
+      overflow: hidden;
+    }
+    .hero .bg {
+      position: absolute; inset: 0;
+      background: url('assets/bg-green.jpg') center/cover no-repeat;
+      z-index: 0;
+    }
+    .hero .bg::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(245,235,222,0) 35%, rgba(245,235,222,0.94) 100%);
+    }
+    .hero .inner { position: relative; z-index: 1; max-width: 1100px; }
+    .brand {
+      display: flex; align-items: baseline; gap: 14px;
+      font-family: var(--font-display); font-style: italic; font-weight: 300;
+      font-size: 18px; color: var(--ink-900);
+    }
+    .brand .sep { width: 28px; height: 1px; background: var(--ink-900); opacity: 0.5; }
+    .brand .mark { font-style: normal; font-weight: 500; letter-spacing: 0.32em; font-size: 13px; }
+    .hello {
+      font-family: var(--font-hand); font-weight: 500;
+      font-size: clamp(3.5rem, 2.8rem + 5vw, 7rem);
+      color: var(--verde-700);
+      line-height: 0.9; margin: 24px 0 0;
+      transform: rotate(-3deg); transform-origin: left; display: inline-block;
+    }
+    h1 {
+      font-family: var(--font-display); font-style: italic; font-weight: 300;
+      font-size: clamp(2.4rem, 1.8rem + 3vw, 4.5rem);
+      line-height: 0.98; letter-spacing: -0.025em;
+      color: var(--ink-900); margin: 24px 0 18px;
+      max-width: 18ch; text-wrap: balance;
+    }
+    .lede {
+      font-family: var(--font-display); font-weight: 300;
+      font-size: clamp(1.1rem, 0.95rem + 0.7vw, 1.4rem);
+      line-height: 1.45; color: var(--ink-700);
+      max-width: 52ch; text-wrap: pretty; margin: 0 0 40px;
+    }
+    .row { display: flex; flex-wrap: wrap; gap: 12px; }
+    .btn {
+      font-family: var(--font-body); font-size: 15px; font-weight: 500;
+      padding: 14px 26px; border-radius: 999px;
+      display: inline-flex; align-items: center; gap: 10px;
+      text-decoration: none; border: none; cursor: pointer;
+      transition: transform .3s var(--ease-out), background .3s var(--ease-out), box-shadow .3s var(--ease-out);
+    }
+    .btn-primary { background: var(--ink-900); color: var(--cream-100); }
+    .btn-primary:hover { background: var(--verde-900); transform: translateY(-1px); box-shadow: var(--shadow-2); }
+    .btn-secondary { background: transparent; color: var(--ink-900); border: 1px solid var(--line-strong); }
+    .btn-secondary:hover { background: var(--cream-200); }
+    .btn .arrow { transition: transform .3s var(--ease-out); }
+    .btn:hover .arrow { transform: translateX(3px); }
+
+    section.entries {
+      padding: 96px 8vw 120px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .eyebrow {
+      font-family: var(--font-body); font-weight: 500;
+      font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--verde-700); margin: 0 0 12px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 32px;
+    }
+    @media (max-width: 880px) { .grid { grid-template-columns: 1fr; } }
+    .card {
+      display: flex; flex-direction: column;
+      background: var(--cream-50);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 24px 26px 26px;
+      text-decoration: none; color: inherit;
+      transition: transform .3s var(--ease-out), box-shadow .3s var(--ease-out), border-color .3s var(--ease-out);
+    }
+    .card:hover { transform: translateY(-3px); box-shadow: var(--shadow-2); border-color: transparent; }
+    .card .n {
+      font-family: var(--font-display); font-style: italic; font-weight: 300;
+      font-size: 20px; color: var(--ink-500); margin-bottom: 6px;
+    }
+    .card h3 {
+      font-family: var(--font-display); font-weight: 400; font-style: italic;
+      font-size: 24px; color: var(--ink-900); margin: 0 0 8px;
+      line-height: 1.1; letter-spacing: -0.015em;
+    }
+    .card p {
+      font-family: var(--font-body); font-size: 14px; line-height: 1.55;
+      color: var(--ink-500); margin: 0 0 18px;
+    }
+    .card .go {
+      margin-top: auto; font-family: var(--font-body); font-size: 13px;
+      font-weight: 500; color: var(--verde-700);
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+
+    footer {
+      padding: 32px 8vw 48px;
+      border-top: 1px solid var(--line);
+      font-family: var(--font-body); font-size: 12px; color: var(--ink-500);
+      display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px;
+    }
+    footer .sig {
+      font-family: var(--font-hand); font-size: 22px;
+      color: var(--laranja-700); transform: rotate(-3deg); display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+  <section class="hero">
+    <div class="bg"></div>
+    <div class="inner">
+      <div class="brand">
+        <span>Elaine Narcizo</span>
+        <span class="sep"></span>
+        <span class="mark">PONTE</span>
+      </div>
+      <span class="hello">Olá!</span>
+      <h1>Uma ponte entre o seu presente e o seu futuro.</h1>
+      <p class="lede">Três exercícios à mão. Onze áreas da vida. Um compromisso pessoal — para você e para alguém de confiança. Esta é a oficina <em>PONTE</em>, em formato guiado.</p>
+      <div class="row">
+        <a class="btn btn-primary" href="ui_kits/ponte/">Começar o percurso <span class="arrow">→</span></a>
+        <a class="btn btn-secondary" href="canvas/todas-as-telas.html">Ver todas as telas</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="entries">
+    <p class="eyebrow">Por onde entrar</p>
+    <h2 style="font-family: var(--font-display); font-weight: 300; font-style: italic; font-size: clamp(2rem, 1.5rem + 2vw, 3rem); margin: 0; max-width: 22ch; color: var(--ink-900); letter-spacing: -0.02em;">Três jeitos de explorar este material.</h2>
+
+    <div class="grid">
+      <a class="card" href="ui_kits/ponte/">
+        <span class="n">01</span>
+        <h3>A experiência guiada</h3>
+        <p>O percurso completo da oficina, em 10 telas. Inventário do presente, reflexão sobre o futuro, ponte de ações, e a carta de compromisso final.</p>
+        <span class="go">começar o percurso →</span>
+      </a>
+
+      <a class="card" href="canvas/todas-as-telas.html">
+        <span class="n">02</span>
+        <h3>Todas as telas, lado a lado</h3>
+        <p>Para olhar tudo ao mesmo tempo. Útil para apresentar, decidir, ou pular direto pra uma etapa específica.</p>
+        <span class="go">ver mapa de telas →</span>
+      </a>
+
+      <a class="card" href="content/ponte-text.md">
+        <span class="n">03</span>
+        <h3>O texto original, na íntegra</h3>
+        <p>Toda a oficina como Elaine escreveu — sem cortes, sem reformatação. Para ler com tempo.</p>
+        <span class="go">ler o texto →</span>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <span>© 2026 Elaine Narcizo · Oficina PONTE para elaboração de projetos de vida</span>
+    <span class="sig">com&nbsp;carinho.</span>
+  </footer>
+
+</body>
+</html>
