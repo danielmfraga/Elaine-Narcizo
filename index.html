@@ -474,7 +474,12 @@ html.sdt .mq-esq{
    só CONSOME. Marcador de 250svh ⇒ a fase `contain` (250−100=150svh) casa
    exatamente com a duração em que o pino fica preso. */
 .perc-timer{ display:none; }
-html.sdt .percursos-scene{ height:250svh; timeline-scope:--percurso; }
+/* ⚠️ A cena NAO pode ter altura fixa: a lamina das Consideracoes mora dentro
+   dela agora. Quem fornece a pista do deslize e o .perc-espaco (150svh), e o
+   pino segue preso enquanto a lamina sobe — que e o efeito pedido. */
+html.sdt .percursos-scene{ timeline-scope:--percurso; }
+.perc-espaco{ height:0; }
+html.sdt .perc-espaco{ height:150svh; }
 html.sdt .perc-timer{ display:block; height:250svh; margin-bottom:-250svh; pointer-events:none; view-timeline-name:--percurso; view-timeline-axis:block; }
 html.sdt .perc-pin{ position:sticky; top:0; height:100svh; overflow:hidden; }
 html.sdt .perc-track{
@@ -487,7 +492,7 @@ html.sdt .perc-card{ flex:0 0 100vw; height:100%; min-height:0; }
 /* quem pediu menos movimento: volta pro empilhado e para o sol */
 @media (prefers-reduced-motion:reduce){
   .viv-sun{ animation:none; }
-  html.sdt .percursos-scene{ height:auto; }
+  html.sdt .perc-espaco{ height:0; }
   html.sdt .perc-pin{ position:relative; height:auto; overflow:visible; }
   html.sdt .perc-track{ flex-direction:column; width:auto; animation:none; }
   html.sdt .perc-card{ flex:0 0 auto; height:auto; min-height:100svh; }
@@ -2230,10 +2235,14 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
         </article>
       </div>
     </section>
-  </div>
 
-  <!-- CENA (Consideracoes finais) -->
-  <div class="scene">
+    <!-- CORREDOR da passagem horizontal: 150svh presos = exatamente a duracao
+         do deslize (a fase `contain` do marcador). Quando ele termina, o cartaz
+         02 esta cheio na tela — e a lamina abaixo comeca a subir POR CIMA dele,
+         que e o padrao deck-de-cartas do resto do site. Por isso a lamina das
+         Consideracoes finais MORA DENTRO desta cena: `position:sticky` so
+         prende dentro do proprio conteiner. -->
+    <div class="perc-espaco" aria-hidden="true"></div>
 
   <!-- ══ CONSIDERAÇÕES FINAIS — porta de entrada do BLOG ══
        Carrossel no mesmo motor do de Formações (ver CSS). Os 10 títulos
@@ -2307,7 +2316,7 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
     </div>
   </div>
 
-  </div><!-- /scene (Consideracoes finais) -->
+  </div><!-- /percursos-scene (o cartaz 02 fica preso enquanto esta lamina sobe) -->
 
   <!-- CENA 3 -->
   <div class="scene">
