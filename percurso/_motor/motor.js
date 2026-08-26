@@ -28,6 +28,10 @@
 
   var LS = "percurso:" + P.id + ":v" + (P.versao || 1);
   var raiz = document.getElementById("percurso");
+  /* ?capa=1 — embutido no cartaz da home: só a capa, e SEM ESCREVER NADA.
+     Sem esta trava o iframe (a) abriria no passo que a pessoa parou, em vez
+     da capa, e (b) salvaria i=0 por cima do progresso real dela. */
+  var SO_CAPA = document.documentElement.classList.contains("so-capa");
 
   /* ---------- helpers de DOM ---------------------------------------------- */
   function h(tag, attrs) {
@@ -73,6 +77,7 @@
   }
   var tSave = null;
   function salvar(agora) {
+    if (SO_CAPA) return;              /* modo vitrine nunca escreve */
     clearTimeout(tSave);
     var faz = function () {
       estado.atualizado = Date.now();
@@ -196,6 +201,7 @@
        voltasse à capa pelo mapa (estado.i vira 0) perderia o "continuar". */
     var temAlgo = preenchidas() > 0 || String(estado.respostas.compromisso || "").trim().length > 0;
     var temProgresso = !!estado.atualizado && (estado.i > 0 || temAlgo);
+    var soCapa = document.documentElement.classList.contains("so-capa");
     return h("section", { class: "pc-tela pc-capa" },
       h("video", {
         class: "pc-capa-video", autoplay: "", muted: "", loop: "", playsinline: "",
@@ -209,11 +215,17 @@
         h("p", { class: "pc-capa-sub" }, P.subtitulo),
         h("p", { class: "pc-capa-ch" }, P.capa.chamada),
         h("div", { class: "pc-capa-acoes" },
-          h("button", {
-            class: "pc-b pc-b-claro", type: "button",
-            onClick: function () { ir(estado.i > 0 ? estado.i : 1); }
-          }, temProgresso ? P.capa.retomar : P.capa.entrar, h("span", { class: "pc-seta" }, "→")),
-          temProgresso ? h("button", {
+          /* embutida no cartaz (?capa=1): o botão SAI do iframe e abre o
+             percurso inteiro na janela de cima — escrever 33 respostas dentro
+             de um cartão que desliza seria péssimo. */
+          soCapa
+            ? h("a", { class: "pc-b pc-b-claro", href: location.pathname, target: "_top" },
+                P.capa.entrar, h("span", { class: "pc-seta" }, "→"))
+            : h("button", {
+                class: "pc-b pc-b-claro", type: "button",
+                onClick: function () { ir(estado.i > 0 ? estado.i : 1); }
+              }, temProgresso ? P.capa.retomar : P.capa.entrar, h("span", { class: "pc-seta" }, "→")),
+          !soCapa && temProgresso ? h("button", {
             class: "pc-b pc-b-vazio", type: "button",
             onClick: function () {
               if (confirm("Recomeçar o percurso? Tudo que você escreveu será apagado.")) {
@@ -225,7 +237,7 @@
         ),
         h("p", { class: "pc-capa-meta" },
           P.capa.tempo,
-          temProgresso ? " · " + preenchidas() + " de " + totalAreas() + " áreas preenchidas" : ""
+          (!soCapa && temProgresso) ? " · " + preenchidas() + " de " + totalAreas() + " áreas preenchidas" : ""
         ),
         h("p", { class: "pc-capa-cred" }, "por " + P.autora)
       )
@@ -663,6 +675,7 @@
 
   /* ---------- desenhar ---------------------------------------------------- */
   function desenhar() {
+    if (SO_CAPA) estado.i = 0;        /* vitrine mostra sempre a capa */
     var passo = passos[estado.i];
     raiz.innerHTML = "";
     var no;

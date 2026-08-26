@@ -37,6 +37,20 @@ a{ color:inherit; }
 /* ─── casca ─────────────────────────────────────────────────────────────── */
 .pc-tela{ min-height:100svh; display:flex; flex-direction:column; }
 
+/* ─── MODO "SÓ A CAPA" (?capa=1) — o percurso embutido no cartaz da home ───
+   Mostra apenas a capa e deixa o documento SEM NADA PRA ROLAR, para o gesto
+   do dedo ATRAVESSAR o iframe e rolar a página-mãe.
+   🔴 REGRA DURA: aqui NUNCA declarar `overscroll-behavior:contain`. Ele é
+   exatamente o mecanismo que impede a rolagem de passar de um iframe pra
+   página de fora — foi o que travou a tela no iPhone no caso das Cartas.
+   Aqui é pior ainda: o cartaz vive numa cena PRESA que desliza por scroll;
+   se o iframe engolir o gesto, a pessoa fica encalhada no cartaz. */
+html.so-capa, html.so-capa body{
+  height:100%; overflow:hidden; overscroll-behavior:auto;
+}
+html.so-capa .pc-capa{ height:100%; min-height:0; }
+html.so-capa .pc-capa-sair{ display:none; }   /* dentro do cartaz não há "sair" */
+
 /* ─── cabeçalho + progresso ─────────────────────────────────────────────── */
 .pc-top{
   position:sticky; top:0; z-index:30;

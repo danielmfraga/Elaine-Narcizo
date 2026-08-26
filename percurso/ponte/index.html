@@ -30,6 +30,15 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Montserrat:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../_motor/percurso.css" />
+<script>
+  /* ?capa=1 → modo "só a capa": é assim que a home embute este percurso no
+     cartaz da Vivona, em vez de manter uma CÓPIA da capa lá. Fonte única de
+     verdade — o que muda aqui aparece lá sozinho. (Mesmo mecanismo das
+     Cartas entre Homens.) */
+  if (window !== window.top) document.documentElement.classList.add('embedded');
+  try { if (new URLSearchParams(location.search).get('capa') === '1')
+    document.documentElement.classList.add('so-capa'); } catch (e) {}
+</script>
 
 <script type="application/ld+json">
 {

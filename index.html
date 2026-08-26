@@ -459,9 +459,10 @@ html.sdt .mq-esq{
 .viv-sun{ transform-box:fill-box; transform-origin:center; animation:vivSun 42s linear infinite; }
 @keyframes vivSun{ to{ transform:rotate(360deg); } }
 
-.perc-card-todo{ background:var(--oliva); color:var(--ink); }   /* placeholder do cartaz 02 */
-.perc-card-todo .big{ font-family:var(--disp); font-weight:820; font-stretch:112%; font-size:clamp(4.5rem,28vw,15rem); line-height:.86; }
-.perc-card-todo .lbl{ font-family:var(--mono); text-transform:uppercase; letter-spacing:.16em; font-size:.85rem; color:rgba(15,14,12,.6); margin-top:12px; }
+/* cartaz que embute um percurso (a capa dele É a peça) — sem padding, o
+   iframe preenche o cartaz inteiro. Padrão pros próximos percursos. */
+.perc-card-frame{ padding:0; background:var(--ink); position:relative; overflow:hidden; }
+.perc-card-frame iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; display:block; }
 
 /* COM suporte a scroll-driven: pina + desliza na horizontal.
    🔑 Padrão comprovado do arquivo (o MESMO da subida lenta da Rádio e das
@@ -2216,10 +2217,16 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
           </div>
           </div><!-- /viv-inner -->
         </article>
-        <article class="perc-card perc-card-todo">
-          <!-- CARTAZ 02 — conteudo a fornecer pelo Daniel -->
-          <span class="big">02</span>
-          <span class="lbl">Em breve</span>
+        <!-- CARTAZ 02 — o percurso PONTE. A capa dele É a peça: embutimos a
+             página oficial em modo vitrine (?capa=1), fonte única de verdade,
+             mesmo padrão do Portão 02 (Cartas). O botão de dentro sai do
+             iframe (target="_top") e abre o percurso inteiro.
+             ⚠️ NUNCA pôr overscroll-behavior:contain dentro dessa página em
+             modo capa — travaria a rolagem da home e prenderia a pessoa aqui
+             (a cena desliza POR SCROLL). Ver percurso.css. -->
+        <article class="perc-card perc-card-frame">
+          <iframe src="/percurso/ponte/?capa=1" title="Percurso Ponte"
+            loading="lazy" scrolling="no" allow="autoplay"></iframe>
         </article>
       </div>
     </section>
