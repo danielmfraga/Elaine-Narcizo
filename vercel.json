@@ -1,12 +1,29 @@
 {
   "redirects": [
-    { "source": "/home-fluxo.html", "destination": "/", "permanent": false }
+    {
+      "source": "/home-fluxo.html",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/ui_kits/ponte",
+      "destination": "/percurso/ponte/",
+      "permanent": false
+    },
+    {
+      "source": "/ui_kits/ponte/",
+      "destination": "/percurso/ponte/",
+      "permanent": false
+    }
   ],
   "headers": [
     {
       "source": "/(.*)\\.(css|js|svg|jpg|jpeg|png|webp|mp4|webm)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=604800, immutable" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800, immutable"
+        }
       ]
     }
   ]
