@@ -13,7 +13,13 @@ window.PERCURSO = {
   nome: "Ponte",
   subtitulo: "percurso para elaboração de projetos de vida",
   autora: "Elaine Narcizo",
-  versao: 2,                       /* ⚠️ subir isto invalida o progresso salvo */
+  versao: 2,                              /* ⚠️ subir isto invalida o progresso salvo */
+
+  /* 🔑 Para onde o ✕ e o "voltar ao site" levam. Aponta pra CAPA DA VIVONA,
+     de onde este percurso e acessado — voltar pro topo do site perderia o
+     lugar da pessoa. ⚠️ A ancora e #vivona (a cena, que NAO e sticky) e nao
+     #percursos: ancora pra elemento position:sticky nao rola. */
+  voltar: "/#vivona",
 
   capa: {
     video: "/assets/video/ponte-capa.mp4",

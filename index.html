@@ -431,9 +431,9 @@ html.sdt .mq-esq{
   83.3%{ fill:#0bc1ea; }       /* 6 */
 }
 @media (prefers-reduced-motion:reduce){ .viv-art-svg{ animation:none; fill:#079fb4; } }
-.viv-cta{ align-self:center; display:inline-flex; align-items:center; justify-content:center; text-align:center; max-width:100%; margin-top:clamp(6px,1.6vh,16px); padding:17px 28px; border-radius:18px; background:#464646; color:#fff; border:0; cursor:pointer; text-decoration:none; font-family:"Montserrat",var(--sans); font-weight:400; font-size:clamp(.8rem,3.4vw,.95rem); letter-spacing:.02em; text-transform:uppercase; line-height:1.2; transition:background .16s var(--ease); -webkit-tap-highlight-color:transparent; }
-@media(hover:hover){ .viv-cta:hover{ background:#333; } }
-.viv-cta:active{ background:#2a2a2a; }
+.viv-cta{ align-self:center; display:inline-flex; align-items:center; justify-content:center; text-align:center; max-width:100%; margin-top:clamp(6px,1.6vh,16px); padding:17px 28px; border-radius:18px; background:var(--ink); color:#fff; border:0; cursor:pointer; text-decoration:none; font-family:"Montserrat",var(--sans); font-weight:400; font-size:clamp(.8rem,3.4vw,.95rem); letter-spacing:.02em; text-transform:uppercase; line-height:1.2; transition:background .16s var(--ease); -webkit-tap-highlight-color:transparent; }
+@media(hover:hover){ .viv-cta:hover{ background:#2a2823; } }
+.viv-cta:active{ background:#33302a; }
 
 /* ── Modal do formulário "Quero ser avisada" (envia pro Google Sheets via
    Apps Script; NADA salvo no site). Overlay fixo, escapa do overflow do pino. */
@@ -482,20 +482,47 @@ html.sdt .percursos-scene{ timeline-scope:--percurso; }
 html.sdt .perc-espaco{ height:150svh; }
 html.sdt .perc-timer{ display:block; height:250svh; margin-bottom:-250svh; pointer-events:none; view-timeline-name:--percurso; view-timeline-axis:block; }
 html.sdt .perc-pin{ position:sticky; top:0; height:100svh; overflow:hidden; }
-html.sdt .perc-track{
-  flex-direction:row; width:200vw; height:100%;
-  animation:percSlide linear both; animation-timeline:--percurso; animation-range:contain 0% contain 100%;
+/* 🔑 DECK DE CARTAS NA HORIZONTAL (pedido do Daniel, ago/2026).
+   Antes a FAIXA inteira deslizava pra esquerda: os dois cartazes andavam
+   juntos. Agora a Vivona FICA PARADA no lugar dela e o cartaz da PONTE entra
+   da direita POR CIMA — o mesmo efeito que as laminas fazem na vertical.
+   Os dois cartazes viram camadas empilhadas dentro do pino. */
+html.sdt .perc-track{ position:absolute; inset:0; display:block; width:auto; height:100%; animation:none; }
+html.sdt .perc-card{ position:absolute; inset:0; flex:none; height:auto; min-height:0; }
+/* a Vivona escurece de leve ao ser coberta, como as capas do resto do site */
+html.sdt .perc-card-vivona{
+  animation:percEscurece linear both;
+  animation-timeline:--percurso; animation-range:contain 0% contain 100%;
 }
-html.sdt .perc-card{ flex:0 0 100vw; height:100%; min-height:0; }
-@keyframes percSlide{ from{ transform:translateX(0); } to{ transform:translateX(-100vw); } }
+/* a PONTE entra por cima: borda arredondada + sombra do lado que chega */
+html.sdt .perc-card-frame{
+  z-index:2;
+  border-radius:var(--radius) 0 0 var(--radius);
+  box-shadow:-18px 0 60px rgba(0,0,0,.35);
+  animation:percEntra linear both;
+  animation-timeline:--percurso; animation-range:contain 0% contain 100%;
+}
+/* ⏸️ A TRAVADINHA: nos primeiros 34% da passagem nada anda — da a sensacao de
+   que a Vivona "tranca" ali. Os 66% restantes fazem o deslize inteiro, ou
+   seja, ele ficou ~1,5x MAIS RAPIDO do que quando ocupava o percurso todo. */
+@keyframes percEntra{
+  0%,34%{ transform:translateX(100%); }
+  100%  { transform:translateX(0); }
+}
+@keyframes percEscurece{
+  0%,34%{ filter:brightness(1); }
+  100%  { filter:brightness(.84); }
+}
 
 /* quem pediu menos movimento: volta pro empilhado e para o sol */
 @media (prefers-reduced-motion:reduce){
   .viv-sun{ animation:none; }
   html.sdt .perc-espaco{ height:0; }
   html.sdt .perc-pin{ position:relative; height:auto; overflow:visible; }
-  html.sdt .perc-track{ flex-direction:column; width:auto; animation:none; }
-  html.sdt .perc-card{ flex:0 0 auto; height:auto; min-height:100svh; }
+  html.sdt .perc-track{ position:relative; inset:auto; display:flex; flex-direction:column; width:auto; animation:none; }
+  html.sdt .perc-card{ position:relative; flex:0 0 auto; height:auto; min-height:100svh; }
+  html.sdt .perc-card-vivona,
+  html.sdt .perc-card-frame{ animation:none; transform:none; filter:none; box-shadow:none; border-radius:0; }
 }
 
 .y{ background:var(--amarelo); color:var(--ink); }
@@ -1657,11 +1684,14 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   <a class="mi" style="--i:2" href="#radio"><small>02</small>Rádio Tinhosa</a>
   <a class="mi" style="--i:3" href="#formacoes"><small>03</small>Formações</a>
   <a class="mi" style="--i:4" href="#cartaz"><small>04</small>Bilheteria</a>
-  <a class="mi" style="--i:5" href="#reflexoes"><small>05</small>Reflexões</a>
-  <a class="mi" style="--i:6" href="#conectar"><small>06</small>Conectar</a>
-  <a class="mi" style="--i:7" href="#informacoes"><small>07</small>Informações gerais</a>
+  <a class="mi" style="--i:5" href="#vivona"><small>05</small>Escola Vivona</a>
+  <a class="mi" style="--i:6" href="#reflexoes"><small>06</small>Reflexões</a>
+  <a class="mi" style="--i:7" href="#conectar"><small>07</small>Conectar</a>
+  <a class="mi" style="--i:8" href="#informacoes"><small>08</small>Informações gerais</a>
   <div class="mfoot">
     <a href="https://www.instagram.com/elaine.c.narcizo/" target="_blank" rel="noopener">Instagram</a>
+    <a href="/blog/">Blog</a>
+    <a href="/percurso/ponte/">Percurso Ponte</a>
     <a href="https://www.youtube.com/@elainenarc" target="_blank" rel="noopener">YouTube</a>
     <a href="https://api.whatsapp.com/send?phone=5516991595707" target="_blank" rel="noopener">WhatsApp</a>
   </div>
@@ -2050,7 +2080,7 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
        (view-timeline no proprio bloco + html.sdt como porteiro). Sem suporte,
        os 2 cartazes EMPILHAM na vertical (fallback no CSS).
        ⚠️ CARTAZ 02 e PLACEHOLDER — Daniel vai fornecer o conteudo. -->
-  <div class="percursos-scene">
+  <div class="percursos-scene" id="vivona">
     <div class="perc-timer" aria-hidden="true"></div>
     <section class="perc-pin" id="percursos">
       <div class="perc-track">
@@ -2230,7 +2260,7 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
              modo capa — travaria a rolagem da home e prenderia a pessoa aqui
              (a cena desliza POR SCROLL). Ver percurso.css. -->
         <article class="perc-card perc-card-frame">
-          <iframe src="/percurso/ponte/?capa=1&v=4" title="Percurso Ponte"
+          <iframe src="/percurso/ponte/?capa=1&v=5" title="Percurso Ponte"
             loading="lazy" scrolling="no" allow="autoplay"></iframe>
         </article>
       </div>

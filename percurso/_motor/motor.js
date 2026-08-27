@@ -32,6 +32,7 @@
      Sem esta trava o iframe (a) abriria no passo que a pessoa parou, em vez
      da capa, e (b) salvaria i=0 por cima do progresso real dela. */
   var SO_CAPA = document.documentElement.classList.contains("so-capa");
+  var VOLTAR = P.voltar || "/";   /* de onde o percurso e acessado */
 
   /* ---------- helpers de DOM ---------------------------------------------- */
   function h(tag, attrs) {
@@ -153,7 +154,7 @@
   function cabecalho(passo) {
     var pct = Math.round((estado.i / (TOTAL - 1)) * 100);
     return h("header", { class: "pc-top" },
-      h("a", { class: "pc-sair", href: "/", "aria-label": "Voltar ao site" }, "✕"),
+      h("a", { class: "pc-sair", href: VOLTAR, "aria-label": "Voltar ao site" }, "✕"),
       h("div", { class: "pc-id" },
         h("span", { class: "pc-nome" }, P.nome),
         h("span", { class: "pc-salvo" }, "")
@@ -208,7 +209,7 @@
         preload: "metadata", poster: P.capa.poster
       }, h("source", { src: P.capa.video, type: "video/mp4" })),
       h("div", { class: "pc-capa-veu" }),
-      h("a", { class: "pc-capa-sair", href: "/", "aria-label": "Voltar ao site" }, "✕"),
+      h("a", { class: "pc-capa-sair", href: VOLTAR, "aria-label": "Voltar ao site" }, "✕"),
       h("div", { class: "pc-capa-in" },
         h("span", { class: "pc-capa-et" }, "Percurso"),
         h("h1", { class: "pc-capa-t" }, P.nome),
@@ -518,7 +519,7 @@
       ),
       h("div", { class: "pc-nav" },
         h("button", { class: "pc-b pc-b-ghost", type: "button", onClick: anterior }, "← Voltar"),
-        h("a", { class: "pc-b pc-b-cheio", href: "/" }, "Voltar ao site", h("span", { class: "pc-seta" }, "→"))
+        h("a", { class: "pc-b pc-b-cheio", href: VOLTAR }, "Voltar ao site", h("span", { class: "pc-seta" }, "→"))
       )
     );
   }
