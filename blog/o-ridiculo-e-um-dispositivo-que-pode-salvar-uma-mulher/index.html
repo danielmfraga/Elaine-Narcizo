@@ -5,29 +5,62 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
 <!-- ═══════════════════════════════════════════════════════════════════════
-     BLOG NATIVO — PÁGINA-LISTA "Biblioteca Tinhosa"
-     ✅ ago/2026: os 16 textos (1 do protótipo + 15 migrados de uma vez, a
-     partir dos .txt que o Daniel copiou do Medium) estão todos nativos.
-     Destaque = o mais recente. Grade = os outros 15, mais antigos.
-     Nada aqui aponta mais pro Medium.
+     BLOG NATIVO — MODELO DE PÁGINA DE POST (protótipo, ago/2026)
+     Primeiro texto migrado do Medium pra fechar o formato antes de multiplicar.
+     🔑 O texto vive ESCRITO no HTML (não montado por JS) — é isso que faz o
+     Google ler e dar o crédito de SEO pro domínio dela, não pro Medium.
+     Estrutura de URL: /blog/<slug>/  (pasta + index.html = URL limpa).
      ═══════════════════════════════════════════════════════════════════════ -->
 
-<title>Biblioteca Tinhosa — Elaine Narcizo</title>
-<meta name="description" content="Textos de Elaine Narcizo sobre tempo, descanso, autonomia e o cotidiano das mulheres — publicados a cada duas semanas." />
+<title>O ridículo é um dispositivo que pode salvar uma mulher — Elaine Narcizo</title>
+<meta name="description" content="Cinco razões pelas quais permitir-se ser ridícula — quebrar o controle, o julgamento, a seriedade — pode ser um caminho de autonomia e autoconhecimento." />
 <meta name="author" content="Elaine Narcizo" />
-<link rel="canonical" href="https://elainenarcizo.com.br/blog/" />
+<meta name="keywords" content="Autonomia, Feminino, Criatividade" />
 
-<meta property="og:type" content="website" />
+<!-- Canonical APONTA PRO PRÓPRIO SITE (self-canonical) — dizemos ao Google que
+     ESTA é a versão oficial. ⚠️ Se a decisão for MANTER o Medium no ar, aqui é
+     onde entraria o dilema de cópia (ver plano do blog). Por ora: o site vence. -->
+<link rel="canonical" href="https://elainenarcizo.com.br/blog/o-ridiculo-e-um-dispositivo-que-pode-salvar-uma-mulher/" />
+
+<!-- Open Graph (preview bonito no WhatsApp/Instagram/Facebook) -->
+<meta property="og:type" content="article" />
 <meta property="og:locale" content="pt_BR" />
 <meta property="og:site_name" content="Elaine Narcizo" />
-<meta property="og:title" content="Biblioteca Tinhosa — Elaine Narcizo" />
-<meta property="og:description" content="Textos sobre tempo, descanso, autonomia e o cotidiano das mulheres — publicados a cada duas semanas." />
-<meta property="og:url" content="https://elainenarcizo.com.br/blog/" />
+<meta property="og:title" content="O ridículo é um dispositivo que pode salvar uma mulher" />
+<meta property="og:description" content="Cinco razões pelas quais permitir-se ser ridícula — quebrar o controle, o julgamento, a seriedade — pode ser um caminho de autonomia e autoconhecimento." />
+<meta property="og:url" content="https://elainenarcizo.com.br/blog/o-ridiculo-e-um-dispositivo-que-pode-salvar-uma-mulher/" />
+<meta property="article:published_time" content="2026-02-21" />
+<meta property="article:author" content="Elaine Narcizo" />
+<meta property="article:section" content="Reflexão" />
+<meta property="og:image" content="https://elainenarcizo.com.br/assets/video/blog-capa-2.jpg" />
+<meta property="og:image:width" content="1280" />
+<meta property="og:image:height" content="720" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="O ridículo é um dispositivo que pode salvar uma mulher" />
+<meta name="twitter:description" content="Cinco razões pelas quais permitir-se ser ridícula — quebrar o controle, o julgamento, a seriedade — pode ser um caminho de autonomia e autoconhecimento." />
+<meta name="twitter:image" content="https://elainenarcizo.com.br/assets/video/blog-capa-2.jpg" />
 
 <link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=DM+Sans:opsz,wght@9..40,300..500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- Schema.org Article — ajuda o Google a entender que é um artigo, com autor e data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "O ridículo é um dispositivo que pode salvar uma mulher",
+  "author": { "@type": "Person", "name": "Elaine Narcizo", "url": "https://elainenarcizo.com.br/" },
+  "publisher": { "@type": "Person", "name": "Elaine Narcizo" },
+  "datePublished": "2026-02-21",
+  "mainEntityOfPage": "https://elainenarcizo.com.br/blog/o-ridiculo-e-um-dispositivo-que-pode-salvar-uma-mulher/",
+  "articleSection": "Reflexão",
+  "keywords": "Autonomia, Feminino, Criatividade",
+  "inLanguage": "pt-BR"
+}
+</script>
 
 <style>
 :root{
@@ -38,7 +71,8 @@
   --disp:"Archivo",sans-serif;
   --sans:"DM Sans",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
   --mono:"Space Mono",ui-monospace,monospace;
-  --accent:var(--lilas);
+  --accent:var(--lilas);           /* cada texto pode ter seu acento; este = lilás */
+  --measure:40rem;                  /* largura da coluna de leitura (~640px) */
   --pad:clamp(20px,5vw,56px);
   --ease:cubic-bezier(.22,.61,.36,1);
 }
@@ -46,19 +80,22 @@
 html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
 html,body{ background:var(--paper); }
 body{
-  font-family:var(--sans); color:var(--ink); font-size:1.05rem; line-height:1.6;
-  -webkit-font-smoothing:antialiased; overflow-x:clip;
+  font-family:var(--sans); color:var(--ink);
+  font-size:clamp(1.05rem,1rem + .35vw,1.2rem); line-height:1.75;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  overflow-x:clip;
 }
 a{ color:inherit; }
 ::selection{ background:var(--accent); color:var(--ink); }
 
-/* ── Cabeçalho padrão do site (portado de home-fluxo.html) ──
-   Aqui o topo é creme (hero claro), então o texto do header começa ESCURO
-   (ink), diferente da home/post onde o hero é vídeo escuro. */
+/* ── Barra de progresso de leitura ── */
+.progress{ position:fixed; top:0; left:0; height:3px; width:0; background:var(--accent); z-index:90; transition:width .06s linear; }
+
+/* ── Cabeçalho padrão do site (portado de home-fluxo.html) ── */
 .hdr{
   position:fixed; top:0; left:0; right:0; z-index:80;
   display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:16px;
-  padding:10px var(--pad); background:transparent; color:var(--ink);
+  padding:10px var(--pad); background:transparent; color:var(--paper);
   transition:background .35s var(--ease), color .35s var(--ease), padding .35s var(--ease), box-shadow .35s var(--ease);
 }
 .hdr.scrolled{ background:var(--white); color:var(--ink); padding:8px var(--pad); box-shadow:0 1px 0 var(--line); }
@@ -89,59 +126,104 @@ a{ color:inherit; }
 .menu .mfoot a{ color:inherit; text-decoration:none; }
 .menu .mfoot a:hover{ color:var(--amarelo); }
 
-/* hero — padding-top extra pra limpar o cabeçalho fixo */
-.hero{ max-width:900px; margin:0 auto; padding:clamp(92px,14vw,128px) var(--pad) clamp(30px,6vw,52px); }
-.hero .kick{ font-family:var(--mono); font-size:.78rem; text-transform:uppercase; letter-spacing:.12em; color:var(--mute); display:flex; align-items:center; gap:10px; margin-bottom:20px; }
-.hero .kick .dot{ width:5px; height:5px; border-radius:50%; background:var(--accent); }
-.hero h1{
-  font-family:var(--disp); font-weight:800; line-height:.98; letter-spacing:-.02em;
-  font-size:clamp(3rem,15vw,7rem); font-variation-settings:"wght" 800,"wdth" 112;
+/* ── Capa em vídeo (full-bleed) ── */
+.post-hero{
+  position:relative; width:100%; min-height:clamp(340px,62vh,600px);
+  display:flex; align-items:flex-end; overflow:hidden; background:var(--ink);
 }
-.hero p{ margin-top:22px; max-width:44ch; color:var(--mute); font-size:clamp(1.05rem,3.6vw,1.25rem); line-height:1.55; }
-
-main{ max-width:1080px; margin:0 auto; padding:0 var(--pad) clamp(56px,10vw,96px); }
-
-/* card destaque (nativo) — com TIRA de vídeo no topo do box */
-.feature{
-  display:flex; flex-direction:column; text-decoration:none; color:inherit; margin:8px 0 44px;
-  border-radius:22px; background:var(--white); border:1px solid var(--line);
-  position:relative; overflow:hidden;
-  transition:transform .18s var(--ease), box-shadow .18s var(--ease);
+.post-hero .hero-vid{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+.post-hero .hero-scrim{
+  position:absolute; inset:0; z-index:1;
+  background:linear-gradient(180deg, rgba(15,14,12,.18) 0%, rgba(15,14,12,0) 34%, rgba(15,14,12,.66) 100%);
 }
-.feature:hover{ transform:translateY(-3px); box-shadow:0 18px 40px rgba(15,14,12,.10); }
-.feature .strip{ display:block; width:100%; height:clamp(130px,26vw,210px); overflow:hidden; background:var(--ink); }
-.feature .strip video{ width:100%; height:100%; object-fit:cover; display:block; }
-.feature .fbody{ padding:clamp(22px,4.5vw,42px); }
-.feature .badge{ display:inline-block; font-family:var(--mono); font-size:.68rem; text-transform:uppercase; letter-spacing:.1em; color:var(--roxo); border:1px solid var(--roxo); padding:4px 10px; border-radius:999px; margin-bottom:18px; }
-.feature .meta{ font-family:var(--mono); font-size:.76rem; color:var(--mute); text-transform:uppercase; letter-spacing:.06em; margin-bottom:12px; }
-.feature h2{ font-family:var(--disp); font-weight:800; line-height:1.05; letter-spacing:-.01em; font-size:clamp(1.9rem,6vw,3rem); font-variation-settings:"wght" 800,"wdth" 106; }
-.feature .exc{ margin-top:16px; max-width:52ch; color:#3a382f; font-size:1.1rem; line-height:1.55; }
-.feature .go{ display:inline-flex; margin-top:22px; font-family:var(--disp); font-weight:700; }
-.feature .go .arw{ margin-left:6px; transition:transform .18s var(--ease); }
-.feature:hover .go .arw{ transform:translateX(5px); }
+.post-hero .hero-in{ position:relative; z-index:2; width:100%; padding:clamp(28px,6vw,56px) var(--pad); }
+.post-hero .hero-in > div{ max-width:var(--measure); margin:0 auto; }
+.post-hero .kicker{ color:rgba(243,238,224,.9); margin-bottom:16px; }
+.post-hero .kicker .tag0{ color:var(--paper); }
+.post-hero h1.title{ color:var(--paper); margin-bottom:0; text-shadow:0 2px 30px rgba(0,0,0,.35); }
 
-/* faixa divisória */
-.rule{ display:flex; align-items:center; gap:16px; margin:8px 0 26px; }
-.rule .txt{ font-family:var(--mono); font-size:.74rem; text-transform:uppercase; letter-spacing:.1em; color:var(--mute); white-space:nowrap; }
-.rule .ln{ height:1px; background:var(--line); flex:1; }
+/* ── Artigo ── */
+main{ padding:clamp(30px,6vw,56px) var(--pad) 0; }
+.post{ max-width:var(--measure); margin:0 auto; }
 
-/* grade dos textos ainda no Medium — 2 colunas MESMO no celular (pedido do Daniel) */
-.grid{ list-style:none; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
-@media(min-width:680px){ .grid{ grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; } }
-@media(min-width:980px){ .grid{ grid-template-columns:repeat(4,minmax(0,1fr)); } }
-.grid a{
-  display:flex; flex-direction:column; height:100%; text-decoration:none; color:inherit;
-  padding:16px 15px 15px; border-radius:16px; background:var(--white); border:1px solid var(--line);
-  transition:transform .16s var(--ease), box-shadow .16s var(--ease);
+.kicker{
+  font-family:var(--mono); font-size:.76rem; text-transform:uppercase; letter-spacing:.12em;
+  color:var(--mute); display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:22px;
 }
-.grid a:hover{ transform:translateY(-3px); box-shadow:0 14px 30px rgba(15,14,12,.09); }
-.grid .d{ font-family:var(--mono); font-size:.68rem; color:var(--mute); text-transform:uppercase; letter-spacing:.04em; margin-bottom:10px; }
-.grid .t{ font-family:var(--disp); font-weight:700; font-size:1.02rem; line-height:1.24; letter-spacing:-.01em; }
-.grid .r{ margin-top:auto; padding-top:14px; font-family:var(--mono); font-size:.72rem; color:var(--mute); }
-@media(min-width:680px){ .grid a{ padding:22px 20px 18px; border-radius:18px; } .grid .t{ font-size:1.16rem; } .grid .d{ font-size:.72rem; } }
+.kicker .dot{ width:5px; height:5px; border-radius:50%; background:var(--accent); }
+.kicker .tag0{ color:var(--ink); font-weight:700; }
 
-footer{ background:var(--ink); color:var(--paper); padding:clamp(40px,8vw,72px) var(--pad); }
-.foot-in{ max-width:1080px; margin:0 auto; display:flex; flex-wrap:wrap; gap:24px 40px; justify-content:space-between; align-items:flex-end; }
+h1.title{
+  font-family:var(--disp); font-weight:800; line-height:1.04; letter-spacing:-.02em;
+  font-size:clamp(2.4rem,9vw,4.2rem); margin-bottom:26px;
+  font-variation-settings:"wght" 800,"wdth" 108;
+}
+.byline{
+  display:flex; align-items:center; gap:12px; padding-bottom:30px; margin-bottom:8px;
+  border-bottom:1px solid var(--line);
+}
+.byline .who{ font-family:var(--disp); font-weight:700; }
+.byline .avatar{
+  width:38px; height:38px; border-radius:50%; flex:none;
+  background:linear-gradient(135deg,var(--accent),var(--rosa));
+  display:grid; place-items:center; font-family:var(--disp); font-weight:800; color:var(--ink); font-size:.95rem;
+}
+.byline .meta{ color:var(--mute); font-size:.9rem; line-height:1.3; }
+
+/* corpo */
+.lede{
+  font-family:var(--disp); font-weight:500; font-size:clamp(1.3rem,4.4vw,1.7rem);
+  line-height:1.4; letter-spacing:-.01em; margin:36px 0 30px;
+}
+.body > p{ margin:0 0 1.35em; }
+.body > p:first-of-type::first-letter{
+  font-family:var(--disp); font-weight:800; float:left;
+  font-size:3.4em; line-height:.78; padding:.04em .1em 0 0; color:var(--accent);
+}
+.body em{ font-style:italic; }
+.body .src{ color:var(--mute); font-size:.85em; }
+.body h3{ font-family:var(--disp); font-weight:700; font-size:1.25em; letter-spacing:-.01em; margin:1.4em 0 .6em; }
+.body ul.blist,.body ol.nlist{ margin:0 0 1.35em; padding-left:1.3em; }
+.body ul.blist li,.body ol.nlist li{ margin-bottom:.55em; }
+.body ol.nlist{ list-style:decimal; }
+.body ul.blist{ list-style:none; padding-left:0; }
+.body ul.blist li{ padding-left:1.3em; position:relative; }
+.body ul.blist li::before{ content:"•"; position:absolute; left:0; color:var(--accent); font-weight:700; }
+.body .close{
+  font-family:var(--disp); font-weight:500; font-size:1.15em; line-height:1.5;
+  margin-top:1.6em; padding-top:1.4em; border-top:1px solid var(--line);
+}
+
+/* chips de tema */
+.chips{ display:flex; flex-wrap:wrap; gap:10px; margin:44px 0 0; }
+.chip{
+  font-family:var(--mono); font-size:.72rem; text-transform:uppercase; letter-spacing:.06em;
+  padding:7px 13px; border:1px solid var(--line); border-radius:999px; color:var(--mute);
+}
+
+/* rodapé do post: compartilhar + voltar */
+.post-foot{ margin:40px 0 0; padding:26px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+.post-foot .lbl{ font-family:var(--mono); font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; color:var(--mute); margin-bottom:14px; }
+.share{ display:flex; flex-wrap:wrap; gap:10px; }
+.share a{
+  display:inline-flex; align-items:center; gap:8px; text-decoration:none;
+  font-family:var(--disp); font-weight:700; font-size:.95rem;
+  padding:11px 18px; border-radius:999px; border:1.5px solid var(--ink); background:var(--ink); color:var(--paper);
+  transition:transform .15s var(--ease);
+}
+.share a.ghost{ background:transparent; color:var(--ink); }
+.share a:hover{ transform:translateY(-2px); }
+
+.backline{ max-width:var(--measure); margin:34px auto 0; }
+.backline a{ font-family:var(--mono); font-size:.82rem; text-decoration:none; color:var(--mute); }
+.backline a:hover{ color:var(--ink); }
+
+/* ── Rodapé ── */
+footer{
+  margin-top:clamp(56px,12vw,110px); background:var(--ink); color:var(--paper);
+  padding:clamp(40px,8vw,72px) var(--pad);
+}
+.foot-in{ max-width:var(--measure); margin:0 auto; display:flex; flex-wrap:wrap; gap:24px 40px; justify-content:space-between; align-items:flex-end; }
 .foot-in .sig{ font-family:var(--disp); font-weight:800; font-size:1.6rem; letter-spacing:-.01em; }
 .foot-in .links{ display:flex; gap:20px; font-family:var(--mono); font-size:.8rem; }
 .foot-in a{ color:var(--paper); text-decoration:none; opacity:.82; }
@@ -150,6 +232,8 @@ footer{ background:var(--ink); color:var(--paper); padding:clamp(40px,8vw,72px) 
 </style>
 </head>
 <body>
+
+<div class="progress" id="progress"></div>
 
 <header class="hdr" id="hdr">
   <a class="wordmark" href="/#inicio" aria-label="Elaine Narcizo">
@@ -204,61 +288,67 @@ footer{ background:var(--ink); color:var(--paper); padding:clamp(40px,8vw,72px) 
   </div>
 </div>
 
-<section class="hero">
-  <h1>Biblioteca Tinhosa</h1>
-  <p>Textos sobre tempo, descanso, autonomia e o cotidiano das mulheres — publicados a cada duas semanas.</p>
+<section class="post-hero">
+  <video class="hero-vid" autoplay muted loop playsinline preload="metadata" poster="/assets/video/blog-capa-2.jpg">
+    <source src="/assets/video/blog-capa-2.mp4" type="video/mp4" />
+  </video>
+  <div class="hero-scrim"></div>
+  <div class="hero-in"><div>
+    <div class="kicker">
+      <span class="tag0">Reflexão</span>
+      <span class="dot"></span>
+      <time datetime="2026-02-21">21 de fevereiro de 2026</time>
+      <span class="dot"></span>
+      <span>1 min de leitura</span>
+    </div>
+    <h1 class="title">O ridículo é um dispositivo que pode salvar uma mulher</h1>
+  </div></div>
 </section>
 
 <main>
-  <!-- ══ DESTAQUE: o texto mais recente ══ -->
-  <a class="feature" href="/blog/quando-dizemos-parabens-no-dia-da-mulher/">
-    <span class="strip">
-      <video autoplay muted loop playsinline preload="metadata" poster="/assets/video/blog-capa-1.jpg">
-        <source src="/assets/video/blog-capa-1.mp4" type="video/mp4" />
-      </video>
-    </span>
-    <span class="fbody">
-      <div class="meta">08 mar 2026 · 1 min</div>
-      <h2>Quando dizemos "parabéns" no Dia da Mulher, estamos celebrando exatamente o quê?</h2>
-      <p class="exc">Por que o "parabéns" dirigido às mulheres às vezes soa como elogio por cumprir bem um papel — e o que o Dia da Mulher poderia ser, se fosse sobre se encontrar e se fortalecer.</p>
-      <span class="go">Ler o texto <span class="arw">→</span></span>
-    </span>
-  </a>
+  <article class="post">
+    <div class="byline">
+      <span class="avatar" aria-hidden="true">E</span>
+      <div>
+        <div class="who">Elaine Narcizo</div>
+        <div class="meta">Educadora, arteterapeuta e pesquisadora</div>
+      </div>
+    </div>
 
-  <!-- ══ TODOS OS OUTROS TEXTOS (mais antigo → mais novo aqui, do topo ao fim) ══ -->
-  <div class="rule"><span class="txt">Todos os textos</span><span class="ln"></span></div>
-  <ul class="grid" role="list">
-    <li><a href="/blog/o-ridiculo-e-um-dispositivo-que-pode-salvar-uma-mulher/">
-      <span class="d">21 fev 2026</span><span class="t">O ridículo é um dispositivo que pode salvar uma mulher</span><span class="r">Ler o texto →</span></a></li>
-    <li><a href="/blog/mulher-voce-ja-pensou-que/">
-      <span class="d">07 fev 2026</span><span class="t">Mulher, você já pensou que passa a vida respondendo perguntas que nunca fez?</span><span class="r">Ler o texto →</span></a></li>
-    <li><a href="/blog/descanso-e-mulheres/">
-      <span class="d">24 jan 2026</span><span class="t">Descanso e mulheres: não basta igualdade na corrida quando ninguém pode parar</span><span class="r">Ler o texto →</span></a></li>
-    <li><a href="/blog/desercao-das-lagrimas/">
-      <span class="d">20 dez 2025</span><span class="t">Deserção das lágrimas: um sonho para 2026</span><span class="r">Ler o texto →</span></a></li>
-    <li><a href="/blog/reescrevendo-o-agora/">
-      <span class="d">06 dez 2025</span><span class="t">Reescrevendo o agora: o papel estrutural do planejamento feminino</span><span class="r">Ler o texto →</span></a></li>
-    <li><a href="/blog/se-voce-estiver-cansada/">
-      <span class="d">22 nov 2025</span><span class="t">Se você estiver cansada, talvez isso seja para você</span><span class="r">Ler o texto →</span></a></li>
-    <li><a href="/blog/a-tristeza-aleatoria/">
-      <span class="d">08 nov 2025</span><span class="t">A Tristeza Aleatória</span><span class="r">Ler o texto →</span></a></li>
-    <li><a href="/blog/originar-se-territorios-de-formacao/">
-      <span class="d">03 out 2025</span><span class="t">Originar-se: territórios de formação</span><span class="r">Ler o texto →</span></a></li>
-    <li><a href="/blog/quero-ter-um-filho/">
-      <span class="d">13 set 2025</span><span class="t">"Quero ter um filho, quero dar a morte para alguém…" — sobre o amor e a finitude</span><span class="r">Ler o texto →</span></a></li>
-    <li><a href="/blog/curar-sem-resolver-territorios-da-criatividade/">
-      <span class="d">30 ago 2025</span><span class="t">Curar sem resolver: territórios da criatividade, autenticidade e do aprender</span><span class="r">Ler o texto →</span></a></li>
-    <li><a href="/blog/curar-sem-resolver-sugestoes-praticas/">
-      <span class="d">16 ago 2025</span><span class="t">Curar sem resolver, sugestões práticas: nomear o cuidado</span><span class="r">Ler o texto →</span></a></li>
-    <li><a href="/blog/curar-sem-resolver-a-dignidade-do-que-nao-melhora/">
-      <span class="d">26 jul 2025</span><span class="t">Curar sem resolver: a dignidade do que não melhora</span><span class="r">Ler o texto →</span></a></li>
-    <li><a href="/blog/o-vicio-do-convencido/">
-      <span class="d">12 jul 2025</span><span class="t">O vício do convencido</span><span class="r">Ler o texto →</span></a></li>
-    <li><a href="/blog/salvacao-nao-se-discute/">
-      <span class="d">28 jun 2025</span><span class="t">Salvação não se discute?</span><span class="r">Ler o texto →</span></a></li>
-    <li><a href="/blog/o-poder-da-palavra/">
-      <span class="d">14 jun 2025</span><span class="t">O poder da palavra</span><span class="r">Ler o texto →</span></a></li>
-  </ul>
+    <p class="lede">Ser ridícula liberta.</p>
+
+    <div class="body">
+      <p>Ser ridícula liberta. O que você se permite fazer sem se julgar revela quem você realmente é, sem máscaras. É um radar da sua própria verdade.</p>
+
+      <p>Ser ridícula gera autonomia. Quebrar regras internas de perfeição e controle dissolve padrões que limitam a expressão feminina há gerações.</p>
+
+      <p>O ridículo te dá um mapa de talentos escondidos. Quando você se permite gestos ou experimentos “bobos”, descobre habilidades, ritmos e capacidades que estavam reprimidos. Isso é a fonte da criatividade.</p>
+
+      <p>O ridículo gera desbloqueio de memória emocional. Rir de si mesma dissolve cristalizações emocionais antigas; é o melhor antídoto para a associação adoecedora entre seriedade e chatice.</p>
+
+      <p>Isso não é sobre se expor. Comece por você mesma, em casa: permita-se mini-delírios. Brinque com seu corpo, voz e objetos. Cada gesto fora do padrão é um laboratório secreto de autoconhecimento e prazer.</p>
+
+      <p class="close">Experimente!</p>
+    </div>
+
+    <div class="chips" aria-label="Temas">
+      <span class="chip">Autonomia</span>
+      <span class="chip">Feminino</span>
+      <span class="chip">Criatividade</span>
+    </div>
+
+    <div class="post-foot">
+      <div class="lbl">Compartilhar</div>
+      <div class="share">
+        <a id="waShare" href="https://api.whatsapp.com/send?text=O%20rid%C3%ADculo%20%C3%A9%20um%20dispositivo%20que%20pode%20salvar%20uma%20mulher%20%E2%80%94%20Elaine%20Narcizo%20https%3A%2F%2Felainenarcizo.com.br%2Fblog%2Fo-ridiculo-e-um-dispositivo-que-pode-salvar-uma-mulher%2F" target="_blank" rel="noopener">WhatsApp</a>
+        <a class="ghost" id="copyLink" href="#">Copiar link</a>
+      </div>
+    </div>
+  </article>
+
+  <div class="backline">
+    <a href="/blog/">← Todos os textos</a>
+  </div>
 </main>
 
 <footer>
@@ -267,7 +357,7 @@ footer{ background:var(--ink); color:var(--paper); padding:clamp(40px,8vw,72px) 
     <div class="links">
       <a href="https://www.instagram.com/elaine.c.narcizo/" target="_blank" rel="noopener">Instagram</a>
       <a href="https://api.whatsapp.com/send?phone=5516991595707" target="_blank" rel="noopener">WhatsApp</a>
-      <a href="/">Início</a>
+      <a href="/blog/">Reflexões</a>
     </div>
   </div>
 </footer>
@@ -293,6 +383,23 @@ footer{ background:var(--ink); color:var(--paper); padding:clamp(40px,8vw,72px) 
     addEventListener('keydown',function(e){ if(e.key==='Escape') setMenu(false); });
   }
 })();
+
+/* barra de progresso de leitura */
+(function(){
+  var bar=document.getElementById('progress');
+  function upd(){
+    var h=document.documentElement, max=h.scrollHeight-h.clientHeight;
+    bar.style.width=(max>0?(h.scrollTop||document.body.scrollTop)/max*100:0)+'%';
+  }
+  addEventListener('scroll',upd,{passive:true}); addEventListener('resize',upd); upd();
+})();
+/* copiar link */
+document.getElementById('copyLink').addEventListener('click',function(e){
+  e.preventDefault(); var url='https://elainenarcizo.com.br/blog/o-ridiculo-e-um-dispositivo-que-pode-salvar-uma-mulher/', b=this;
+  (navigator.clipboard?navigator.clipboard.writeText(url):Promise.reject())
+    .then(function(){b.textContent='Link copiado ✓';setTimeout(function(){b.textContent='Copiar link';},1800);})
+    .catch(function(){prompt('Copie o link:',url);});
+});
 </script>
 </body>
 </html>
