@@ -1598,10 +1598,24 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
 .ftr ul a:hover{ opacity:1; color:var(--amarelo); }
 .ftr .close{ margin-top:clamp(36px,7vh,72px); padding-top:22px; border-top:1px solid rgba(250,248,243,.12);
   display:flex; flex-wrap:wrap; gap:12px 26px; align-items:baseline; justify-content:space-between; }
-/* "Vamos tecer o futuro" — cicla pelas 4 cores da casa, em fase com a capa
-   Conectar logo acima. O `color` fixo fica de piso pro reduced-motion. */
-.ftr .close .tag{ font-weight:820; font-stretch:115%; text-transform:uppercase; font-size:clamp(1.1rem,3.4vw,1.7rem);
+/* Era a tagline curta "Vamos tecer o futuro — gesto a gesto." (caixa-alta,
+   peso 820) — virou uma citação do Manoel de Barros (pedido do Daniel,
+   ago/2026), bem mais longa. Caixa-alta/peso pesado numa citação inteira
+   fica "gritado" e ilegível, então a citação troca pra itálico + peso
+   leve (DM Sans, a fonte editorial do site) e ganha largura máxima pra
+   não esticar a linha. A ciclagem de cor continua — mesmas 4 cores da
+   casa, em fase com a capa Conectar logo acima — só não se aplica à
+   assinatura do autor, que fica discreta feito o "© 2026" ao lado.
+   O `color` fixo fica de piso pro reduced-motion. */
+.ftr .close .tag{ font-family:var(--sans); font-style:italic; font-weight:400; font-size:clamp(1rem,3vw,1.3rem);
+  line-height:1.5; max-width:50ch;
   color:var(--lima); animation:casaCiclo 34.4s linear infinite; }
+.ftr .close .tag cite{
+  display:block; margin-top:10px; font-family:var(--mono); font-style:normal;
+  font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
+  color:rgba(250,248,243,.4); animation:none;
+}
+.ftr .close .tag cite::before{ content:"— "; }
 .ftr .fine{ font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; color:rgba(250,248,243,.4); }
 
 /* ── revelação ao entrar (progressive enhancement) ──
@@ -2397,7 +2411,7 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
         </div>
       </div>
       <div class="close">
-        <span class="tag">Vamos tecer o futuro — gesto a gesto.</span>
+        <span class="tag">“Quem anda no trilho é trem de ferro. Sou água que corre entre pedras - liberdade caça jeito.”<cite>Manoel de Barros</cite></span>
         <span class="fine">© 2026 Elaine Narcizo</span>
       </div>
     </div>
