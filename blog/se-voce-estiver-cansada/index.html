@@ -189,6 +189,17 @@ h1.title{
 .body ul.blist{ list-style:none; padding-left:0; }
 .body ul.blist li{ padding-left:1.3em; position:relative; }
 .body ul.blist li::before{ content:"•"; position:absolute; left:0; color:var(--accent); font-weight:700; }
+/* drop-cap flutuante quebra quando o 1º parágrafo é curto demais pra conter
+   a letra (o float invade o parágrafo seguinte, texto some/aperta do lado
+   dela) — .no-cap desliga o efeito nesses casos e nos textos-poema, que
+   não pedem essa moldura de qualquer forma. */
+.body.no-cap > p:first-of-type::first-letter{ all:unset; }
+/* textos-poema (versos curtos, um por linha) — o espaçamento de parágrafo
+   de prosa normal (1.35em) faz cada verso parecer um parágrafo solto e
+   quebrado; aqui aproximamos e inclinamos pra ler como poema, não como
+   texto corrido interrompido. */
+.body.poem{ font-style:italic; }
+.body.poem > p{ margin:0 0 .55em; }
 .body .close{
   font-family:var(--disp); font-weight:500; font-size:1.15em; line-height:1.5;
   margin-top:1.6em; padding-top:1.4em; border-top:1px solid var(--line);
@@ -317,7 +328,7 @@ footer{
 
     <p class="lede">Não desista.</p>
 
-    <div class="body">
+    <div class="body poem no-cap">
       <p>Não desista.</p>
 
       <p>as pessoas às vezes não compensam mesmo</p>
