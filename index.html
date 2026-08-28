@@ -26,7 +26,7 @@ if(!window.enVoltou && !location.hash) scrollTo(0,0);
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Elaine Narcizo</title>
-<meta name="description" content="Elaine Narcizo — educadora, arteterapeuta, pesquisadora. Tem muita vida acontecendo aqui." />
+<meta name="description" content="Elaine Narcizo — educadora, arteterapeuta, pesquisadora. Tudo começa quando a gente se encontra." />
 <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1111,20 +1111,22 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   transform:translate(var(--tw-title-x, 13px), var(--tw-title-y, 7px)) !important; /* calibrado no painel */
 }
 /* botão "navegue" — montado dos 2 vetores do Daniel (pílula branca +
-   letreiro lilás), embutido no fim da última linha do título, colado
-   pela base (baseline) nela. Efeito de onda: brilho diagonal varre o
-   botão a cada ~3.4s (aprovado do jeito que está — "tá bom assim").
+   letreiro lilás). Efeito de onda: brilho diagonal varre o botão a cada
+   ~3.4s (aprovado do jeito que está — "tá bom assim").
    Largura em `em` (relativa ao font-size do h1) — 2.85em calibrado no
    painel (188px medido com título a 66px: 188/66≈2.85) — continua
    escalando junto quando o título cresce.
-   --tw-btn-y: deslocamento vertical (sobe/desce), não altura — o
-   Daniel corrigiu que "altura" foi um pedido impreciso, o que ele
-   queria mesmo era mover o botão no eixo vertical, tipo os nudges
-   do Olá/estrelas. */
+   Ago/2026 (pedido do Daniel, mockup): título virou 3 linhas ("Tudo
+   começa / quando a gente / se encontra.") e o botão saiu de "colado
+   na baseline da última linha" pra sua PRÓPRIA linha, abaixo do título
+   (o <br/> antes do <a> força a quebra) — por isso margin-left/top
+   substituem o antigo glue por baseline, e --tw-btn-y virou um nudge
+   simples a partir dessa posição (não mais um deslocamento pra cima
+   pra alinhar com o texto). */
 .btn-navegue{
-  position:relative; display:inline-block; overflow:hidden; vertical-align:text-bottom;
-  width:var(--tw-btn-w, 2.85em); margin-left:var(--tw-btn-ml, .212em);
-  transform:translateY(var(--tw-btn-y, -19px));
+  position:relative; display:inline-block; overflow:hidden;
+  width:var(--tw-btn-w, 2.85em); margin:var(--tw-btn-mt, .3em) 0 0 var(--tw-btn-ml, 0em);
+  transform:translateY(var(--tw-btn-y, 0px));
   border-radius:5% / 19.1%; /* replica o rx=38.7 do SVG (rx/largura ≈5%, rx/altura≈19.1%) */
 }
 .btn-navegue svg{ display:block; width:100%; height:auto; }
@@ -1727,7 +1729,7 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
       </svg>
     </div>
 
-    <h1 class="giant r" style="--r:2"><span class="wsplit"><span class="w-line"><span class="w-word" style="--w:0">Tem</span></span> <span class="w-line"><span class="w-word" style="--w:1">muita</span></span> <span class="w-line"><span class="w-word" style="--w:2">vida</span></span><br /><span class="w-line"><span class="w-word" style="--w:3">acontecendo</span></span><br /><span class="w-line"><span class="w-word" style="--w:4">aqui.</span></span></span><a class="btn-navegue" href="#quem" aria-label="Navegue">
+    <h1 class="giant r" style="--r:2"><span class="wsplit"><span class="w-line"><span class="w-word" style="--w:0">Tudo</span></span> <span class="w-line"><span class="w-word" style="--w:1">começa</span></span><br /><span class="w-line"><span class="w-word" style="--w:2">quando</span></span> <span class="w-line"><span class="w-word" style="--w:3">a</span></span> <span class="w-line"><span class="w-word" style="--w:4">gente</span></span><br /><span class="w-line"><span class="w-word" style="--w:5">se</span></span> <span class="w-line"><span class="w-word" style="--w:6">encontra.</span></span></span><br /><a class="btn-navegue" href="#quem" aria-label="Navegue">
       <svg viewBox="0 0 773.6 203" xmlns="http://www.w3.org/2000/svg">
         <rect class="bn-bg" width="773.6" height="203" rx="38.7" ry="38.7"/>
         <g transform="translate(45.3,40.7)">
@@ -3027,6 +3029,7 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
     { key:'--tw-btn-w',     label:'Botão navegue — largura',       unit:'px', min:60,  max:420, step:2, get:function(){ return document.querySelector('.btn-navegue').getBoundingClientRect().width; } },
     { key:'--tw-btn-y',     label:'Botão navegue — sobe / desce',  unit:'px', min:-100, max:100, step:1, get:function(){ return tyOf(document.querySelector('.btn-navegue')); } },
     { key:'--tw-btn-ml',    label:'Botão navegue — deslocar lateral', unit:'px', min:-80, max:80, step:1, get:function(){ return parseFloat(getComputedStyle(document.querySelector('.btn-navegue')).marginLeft); } },
+    { key:'--tw-btn-mt',    label:'Botão navegue — espaço acima (do título)', unit:'px', min:0, max:80, step:1, get:function(){ return parseFloat(getComputedStyle(document.querySelector('.btn-navegue')).marginTop); } },
     { key:'--tw-pad-bottom',label:'Bloco inteiro — sobe / desce',  unit:'px', min:20,  max:220, step:2, get:function(){ return parseFloat(getComputedStyle(document.querySelector('.c-hero')).paddingBottom); } },
     { key:'--tw-gap',       label:'Espaço Olá / estrelas / título',unit:'px', min:0,   max:70,  step:1, get:function(){ var s=getComputedStyle(document.querySelector('.c-hero')); return parseFloat(s.rowGap||s.gap); } },
     /* Rádio Tinhosa — enquadramento do vídeo. Padrão parte do original
