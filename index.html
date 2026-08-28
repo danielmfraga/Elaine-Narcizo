@@ -878,6 +878,13 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   scrollbar-width:none;                  /* Firefox */
 }
 .fcar::-webkit-scrollbar{ display:none; }/* WebKit: fio sem barra à mostra */
+/* Enquanto só há 1 formação visível (Repertórios sensíveis, ago/2026 — os
+   outros 3 cartões estão comentados ali embaixo), centraliza o cartão em vez
+   de deixá-lo colado na esquerda. `:has()` faz isso se autocorrigir: assim
+   que mais cartões voltarem (descomentar), este seletor deixa de bater
+   sozinho e o fio volta ao alinhado-à-esquerda de sempre, pronto pra
+   arrastar — não precisa lembrar de desfazer nada. */
+.fcar:has(> .fcar-card:only-child){ justify-content:center; }
 .fcar-card{
   /* a largura vira variável porque a ALTURA é derivada dela (ver abaixo) */
   --fcar-w:clamp(190px,58vw,250px);
@@ -1794,12 +1801,12 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
           </span>
           <span class="sr-only">Sintonize</span>
         </a>
-        <a class="btn ghost mrun" href="#formacoes">
+        <a class="btn ghost mrun" href="#vivona">
           <span class="track" aria-hidden="true">
-            <span>Formações</span><i class="spk">✦</i><span>Formações</span><i class="spk">✦</i><span>Formações</span><i class="spk">✦</i>
-            <span>Formações</span><i class="spk">✦</i><span>Formações</span><i class="spk">✦</i><span>Formações</span><i class="spk">✦</i>
+            <span>Escola Vivona</span><i class="spk">✦</i><span>Escola Vivona</span><i class="spk">✦</i><span>Escola Vivona</span><i class="spk">✦</i>
+            <span>Escola Vivona</span><i class="spk">✦</i><span>Escola Vivona</span><i class="spk">✦</i><span>Escola Vivona</span><i class="spk">✦</i>
           </span>
-          <span class="sr-only">Formações</span>
+          <span class="sr-only">Escola Vivona</span>
         </a>
       </div>
       <div class="sparkle-slot">
@@ -1987,9 +1994,12 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
     </div>
 
     <!-- botão no molde da referência que o Daniel mandou: pílula de contorno
-         fino, centralizada abaixo do fio -->
+         fino, centralizada abaixo do fio.
+         ⚠️ ago/2026: era `href="#"` (placeholder que, sem querer, mandava
+         pra capa do site — `#` sobe pro topo da página). Pedido do Daniel:
+         manda pro WhatsApp, com o mesmo número usado no resto do site. -->
     <div class="fcar-cta-wrap">
-      <a class="fcar-cta" href="#" data-todo="destino da lista de espera">Listas de espera</a>
+      <a class="fcar-cta" href="https://api.whatsapp.com/send?phone=5516991595707&amp;text=Ol%C3%A1!%20Gostaria%20de%20entrar%20na%20lista%20de%20espera%20das%20forma%C3%A7%C3%B5es." target="_blank" rel="noopener">Listas de espera</a>
     </div>
   </div>
   </div><!-- /scene 1 -->
