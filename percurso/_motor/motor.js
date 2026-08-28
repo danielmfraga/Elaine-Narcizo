@@ -68,12 +68,18 @@
   P.exercicios.forEach(function (ex) { if (!estado.respostas[ex.campo]) estado.respostas[ex.campo] = {}; });
   if (!estado.respostas.fundamentos) estado.respostas.fundamentos = {};
 
+  var DIAS_EXPIRA = 60;   /* uma sessão salva "no seu ritmo" fica valendo por 60 dias;
+     depois disso trata como usuário novo — sobretudo pensando em dispositivo
+     compartilhado (celular de demonstração, notebook emprestado), onde um
+     rascunho de meses atrás não deveria ficar assombrando quem abre depois. */
   function carregar() {
     try {
       var raw = localStorage.getItem(LS);
       if (!raw) return null;
       var s = JSON.parse(raw);
-      return (s && s.v === (P.versao || 1)) ? s : null;   /* versão nova = recomeça limpo */
+      if (!s || s.v !== (P.versao || 1)) return null;   /* versão nova = recomeça limpo */
+      if (s.atualizado && (Date.now() - s.atualizado) > DIAS_EXPIRA * 24 * 60 * 60 * 1000) return null;
+      return s;
     } catch (e) { return null; }
   }
   var tSave = null;
@@ -198,10 +204,16 @@
   /* ============================ TELAS ===================================== */
 
   function telaCapa() {
-    /* "tem progresso" olha o que foi ESCRITO, não só o passo — senão quem
-       voltasse à capa pelo mapa (estado.i vira 0) perderia o "continuar". */
+    /* "tem progresso" olha SÓ o que foi ESCRITO, nunca o passo (estado.i) —
+       do contrário, só de folhear as primeiras telas sem escrever nada (por
+       curiosidade, ou alguém testando antes de mostrar pra outra pessoa) já
+       travava a posição, e a próxima abertura "começava no meio" sem ter
+       progresso de verdade pra defender (foi um relato real, ago/2026).
+       Como bônus, isso também resolve por conta própria o caso de quem
+       volta à capa pelo mapa (estado.i vira 0 mas o que foi escrito continua
+       valendo). */
     var temAlgo = preenchidas() > 0 || String(estado.respostas.compromisso || "").trim().length > 0;
-    var temProgresso = !!estado.atualizado && (estado.i > 0 || temAlgo);
+    var temProgresso = temAlgo;
     var soCapa = document.documentElement.classList.contains("so-capa");
     return h("section", { class: "pc-tela pc-capa" },
       h("video", {
@@ -224,7 +236,7 @@
                 P.capa.entrar, h("span", { class: "pc-seta" }, "→"))
             : h("button", {
                 class: "pc-b pc-b-claro", type: "button",
-                onClick: function () { ir(estado.i > 0 ? estado.i : 1); }
+                onClick: function () { ir(temProgresso ? estado.i : 1); }
               }, temProgresso ? P.capa.retomar : P.capa.entrar, h("span", { class: "pc-seta" }, "→")),
           !soCapa && temProgresso ? h("button", {
             class: "pc-b pc-b-vazio", type: "button",
