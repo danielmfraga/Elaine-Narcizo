@@ -330,11 +330,57 @@ body.nav-hidden .back-chip{ box-shadow:0 7px 16px rgba(0,0,0,.3); }
     if(history.length>1) history.back(); else location.href='../home-fluxo.html#radio';
   });
 
-  /* YouTube track list */
+  /* YouTube track list — os 3 de marcação viraram os 45 da playlist "Dança
+     Destino" que o Daniel montou (ago/2026): youtube.com/playlist?list=PLWJeYn75sV3E,
+     nesta mesma ordem. Título/artista limpos a partir dos metadados do
+     YouTube (canais "- Topic"/"Oficial" viram só o nome do artista; quando
+     o título já trazia o artista embutido, ele venceu o nome do canal). */
   var ytTracks=[
-    { id:'nAyXMqB_6Kc', title:'Casaco Marron (Bye, Bye, Ceci)', artist:'DançaDestino' },
+    { id:'9cFgEvmQdAQ', title:'Dikoboda Sombe', artist:'Tradicional (Aka Pygmy)' },
+    { id:'21IGGuBvE3k', title:'DARPA', artist:'Wim Mertens' },
+    { id:'MnTm36D8tg0', title:'O Trenzinho do Caipira', artist:'Egberto Gismonti' },
+    { id:'cCu_6UpgwRU', title:'Sou do Bem', artist:'Naná Vasconcelos' },
+    { id:'_zBZpjAEorA', title:'Sem Fim', artist:'Rogério Skylab' },
+    { id:'qoe4IruSpKI', title:'Um Girassol da Cor do Seu Cabelo', artist:'Lô Borges' },
+    { id:'d4uNOo4OWa4', title:'Coco Dub (Afrociberdelia)', artist:'Chico Science' },
+    { id:'_nerFs6AN1g', title:'Só Morto', artist:'Jards Macalé' },
+    { id:'rmGCNUEXiRo', title:'Rosa (Que Linda Eres)', artist:'Trinix' },
+    { id:'jf5g0uM0Fc0', title:'Banzo, Pt. 1', artist:'Letieres Leite' },
+    { id:'pHJbwr3GuLA', title:'Canção Kayapo', artist:'Grupo Mawaca' },
+    { id:'tfkEejPAiYo', title:'Quero Ser Locomotiva', artist:'Jorge Mautner' },
+    { id:'iWOyfLBYtuU', title:'Dog Days Are Over', artist:'Florence + The Machine' },
+    { id:'PilUCu6QdKg', title:'Chenrezig', artist:'Don Cherry' },
+    { id:'yWWzIVj3L_M', title:'O Côco do Côco', artist:'Leila Pinheiro' },
+    { id:'TvmwfeCxGIA', title:'É Por Isso Que Sofre', artist:'DJ Batata, Tati Quebra Barraco, Bárbara Labres' },
+    { id:'TNHfGriOn_0', title:'Reza do Vento', artist:'Ale de Maria' },
+    { id:'vEnZJSuEzPE', title:'O Amanhecer do Alexandre', artist:'Luís Capucho' },
+    { id:'00kQeA8XyVA', title:'Pimenta Mumuíla', artist:'Mateus Aleluia' },
+    { id:'0KMbTgr0Q5w', title:'Pitágoras', artist:'Os Mutantes' },
+    { id:'yv5xonFSC4c', title:'Redemption Song', artist:'Bob Marley & The Wailers' },
+    { id:'GgJ8BkxTy3Q', title:'Canto da Revolução', artist:'Doralyce' },
+    { id:'8fvOf1idIiw', title:'Ninguém Manda em Mim', artist:'Lucia Vulcano' },
+    { id:'FuZ0OdtK3P8', title:'É Preciso Dar um Jeito, Meu Amigo', artist:'Erasmo Carlos' },
+    { id:'56mu8KSUYqk', title:'Preciso Me Encontrar', artist:'Cartola' },
+    { id:'znxb6KtOo_c', title:'Djobi, Djoba', artist:'Gipsy Kings' },
+    { id:'argwbQd5dXk', title:'Todos Estão Surdos', artist:'Pato Fu' },
+    { id:'5pzTXOONVRg', title:'O Pulso', artist:'Cida Moreira' },
+    { id:'-K_WebdzmwY', title:'Do Vento', artist:'Arnaldo Antunes' },
+    { id:'_2xYN5hd5aU', title:'Grávida', artist:'Marina Lima' },
+    { id:'GJVWEstu_lM', title:'Bolero', artist:'London Symphony Orchestra (Gergiev)' },
+    { id:'rLsP8NgS01Y', title:'One River', artist:'Benjy Wertheimer' },
     { id:'AA_8wtG62DI', title:'Jokerman', artist:'Caetano Veloso' },
-    { id:'rLsP8NgS01Y', title:'Faixa 03', artist:'DançaDestino' }
+    { id:'nAyXMqB_6Kc', title:'Casaco Marron (Bye, Bye, Ceci)', artist:'Evinha' },
+    { id:'oG6fayQBm9w', title:'Walk on the Wild Side', artist:'Lou Reed' },
+    { id:'PIR1f2x1ANk', title:'Galaxia Tropical', artist:'Ranil y Su Conjunto Tropical' },
+    { id:'eH3giaIzONA', title:'I Wanna Dance With Somebody (Who Loves Me)', artist:'Whitney Houston' },
+    { id:'_PpmYjq4cpE', title:'Amor e Paz', artist:'Walter Santos' },
+    { id:'jJTArjsT9mw', title:'Tcheca', artist:'Danny Bond' },
+    { id:'iyLdoQGBchQ', title:'Lambada', artist:'Kaoma' },
+    { id:'CLhjvJkjdho', title:'Eu Despedi o Meu Patrão', artist:'Zeca Baleiro' },
+    { id:'i8WArTByOpM', title:'Ilariê', artist:'Xuxa' },
+    { id:'k1L-EXmR_Vs', title:'Volta Por Cima', artist:'Beth Carvalho' },
+    { id:'hSXIO0t4OlQ', title:'Zé do Caroço', artist:'Leci Brandão' },
+    { id:'oJq2hwQotgA', title:'Guiné-Bissau, Moçambique e Angola Racional', artist:'Tim Maia' }
   ];
   var ytEmbed=document.getElementById('yt-embed');
   var ytCur=-1;
