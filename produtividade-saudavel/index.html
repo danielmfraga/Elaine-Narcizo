@@ -85,6 +85,7 @@
   --pad:clamp(20px,5vw,64px);
   --measure:36rem;
   --ease:cubic-bezier(.22,.61,.36,1);
+  --macio:cubic-bezier(.16,.84,.44,1);   /* desacelera longo — a curva "gostosa" */
 }
 *{ margin:0; padding:0; box-sizing:border-box; }
 html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
@@ -159,23 +160,28 @@ h1,h2,h3{ font-family:var(--disp); text-wrap:balance; }
   padding:calc(78px + 4vh) var(--pad) var(--sp-6); overflow:hidden;
   background:var(--lilas-bg);
 }
-.hero-bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; opacity:.92; }
+/* o fundo é MAIS ALTO que o hero de propósito: essa sobra é o que ele
+   consome no parallax, sem nunca descobrir a borda de baixo. */
+.hero-bg{ position:absolute; left:0; top:0; width:100%; height:calc(100% + 12vh); object-fit:cover; z-index:0; opacity:.92; }
 .hero-veu{ position:absolute; inset:0; z-index:1;
   background:linear-gradient(180deg, rgba(188,175,213,.30) 0%, rgba(188,175,213,.04) 38%, rgba(188,175,213,.60) 100%); }
 .hero > .wrap{ position:relative; z-index:2; display:flex; flex-direction:column; gap:var(--sp-4); align-items:flex-start; }
 .hero .eyebrow{ color:var(--ink); opacity:.75; }
-/* 10,4vw = a proporção do original (112pt em 1080px). Teto medido antes de
-   estourar: ~11,6vw — então há folga. NÃO subir sem medir de novo. */
+/* 🔑 TAMANHO MEDIDO, não chutado. No Archivo o peso quase não muda a
+   largura (400→700 = +3%); quem manda é o eixo de LARGURA. A 62% (o mais
+   condensado da fonte) "PRODUTIVIDADE" ocupa 5,28em, então o teto antes de
+   estourar a tela é ~16,8vw. Fica em 15,4vw = 92% do teto, folga pra erro
+   de métrica. ⚠️ Subir disso SEM medir de novo volta a cortar a palavra. */
 .hero h1{
-  font-weight:700; font-stretch:78%; text-transform:uppercase;
-  font-size:clamp(2.2rem,10.4vw,6.4rem); line-height:.92; letter-spacing:-.01em;
+  font-weight:700; font-stretch:62%; text-transform:uppercase;
+  font-size:clamp(2.9rem,15.4vw,9.2rem); line-height:.88; letter-spacing:-.005em;
 }
-/* subtítulo também em caixa-alta e condensado, como no original. O hífen de
-   "BEM-ESTAR" é NÃO-SEPARÁVEL (&#8209;) e a quebra é explícita: partir a
-   palavra no hífen ficava ruim. Teto medido: ~7,8vw. */
+/* subtítulo em caixa-alta e condensado como no original, agora BEM menor
+   que o título (proporção ~3:1) — o pedido era esse. Teto medido: 10,4vw.
+   O hífen de "BEM-ESTAR" é NÃO-SEPARÁVEL (&#8209;) e a quebra é explícita. */
 .hero .sub{
-  font-family:var(--disp); font-weight:450; font-stretch:78%; text-transform:uppercase;
-  font-size:clamp(1.24rem,7.4vw,3.2rem); line-height:1.04; letter-spacing:-.005em;
+  font-family:var(--disp); font-weight:450; font-stretch:62%; text-transform:uppercase;
+  font-size:clamp(1rem,5.2vw,2.2rem); line-height:1.12; letter-spacing:.01em;
 }
 .hero .acoes{ display:flex; flex-wrap:wrap; gap:var(--sp-2); }
 
@@ -212,9 +218,13 @@ section{ padding:var(--sp-7) var(--pad); }
 .card{
   background:var(--paper); border:1px solid var(--line); border-radius:20px;
   padding:var(--sp-4); display:flex; flex-direction:column; gap:var(--sp-2);
-  transition:transform .18s var(--ease), box-shadow .18s var(--ease), border-color .18s var(--ease);
+  transition:translate .18s var(--ease), box-shadow .18s var(--ease), border-color .18s var(--ease);
 }
-.card:hover{ transform:translateY(-3px); box-shadow:0 18px 40px rgba(15,14,12,.09); border-color:var(--lilas); }
+/* ⚠️ o hover levanta o cartão pela propriedade `translate`, NÃO por
+   `transform`: o cartão também recebe uma animação de entrada dirigida por
+   scroll que ocupa o `transform`, e animação vence transição na cascata —
+   pelo `transform` o hover simplesmente não aconteceria. */
+.card:hover{ translate:0 -3px; box-shadow:0 18px 40px rgba(15,14,12,.09); border-color:var(--lilas); }
 .card .num{ font-family:var(--mono); font-size:.74rem; letter-spacing:.14em; color:var(--roxo); }
 .card h3{ font-weight:700; font-stretch:88%; font-size:1.28rem; line-height:1.14; }
 .card p{ color:var(--mute); font-size:1rem; line-height:1.55; }
@@ -267,9 +277,70 @@ footer a{ color:var(--paper); text-decoration:none; opacity:.8; }
 footer a:hover{ opacity:1; text-decoration:underline; }
 
 /* ── revelação ao entrar ──────────────────────────────────────────── */
-.r{ transition:opacity .7s var(--ease), transform .7s var(--ease); transition-delay:calc(var(--r,0)*90ms); }
-.js .r{ opacity:0; transform:translateY(24px); }
+/* curva mais macia e um pouco mais longa que a padrão do site: aqui a
+   sensação pedida foi "gostoso", então o movimento desacelera devagar. */
+.r{ transition:opacity .9s var(--macio), transform .9s var(--macio); transition-delay:calc(var(--r,0)*95ms); }
+.js .r{ opacity:0; transform:translateY(26px); }
 .js .in-io.vis .r{ opacity:1; transform:none; }
+
+/* ── MOVIMENTO DIRIGIDO PELO SCROLL ───────────────────────────────────
+   Feito em CSS puro (`animation-timeline`), que roda no compositor. É o
+   mesmo caminho já validado no resto do site — a versão em JS treme no
+   iOS, porque duas fontes de movimento brigam pelo mesmo gesto.
+   Tudo atrás de @supports: em navegador que não conhece, a página fica
+   parada e correta, sem nada quebrado. */
+@supports (animation-timeline: scroll()){
+  @media (prefers-reduced-motion: no-preference){
+    /* fundo do hero sobe mais devagar que a página (parallax) e dá um
+       zoom mínimo — a sobra de 12vh na altura é o que ele consome. */
+    .hero-bg{
+      animation:heroParallax linear both;
+      animation-timeline:scroll(root block);
+      animation-range:0 100vh;
+    }
+    @keyframes heroParallax{
+      from{ transform:translateY(0) scale(1.01); }
+      to  { transform:translateY(-9vh) scale(1.06); }
+    }
+    /* o texto do hero sai de cena um pouco antes do fundo: dá profundidade */
+    .hero > .wrap{
+      animation:heroTexto linear both;
+      animation-timeline:scroll(root block);
+      animation-range:0 88vh;
+    }
+    @keyframes heroTexto{
+      from{ transform:translateY(0); opacity:1; }
+      to  { transform:translateY(-3.5vh); opacity:.15; }
+    }
+    /* cada seção entra com um respiro: sobe e assenta enquanto aparece */
+    .s-intro .in, .s-benef .wrap, .s-imp .wrap, .s-lei .wrap, .s-cta .in{
+      animation:assenta linear both;
+      animation-timeline:view();
+      animation-range:entry 8% entry 62%;
+    }
+    @keyframes assenta{
+      from{ transform:translateY(30px); }
+      to  { transform:translateY(0); }
+    }
+    /* os cartões chegam com um leve escalonamento entre si */
+    .card{
+      animation:cartao linear both;
+      animation-timeline:view();
+      animation-range:entry 10% entry 70%;
+    }
+    @keyframes cartao{
+      from{ transform:translateY(26px) scale(.985); }
+      to  { transform:none; }
+    }
+  }
+}
+
+/* asterisco girando devagar — movimento ambiente, sem depender de scroll */
+@media(prefers-reduced-motion:no-preference){
+  .s-intro .aster svg{ animation:giraAster 34s linear infinite; transform-origin:50% 50%; }
+  @keyframes giraAster{ to{ transform:rotate(360deg); } }
+}
+
 @media(prefers-reduced-motion:reduce){
   html{ scroll-behavior:auto; }
   .js .r{ opacity:1!important; transform:none!important; transition:none; }
