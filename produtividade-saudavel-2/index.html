@@ -293,6 +293,10 @@ section{ padding:var(--sp-7) var(--pad); }
 .s-lei h3{ font-family:var(--mono); font-weight:700; font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:rgba(243,238,224,.55); }
 .s-lei .lista li .seta{ color:var(--amarelo); }
 .s-lei p{ color:rgba(243,238,224,.78); max-width:var(--measure); }
+/* .btn sólido é ink-sobre-ink aqui (o padrão assume fundo claro) — vira
+   amarelo, o mesmo acento que a seção já usa no destaque e nas setas. */
+.s-lei .btn{ background:var(--amarelo); border-color:var(--amarelo); color:var(--ink); align-self:flex-start; }
+.s-lei .btn:hover{ background:var(--paper); border-color:var(--paper); }
 
 /* ── fechamento ───────────────────────────────────────────────────── */
 .s-cta{ background:var(--amarelo); }
@@ -482,7 +486,7 @@ footer a:hover{ opacity:1; text-decoration:underline; }
   </section>
 
   <!-- ══ BENEFÍCIOS ══ -->
-  <section class="s-benef">
+  <section class="s-benef" id="beneficios">
     <div class="wrap pilha in-io">
       <div class="cab">
         <span class="eyebrow r" style="--r:0">Benefícios</span>
@@ -545,6 +549,7 @@ footer a:hover{ opacity:1; text-decoration:underline; }
           <li><span class="seta" aria-hidden="true">→</span><span>Menos afastamentos por ansiedade, depressão e burnout.</span></li>
           <li><span class="seta" aria-hidden="true">→</span><span>Equipes mais engajadas — e que permanecem.</span></li>
         </ul>
+        <a class="btn r" style="--r:4" href="#beneficios">Ver os benefícios da Arteterapia <span class="seta" aria-hidden="true">↑</span></a>
       </div>
     </div>
   </section>
