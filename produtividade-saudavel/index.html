@@ -160,9 +160,13 @@ h1,h2,h3{ font-family:var(--disp); text-wrap:balance; }
 .cab{ display:flex; flex-direction:column; gap:var(--sp-2); }
 
 /* ── HERO ─────────────────────────────────────────────────────────── */
+/* o bloco fica CENTRADO na altura, não jogado no rodapé (era
+   `justify-content:flex-end`, que empurrava tudo pra baixo e deixava um
+   vazio enorme em cima). O padding de cima é um pouco maior que o de
+   baixo só pra dar folga ao cabeçalho fixo. */
 .hero{
-  position:relative; min-height:100svh; display:flex; flex-direction:column; justify-content:flex-end;
-  padding:calc(78px + 4vh) var(--pad) var(--sp-6); overflow:hidden;
+  position:relative; min-height:100svh; display:flex; flex-direction:column; justify-content:center;
+  padding:calc(78px + 3vh) var(--pad) calc(40px + 3vh); overflow:hidden;
   background:var(--lilas-bg);
 }
 /* o fundo é MAIS ALTO que o hero de propósito: essa sobra é o que ele
@@ -170,7 +174,11 @@ h1,h2,h3{ font-family:var(--disp); text-wrap:balance; }
 .hero-bg{ position:absolute; left:0; top:0; width:100%; height:calc(100% + 12vh); object-fit:cover; z-index:0; opacity:.92; }
 .hero-veu{ position:absolute; inset:0; z-index:1;
   background:linear-gradient(180deg, rgba(188,175,213,.30) 0%, rgba(188,175,213,.04) 38%, rgba(188,175,213,.60) 100%); }
-.hero > .wrap{ position:relative; z-index:2; display:flex; flex-direction:column; gap:var(--sp-4); align-items:flex-start; }
+/* dois grupos: o texto (rotulo+titulo+subtitulo) e as ações. O respiro
+   DENTRO do texto e menor que o respiro ENTRE ele e os botoes — assim o
+   bloco le como uma coisa so, em vez de quatro itens soltos. */
+.hero > .wrap{ position:relative; z-index:2; display:flex; flex-direction:column; gap:var(--sp-5); align-items:flex-start; }
+.hero-texto{ display:flex; flex-direction:column; gap:var(--sp-2); align-items:flex-start; }
 .hero .eyebrow{ color:var(--ink); opacity:.75; }
 /* 🔑 TAMANHO MEDIDO, não chutado. No Archivo o peso quase não muda a
    largura (400→700 = +3%); quem manda é o eixo de LARGURA. A 62% (o mais
@@ -431,9 +439,11 @@ footer a:hover{ opacity:1; text-decoration:underline; }
   <img class="hero-bg" src="/assets/bg-purple_bx.webp" alt="" aria-hidden="true" />
   <div class="hero-veu" aria-hidden="true"></div>
   <div class="wrap in-io">
+    <div class="hero-texto">
     <span class="eyebrow r" style="--r:0">Para empresas</span>
     <h1 class="r" style="--r:1">Produtividade<br />Saudável</h1>
     <p class="sub r" style="--r:2">Arteterapia e Bem&#8209;Estar<br />no Trabalho.</p>
+    </div>
     <div class="acoes r" style="--r:3">
       <a class="btn ghost mrun" href="#lei">
         <span class="track" aria-hidden="true">
