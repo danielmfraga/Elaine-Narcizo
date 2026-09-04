@@ -12,13 +12,17 @@
      do topo vêm de lá.
 
      🔑 TIPOGRAFIA — o original é TODO em **Acumin Condensed** (título
-     "Condensed Bold" 112pt numa página de 1080px = 10,4% da largura;
-     subtítulo "Condensed Light/Medium" em caixa-alta; títulos de seção
-     "Condensed Medium"). Aqui entra o **Archivo**, display da casa, também
-     variável — usado no eixo CONDENSADO (`font-stretch` 78-88%), não no
-     expandido do resto do site. Medi os avanços do Archivo pra calcular os
-     tetos: "PRODUTIVIDADE" a wdth 78%/Bold ocupa 7,66em, então acima de
-     ~11,6vw ele ESTOURA a tela. Fica em 10,4vw, que é a proporção original.
+     "Condensed Bold", subtítulo "Condensed Light/Medium" em caixa-alta,
+     títulos de seção "Condensed Medium"). Aqui entra o **Archivo**, display
+     da casa, também variável — usado no eixo CONDENSADO, não no expandido
+     do resto do site.
+     ⚠️ Os tamanhos foram MEDIDOS, não chutados: baixei instâncias estáticas
+     do Archivo e calculei os avanços. Descoberta que muda tudo — o PESO
+     quase não altera a largura (400→700 = +3%); quem manda é o eixo de
+     largura. A 62% (o mais condensado) "PRODUTIVIDADE" ocupa 5,28em, então
+     o teto antes de estourar a tela é ~16,8vw. O título fica em 15,4vw
+     (92% do teto). NÃO subir sem refazer a conta — foi exatamente assim que
+     a 1ª versão saiu com a palavra cortada.
 
      🔑 ESPAÇAMENTO — uma escala só (--sp-1..7) manda em tudo. Toda seção usa
      o MESMO padding vertical e as pilhas usam `gap`, nunca margens avulsas:
@@ -83,6 +87,7 @@
   --sp-7:clamp(72px,11vw,128px);   /* padding vertical — IGUAL em toda seção */
 
   --pad:clamp(20px,5vw,64px);
+  --btnw:clamp(190px,52vw,250px);   /* largura dos botões-letreiro */
   --measure:36rem;
   --ease:cubic-bezier(.22,.61,.36,1);
   --macio:cubic-bezier(.16,.84,.44,1);   /* desacelera longo — a curva "gostosa" */
@@ -183,7 +188,7 @@ h1,h2,h3{ font-family:var(--disp); text-wrap:balance; }
   font-family:var(--disp); font-weight:450; font-stretch:62%; text-transform:uppercase;
   font-size:clamp(1rem,5.2vw,2.2rem); line-height:1.12; letter-spacing:.01em;
 }
-.hero .acoes{ display:flex; flex-wrap:wrap; gap:var(--sp-2); }
+.hero .acoes{ display:flex; flex-direction:column; align-items:flex-start; gap:10px; }
 
 /* ── botões ───────────────────────────────────────────────────────── */
 .btn{
@@ -199,6 +204,21 @@ h1,h2,h3{ font-family:var(--disp); text-wrap:balance; }
 .btn:hover .seta{ transform:translateX(5px); }
 .btn.ghost{ background:transparent; color:var(--ink); }
 .btn.ghost:hover{ background:var(--ink); color:var(--paper); }
+
+/* ── botão-LETREIRO (o texto passa) ────────────────────────────────
+   Mesmo motor dos botões "Sintonize"/"Escola Vivona" da home: largura
+   fixa + overflow escondido, e a faixa desliza -50%.
+   ⚠️ Por isso o conteúdo da faixa TEM que ser duas metades idênticas —
+   -50% é exatamente uma cópia, é o que faz o laço não ter emenda. */
+.btn.mrun{
+  width:var(--btnw); padding-left:26px; padding-right:26px;
+  overflow:hidden; justify-content:flex-start; gap:0;
+}
+.btn.mrun .track{ display:inline-flex; align-items:center; gap:16px; white-space:nowrap; animation:btnmarq 11s linear infinite; }
+.btn.mrun:hover .track{ animation-play-state:paused; }
+.btn.mrun .spk{ font-style:normal; font-size:.85em; opacity:.7; }
+@keyframes btnmarq{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+.sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
 
 /* ── seções: MESMO padding vertical em todas ─────────────────────── */
 section{ padding:var(--sp-7) var(--pad); }
@@ -415,7 +435,20 @@ footer a:hover{ opacity:1; text-decoration:underline; }
     <h1 class="r" style="--r:1">Produtividade<br />Saudável</h1>
     <p class="sub r" style="--r:2">Arteterapia e Bem&#8209;Estar<br />no Trabalho.</p>
     <div class="acoes r" style="--r:3">
-      <a class="btn ghost" href="#programa">Ver o programa <span class="seta" aria-hidden="true">↓</span></a>
+      <a class="btn ghost mrun" href="#lei">
+        <span class="track" aria-hidden="true">
+          <span>Nova lei de saúde mental</span><i class="spk">✦</i><span>Nova lei de saúde mental</span><i class="spk">✦</i>
+          <span>Nova lei de saúde mental</span><i class="spk">✦</i><span>Nova lei de saúde mental</span><i class="spk">✦</i>
+        </span>
+        <span class="sr-only">Nova lei de saúde mental</span>
+      </a>
+      <a class="btn ghost mrun" href="#programa">
+        <span class="track" aria-hidden="true">
+          <span>Ver o programa</span><i class="spk">✦</i><span>Ver o programa</span><i class="spk">✦</i><span>Ver o programa</span><i class="spk">✦</i>
+          <span>Ver o programa</span><i class="spk">✦</i><span>Ver o programa</span><i class="spk">✦</i><span>Ver o programa</span><i class="spk">✦</i>
+        </span>
+        <span class="sr-only">Ver o programa</span>
+      </a>
     </div>
   </div>
 </header>
@@ -483,10 +516,9 @@ footer a:hover{ opacity:1; text-decoration:underline; }
   </section>
 
   <!-- ══ A LEI COMO DIFERENCIAL ══ -->
-  <section class="s-lei">
+  <section class="s-lei" id="lei">
     <div class="wrap pilha in-io">
       <div class="cab">
-        <span class="eyebrow r" style="--r:0">Diferencial competitivo</span>
         <p class="destaque r" style="--r:1">A nova Lei de Saúde Mental no Trabalho <em>(Lei 14.831/24)</em> já é um diferencial competitivo para empresas.</p>
       </div>
       <div class="duas">
