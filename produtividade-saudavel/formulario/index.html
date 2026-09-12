@@ -313,7 +313,10 @@ document.documentElement.classList.add('js');
 
   var form=document.getElementById('propForm'), btn=form.querySelector('.enviar');
   var origem=document.getElementById('campoOrigem');
-  if(origem) origem.value = document.referrer || 'acesso direto';
+  if(origem){
+    var marca=''; try{ marca=sessionStorage.getItem('ps_origem')||''; }catch(e){}
+    origem.value = (marca ? 'campanha: '+marca+' | ' : '') + (document.referrer || 'acesso direto');
+  }
 
   function mostraFeito(){
     document.getElementById('formArea').hidden=true;

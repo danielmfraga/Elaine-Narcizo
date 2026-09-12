@@ -616,6 +616,17 @@ document.documentElement.classList.add('js');
   }
 })();
 
+/* Campanha: quem chega por /produtividade-saudavel/?de=email guarda a marca
+   na sessão; o formulário de proposta manda junto, na coluna "Origem" da
+   planilha. É o que separa "veio do e-mail que mandei" de "achou sozinho".
+   sessionStorage (não localStorage): vale só esta visita, e some ao fechar. */
+(function(){
+  try{
+    var de=new URLSearchParams(location.search).get('de');
+    if(de) sessionStorage.setItem('ps_origem', de.slice(0,40));
+  }catch(e){}
+})();
+
 /* revelação ao entrar na tela — os blocos .r dentro de um .in-io */
 (function(){
   var alvos=[].slice.call(document.querySelectorAll('.in-io'));
