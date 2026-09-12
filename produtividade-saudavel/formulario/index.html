@@ -9,11 +9,14 @@
      ✅ VALENDO (set/2026): envia pro Google Sheets via Apps Script, o mesmo
      padrão do modal "Quero ser avisada" da home. Deixou de ser o formulário
      fake (setTimeout) da primeira versão.
-     ⚠️ Quem manda é a constante FORM_ENDPOINT lá no fim do <body> — é a URL
-     /exec do Apps Script. Enquanto ela estiver VAZIA a página continua
-     mostrando a tela de "recebemos" sem enviar nada (pra não quebrar o
-     visual): útil pra testar layout, péssimo pra deixar no ar. O código do
-     Apps Script está comentado junto dela.
+     ⚠️ Quem manda é a constante FORM_ENDPOINT lá no fim do <body> — a URL
+     /exec do Apps Script (preenchida e testada em set/2026; a planilha é
+     "Produtividade Saudável", aba "Pedidos", na conta do Daniel). Se ela
+     ficar VAZIA, a página volta a mostrar a tela de "recebemos" sem enviar
+     nada — o fallback existe pra não quebrar o visual, mas no ar significa
+     lead perdido em silêncio. O código do Apps Script está comentado junto
+     dela. 🔑 Mexeu no script? Tem que "Implantar → Nova versão": só salvar
+     no editor do Google NÃO publica.
      Este formulário é COMPARTILHADO: era o destino do botão "Pedir uma
      proposta" das duas variantes institucionais (Lei 14.831/24 e NR-1). Hoje
      só a NR-1 está no ar, em /produtividade-saudavel/; a outra está parada em
@@ -305,7 +308,7 @@ document.documentElement.classList.add('js');
                             .setMimeType(ContentService.MimeType.TEXT); }
    ─────────────────────────────────────────────────────────────────────── */
 (function(){
-  var FORM_ENDPOINT = '';   /* ← URL /exec do Apps Script (Google Sheets) */
+  var FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxnqOwTK77K5GsLBpSeaVAngWcen9cEyMw_67FF7WOMR7pDkhTFvvYDE9kkrcplpetT/exec';   /* URL /exec do Apps Script (Google Sheets) — set/2026, testada */
 
   var form=document.getElementById('propForm'), btn=form.querySelector('.enviar');
   var origem=document.getElementById('campoOrigem');
