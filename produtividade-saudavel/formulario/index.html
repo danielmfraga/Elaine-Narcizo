@@ -6,14 +6,18 @@
 
 <!-- ═══════════════════════════════════════════════════════════════════════
      PEDIR UMA PROPOSTA — formulário do Produtividade Saudável, set/2026
-     🔴 FAKE DE PROPÓSITO (pedido do Daniel): não envia pra lugar nenhum
-     ainda. O submit só troca a tela pra "recebido" (setTimeout simulando
-     rede). Quando existir backend de verdade, plugar aqui — o candidato
-     natural é o MESMO padrão do modal "Quero ser avisada" da home
-     (index.html: Google Sheets via Apps Script, ver comentário lá).
-     Compartilhado pelas 2 variantes institucionais — o botão "Pedir uma
-     proposta" de /produtividade-saudavel/ E /produtividade-saudavel-2/
-     mandam pra cá, não importa de qual página a pessoa veio.
+     ✅ VALENDO (set/2026): envia pro Google Sheets via Apps Script, o mesmo
+     padrão do modal "Quero ser avisada" da home. Deixou de ser o formulário
+     fake (setTimeout) da primeira versão.
+     ⚠️ Quem manda é a constante FORM_ENDPOINT lá no fim do <body> — é a URL
+     /exec do Apps Script. Enquanto ela estiver VAZIA a página continua
+     mostrando a tela de "recebemos" sem enviar nada (pra não quebrar o
+     visual): útil pra testar layout, péssimo pra deixar no ar. O código do
+     Apps Script está comentado junto dela.
+     Este formulário é COMPARTILHADO: era o destino do botão "Pedir uma
+     proposta" das duas variantes institucionais (Lei 14.831/24 e NR-1). Hoje
+     só a NR-1 está no ar, em /produtividade-saudavel/; a outra está parada em
+     `_desativado/` e continuaria caindo aqui se voltasse.
      ═══════════════════════════════════════════════════════════════════════ -->
 
 <title>Pedir uma proposta — Produtividade Saudável | Elaine Narcizo</title>
@@ -212,6 +216,9 @@ footer a:hover{ opacity:1; text-decoration:underline; }
         <label class="campo"><span>WhatsApp</span><input name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="(00) 00000-0000" /></label>
         <label class="campo"><span>Conte um pouco sobre a sua equipe</span><textarea name="mensagem" rows="4"></textarea></label>
         <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <!-- preenchidos por JS: ajudam a saber por onde a pessoa chegou -->
+        <input type="hidden" name="pagina" value="Produtividade Saudável" />
+        <input type="hidden" name="origem" id="campoOrigem" value="" />
         <button class="enviar" type="submit">Enviar pedido</button>
         <p class="legal">Seus dados são usados só pra essa proposta.</p>
       </form>
@@ -255,19 +262,74 @@ document.documentElement.classList.add('js');
   }
 })();
 
-/* 🔴 FAKE: não manda pra lugar nenhum. Só simula uma rede (900ms) e troca
-   pra tela de confirmação. Quando plugar um backend de verdade, é aqui —
-   trocar o setTimeout por um fetch/POST de verdade. */
+/* ✅ Envio de verdade → Google Sheets via Apps Script (mesma receita do
+   modal "Quero ser avisada" da home).
+
+   ⚠️ COLE ABAIXO a URL /exec do Apps Script. Com ela vazia, a página só
+   mostra a tela de "recebemos" SEM enviar nada — bom pra ver o visual,
+   ruim pra deixar publicado.
+
+   mode:'no-cors' = a linha entra na planilha, mas o navegador não lê a
+   resposta; por isso o "enviado" é otimista (só falha se a rede cair).
+
+   ───────── CÓDIGO DO APPS SCRIPT (cole na planilha: Extensões → Apps
+   Script; depois Implantar → App da Web → acesso "qualquer pessoa") ─────────
+
+   var ABA = 'Pedidos';
+   var COLUNAS = ['Data/hora','Nome','Empresa','E-mail','WhatsApp','Mensagem','Origem','Página'];
+
+   function doPost(e) {
+     var p = (e && e.parameter) || {};
+     if (p.website) return resposta_('ok');          // campo-isca: robô
+     var lock = LockService.getScriptLock();
+     lock.waitLock(20000);
+     try {
+       var sh = aba_();
+       sh.appendRow([new Date(), p.nome||'', p.empresa||'', p.email||'',
+                     p.whatsapp||'', p.mensagem||'', p.origem||'', p.pagina||'']);
+     } finally { lock.releaseLock(); }
+     return resposta_('ok');
+   }
+   function doGet(){ return resposta_('Formulário no ar.'); }
+   function aba_() {
+     var ss = SpreadsheetApp.getActiveSpreadsheet();
+     var sh = ss.getSheetByName(ABA) || ss.insertSheet(ABA);
+     if (sh.getLastRow() === 0) {
+       sh.appendRow(COLUNAS);
+       sh.getRange(1,1,1,COLUNAS.length).setFontWeight('bold');
+       sh.setFrozenRows(1);
+     }
+     return sh;
+   }
+   function resposta_(t){ return ContentService.createTextOutput(t)
+                            .setMimeType(ContentService.MimeType.TEXT); }
+   ─────────────────────────────────────────────────────────────────────── */
 (function(){
+  var FORM_ENDPOINT = '';   /* ← URL /exec do Apps Script (Google Sheets) */
+
   var form=document.getElementById('propForm'), btn=form.querySelector('.enviar');
+  var origem=document.getElementById('campoOrigem');
+  if(origem) origem.value = document.referrer || 'acesso direto';
+
+  function mostraFeito(){
+    document.getElementById('formArea').hidden=true;
+    document.getElementById('feito').hidden=false;
+    scrollTo({top:0, behavior:'smooth'});
+  }
+
   form.addEventListener('submit', function(e){
     e.preventDefault();
-    if(form.website.value) return;              /* campo-isca: bot preencheu, silencioso */
+    /* campo-isca preenchido = robô. Mostra a mesma tela de sempre pra não
+       entregar o truque, mas não envia. */
+    if(form.website.value){ mostraFeito(); return; }
     btn.disabled=true; btn.textContent='Enviando…';
-    setTimeout(function(){
-      document.getElementById('formArea').hidden=true;
-      document.getElementById('feito').hidden=false;
-    }, 900);
+    if(!FORM_ENDPOINT){ setTimeout(mostraFeito, 600); return; }   /* sem endpoint: só o visual */
+    fetch(FORM_ENDPOINT,{ method:'POST', mode:'no-cors', body:new FormData(form) })
+      .then(mostraFeito)
+      .catch(function(){
+        btn.disabled=false; btn.textContent='Enviar pedido';
+        alert('Não consegui enviar agora. Pode tentar de novo? Se preferir, chame no WhatsApp: (16) 99159-5707.');
+      });
   });
 })();
 </script>

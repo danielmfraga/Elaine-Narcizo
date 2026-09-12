@@ -5,6 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
 <!-- ═══════════════════════════════════════════════════════════════════════
+     🚫 DESATIVADA (set/2026) — esta é a versão da Produtividade Saudável com
+     o argumento legal da **Lei 14.831/24**. O Daniel comparou as duas e
+     escolheu a da **NR-1**, que virou a página oficial em
+     /produtividade-saudavel/. Esta ficou preservada aqui e NÃO vai pro site:
+     a pasta `_desativado/` está no `.vercelignore`.
+     Pra reativar: mover de volta pra `produtividade-saudavel/` (ou outra
+     pasta), tirar `_desativado/` do `.vercelignore` e conferir canonical/
+     og:url/JSON-LD, que ainda apontam pra /produtividade-saudavel/.
+     ⚠️ O botão "Pedir uma proposta" dela aponta pro formulário compartilhado
+     em /produtividade-saudavel/formulario/ — que hoje envia pro Google Sheets.
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════════════════════════════
      PRODUTIVIDADE SAUDÁVEL — página institucional (para empresas), set/2026
      Primeiro produto puramente B2B do site. Nasceu de um e-mail marketing que
      o Daniel já tinha feito (InDesign: `Institucional Elaine.idml`): texto,
@@ -28,26 +41,22 @@
      o MESMO padding vertical e as pilhas usam `gap`, nunca margens avulsas:
      era isso que criava "buracos" de tamanhos diferentes ao longo da página.
 
-     🔁 VARIANTE de /produtividade-saudavel/ (set/2026) — mesma página,
-     mudando só o argumento legal do final: aqui é a NR-1 (risco
-     psicossocial, obrigatória desde mai/2026) em vez da Lei 14.831/24.
-     Pedido do Daniel pra comparar as duas abordagens.
      ⚠️ Página SOLTA de propósito: ainda não está linkada de lugar nenhum
      (decisão do Daniel: "depois achamos um lugar para colocar ela").
      ═══════════════════════════════════════════════════════════════════════ -->
 
 <title>Produtividade Saudável — Arteterapia e bem-estar no trabalho | Elaine Narcizo</title>
-<meta name="description" content="Programa de arteterapia para empresas: menos conflitos, comunicação mais clara e equipes mais engajadas. Formatos adaptados à cultura da sua empresa — e alinhados à NR-1." />
+<meta name="description" content="Programa de arteterapia para empresas: menos conflitos, comunicação mais clara e equipes mais engajadas. Formatos adaptados à cultura da sua empresa — e alinhados à Lei 14.831/24." />
 <meta name="author" content="Elaine Narcizo" />
-<meta name="keywords" content="arteterapia corporativa, saúde mental no trabalho, bem-estar organizacional, SIPAT, NR-1, riscos psicossociais, produtividade saudável" />
-<link rel="canonical" href="https://elainenarcizo.com.br/produtividade-saudavel-2/" />
+<meta name="keywords" content="arteterapia corporativa, saúde mental no trabalho, bem-estar organizacional, SIPAT, Lei 14.831/24, produtividade saudável" />
+<link rel="canonical" href="https://elainenarcizo.com.br/produtividade-saudavel/" />
 
 <meta property="og:type" content="website" />
 <meta property="og:locale" content="pt_BR" />
 <meta property="og:site_name" content="Elaine Narcizo" />
 <meta property="og:title" content="Produtividade Saudável — Arteterapia e bem-estar no trabalho" />
 <meta property="og:description" content="Programa de arteterapia para empresas: menos conflitos, comunicação mais clara e equipes mais engajadas." />
-<meta property="og:url" content="https://elainenarcizo.com.br/produtividade-saudavel-2/" />
+<meta property="og:url" content="https://elainenarcizo.com.br/produtividade-saudavel/" />
 <meta property="og:image" content="https://elainenarcizo.com.br/assets/bg-purple_bx.webp" />
 
 <link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
@@ -64,7 +73,7 @@
   "provider": { "@type": "Person", "name": "Elaine Narcizo", "url": "https://elainenarcizo.com.br/" },
   "areaServed": "BR",
   "audience": { "@type": "BusinessAudience", "audienceType": "Empresas e instituições" },
-  "url": "https://elainenarcizo.com.br/produtividade-saudavel-2/",
+  "url": "https://elainenarcizo.com.br/produtividade-saudavel/",
   "inLanguage": "pt-BR"
 }
 </script>
@@ -285,18 +294,12 @@ section{ padding:var(--sp-7) var(--pad); }
   max-width:22ch; text-wrap:balance;
 }
 .s-lei .destaque em{ font-style:normal; color:var(--amarelo); }
-/* ⚠️ nesta variante o conteúdo não tem mais 2 colunas paralelas (era
-   licitações/crédito × Geração Z) — agora é 1 fluxo: parágrafo de contexto
-   (dentro de .cab) seguido de 1 coluna só com o h3+lista. Por isso .duas
-   saiu daqui (ficou só em .s-imp, que ainda usa 2 colunas de verdade). */
+.s-lei .duas{ display:grid; grid-template-columns:1fr; gap:var(--sp-5); }
+@media(min-width:900px){ .s-lei .duas{ grid-template-columns:1fr 1fr; gap:var(--sp-6); } }
 .s-lei .col{ display:flex; flex-direction:column; gap:var(--sp-3); }
 .s-lei h3{ font-family:var(--mono); font-weight:700; font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:rgba(243,238,224,.55); }
 .s-lei .lista li .seta{ color:var(--amarelo); }
 .s-lei p{ color:rgba(243,238,224,.78); max-width:var(--measure); }
-/* .btn sólido é ink-sobre-ink aqui (o padrão assume fundo claro) — vira
-   amarelo, o mesmo acento que a seção já usa no destaque e nas setas. */
-.s-lei .btn{ background:var(--amarelo); border-color:var(--amarelo); color:var(--ink); align-self:flex-start; }
-.s-lei .btn:hover{ background:var(--paper); border-color:var(--paper); }
 
 /* ── fechamento ───────────────────────────────────────────────────── */
 .s-cta{ background:var(--amarelo); }
@@ -457,10 +460,10 @@ footer a:hover{ opacity:1; text-decoration:underline; }
     <div class="acoes r" style="--r:3">
       <a class="btn ghost mrun" href="#lei">
         <span class="track" aria-hidden="true">
-          <span>Transforme adequação em benefícios</span><i class="spk">✦</i><span>Transforme adequação em benefícios</span><i class="spk">✦</i>
-          <span>Transforme adequação em benefícios</span><i class="spk">✦</i><span>Transforme adequação em benefícios</span><i class="spk">✦</i>
+          <span>Nova lei de saúde mental</span><i class="spk">✦</i><span>Nova lei de saúde mental</span><i class="spk">✦</i>
+          <span>Nova lei de saúde mental</span><i class="spk">✦</i><span>Nova lei de saúde mental</span><i class="spk">✦</i>
         </span>
-        <span class="sr-only">Transforme adequação em benefícios</span>
+        <span class="sr-only">Nova lei de saúde mental</span>
       </a>
       <a class="btn ghost mrun" href="#programa">
         <span class="track" aria-hidden="true">
@@ -486,7 +489,7 @@ footer a:hover{ opacity:1; text-decoration:underline; }
   </section>
 
   <!-- ══ BENEFÍCIOS ══ -->
-  <section class="s-benef" id="beneficios">
+  <section class="s-benef">
     <div class="wrap pilha in-io">
       <div class="cab">
         <span class="eyebrow r" style="--r:0">Benefícios</span>
@@ -539,17 +542,21 @@ footer a:hover{ opacity:1; text-decoration:underline; }
   <section class="s-lei" id="lei">
     <div class="wrap pilha in-io">
       <div class="cab">
-        <p class="destaque r" style="--r:1">A saúde mental no trabalho virou <em>norma</em>.</p>
-        <p class="r" style="--r:2">A NR-1 tornou a saúde mental da equipe um dever da empresa — pede acompanhamento contínuo. Desde maio de 2026, ela obriga as empresas a gerenciar os riscos psicossociais.</p>
+        <p class="destaque r" style="--r:1">A nova Lei de Saúde Mental no Trabalho <em>(Lei 14.831/24)</em> já é um diferencial competitivo para empresas.</p>
       </div>
-      <div class="col r" style="--r:3">
-        <h3>Uma adaptação adequada traz vantagens econômicas</h3>
-        <ul class="lista">
-          <li><span class="seta" aria-hidden="true">→</span><span>Segurança diante da fiscalização, longe de autuações e passivos.</span></li>
-          <li><span class="seta" aria-hidden="true">→</span><span>Menos afastamentos por ansiedade, depressão e burnout.</span></li>
-          <li><span class="seta" aria-hidden="true">→</span><span>Equipes mais engajadas — e que permanecem.</span></li>
-        </ul>
-        <a class="btn r" style="--r:4" href="#beneficios">Ver os benefícios da Arteterapia <span class="seta" aria-hidden="true">↑</span></a>
+      <div class="duas">
+        <div class="col r" style="--r:2">
+          <h3>Empresas certificadas têm</h3>
+          <ul class="lista">
+            <li><span class="seta" aria-hidden="true">→</span><span>Prioridade em licitações públicas.</span></li>
+            <li><span class="seta" aria-hidden="true">→</span><span>Acesso a linhas de crédito subsidiadas.</span></li>
+            <li><span class="seta" aria-hidden="true">→</span><span>Reconhecimento como empregadores de referência.</span></li>
+          </ul>
+        </div>
+        <div class="col r" style="--r:3">
+          <h3>E quem trabalha percebe</h3>
+          <p>Empresas que investem em saúde mental no trabalho alinham-se às expectativas da Geração Z e dos Millennials — profissionais que valorizam ambientes saudáveis e colaborativos. Quando se sentem cuidados, essas equipes entregam mais: mais engajamento, criatividade e melhores resultados.</p>
+        </div>
       </div>
     </div>
   </section>

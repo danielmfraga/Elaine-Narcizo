@@ -1,0 +1,7 @@
+# Arquivos que ficam no repositório mas NÃO sobem pro site.
+# Pra reativar algo daqui: tirar a linha correspondente e mover o arquivo
+# de volta pro lugar dele.
+
+# Versão da Produtividade Saudável com a Lei 14.831/24 — desativada set/2026
+# (o Daniel escolheu a variante da NR-1, que virou /produtividade-saudavel/)
+_desativado/
