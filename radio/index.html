@@ -246,6 +246,32 @@ body.nav-hidden .back-chip{ box-shadow:0 7px 16px rgba(0,0,0,.3); }
 .feed details[open] summary::after{ content:"–"; }
 .feed details .ans{ font-size:0.88rem; font-weight:300; color:var(--mute); line-height:1.6; padding:0 0 16px; max-width:54ch; }
 
+/* ══════════════════════════════════════════════════════════════════════
+   TELA LARGA — notebook e desktop                        (out/2026)
+   🔴 Tudo dentro de @media(min-width:1000px): o celular (mesmo deitado,
+   ~956px no maior iPhone) não lê nada daqui. O player foi desenhado e
+   aprovado no celular e continua idêntico lá.
+
+   O player é uma COLUNA (capa em cima, lista no meio, controles embaixo).
+   Esticada em 1366px, a capa do episódio virava uma faixa de 1282×383 —
+   quase toda vazia, com o título perdido lá no fundo. Aqui ele volta a ter
+   largura de gente e fica centralizado, que é como um player se parece.
+   A proporção da capa vira ~1.3 em vez de 3.3.
+   ⏳ O arranjo definitivo de desktop (capa à esquerda, lista à direita)
+   fica pra sessão de refino — isto aqui é só parar de esticar.
+   ══════════════════════════════════════════════════════════════════════ */
+@media(min-width:1000px){
+  /* ⚠️ o `html,body` é preto de propósito: no celular o player cobre a tela
+     inteira e esse preto nunca aparece. Ao estreitar o player aqui, ele
+     apareceria como duas tarjas pretas — então a área ao redor ganha o
+     cinza quente da casa, e o player branco se destaca dentro dela. */
+  .rp-stage{ background:var(--warm); }
+  .rp-stage .radio-screen{
+    width:min(100%, 520px); margin-inline:auto;
+    background:var(--paper); border-inline:1px solid var(--line-soft);
+  }
+}
+
 </style>
 </head>
 <body>

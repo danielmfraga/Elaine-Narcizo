@@ -1657,6 +1657,56 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   .js .r,.js .split .w-word,.js .wsplit .w-word,.js .hero-greet .tw-ch{ opacity:1!important; transform:none!important; }
   html{ scroll-behavior:auto; }
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   TELA LARGA — notebook e desktop                        (out/2026)
+   ══════════════════════════════════════════════════════════════════════
+   🔴 REGRA DURA DESTE BLOCO: tudo aqui vive dentro de @media(min-width:1000px).
+   O site foi desenhado e aprovado no celular (80% dos acessos) e NADA pode
+   mudar lá. 1000px é o piso seguro: o maior iPhone DEITADO dá ~956px de
+   largura CSS, então nem celular virado entra aqui. Se for preciso mexer em
+   algo que o celular também lê, não é neste bloco — é com medição antes/depois.
+
+   🔑 O PROBLEMA DE FUNDO: no celular sobra ALTURA e falta largura; no
+   notebook é o contrário. As cenas de tela cheia foram calibradas em
+   390×745, então em 1366×768 o conteúdo não cabe na vertical e corta.
+   A correção quase sempre é a mesma: passar a medir pela ALTURA (svh) em
+   vez da largura (vw) — por isso os `min(valor-do-celular, Nsvh)`.
+   ══════════════════════════════════════════════════════════════════════ */
+@media(min-width:1000px){
+
+  /* ── CAPA ──────────────────────────────────────────────────────────
+     Em 1366×768 o conteúdo passava 107px da tela: o título cortava na
+     última linha e o botão "navegue" ficava fora. A capa já tem as
+     variáveis do painel de calibragem, então aqui só trocamos os
+     números — nenhum seletor de layout é tocado.
+     Os `min()` continuam respeitando o teto original: em telas altas
+     (1440×1080, por ex.) o valor volta a ser o mesmo de antes. */
+  .c-hero{
+    --tw-title-fs:min(8.4rem, 11.8svh);
+    --tw-greet-fs:min(4.3rem, 6.4svh);
+    --tw-aster-size:clamp(110px, 16svh, 240px);
+  }
+  /* os respiros são generosos pra dar ar no celular; no notebook são eles
+     que empurram o botão "navegue" pra fora da tela. */
+  .c-hero.cover{ padding-top:calc(58px + 2vh); padding-bottom:clamp(20px,3.4vh,44px); }
+
+  /* ── RÁDIO TINHOSA ─────────────────────────────────────────────────
+     A arte é um cartaz VERTICAL (720×1280). No celular a tela tem quase
+     essa proporção e ela aparece inteira; no notebook a caixa fica
+     deitada e o `cover` mostra só 32% da altura — o nome "RÁDIO" fica
+     fora da tela, sobra "TINHOSA" sem começo. Em tela larga o vídeo passa
+     a ser medido pela ALTURA e centralizado: vira o cartaz que ele é, e o
+     gradiente bege da própria seção faz as bordas.
+     ⚠️ NÃO mexer em filter/saturate/contrast aqui — a cor desse vídeo foi
+     fechada em ago/2026 depois de 4 rodadas e está aprovada. Isto é só
+     geometria. */
+  .s-radio .radio-video{
+    left:50%; width:auto; max-width:none; transform:translateX(-50%);
+    object-position:50% 50%;
+  }
+
+}
 </style>
 </head>
 <body>
