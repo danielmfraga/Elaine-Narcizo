@@ -1728,6 +1728,34 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   .c-hero .giant .wsplit br{ display:none; }
   .c-hero .giant .wsplit br + .w-line{ margin-left:.17em; }
 
+  /* ── QUEM SOU EU — o título fica como está; abaixo dele, DUAS COLUNAS (mockup, out/2026) ──
+     No celular tudo empilha numa coluna (bio → 2 parágrafos → chamada → botões → foto) e a foto
+     fica lá no fim. Numa tela deitada isso deixava a seção com 2,4× a altura da janela e metade
+     da largura vazia. Agora: [idx] e [bio] ocupam a largura toda; embaixo, à ESQUERDA os 2
+     parágrafos + a chamada + os botões (com o selo de flores) e à DIREITA a foto.
+     🔑 A foto estica (align-self:stretch) até a altura da coluna da esquerda: topo alinhado com o
+     1º parágrafo e base alinhada com os botões — como no mockup. Por isso o aspect-ratio 4/5 da
+     `.sheet.pin .portrait` sai aqui (o ID vence na especificidade): quem manda na altura passa
+     a ser o texto. O parallax interno da foto (img com 14vh de sobra, absoluta) não conta na
+     altura da caixa, então a foto não "empurra" a linha.
+     ⚠️ SEM min-height:100svh de propósito: a regra da casa diz que toda `.sheet.pin` que mede
+     EXATAMENTE 100svh precisa de `data-static` (senão dá o "soluço" de 2 paradas). Sem o
+     min-height a seção tem a altura do conteúdo, e o `--pin-top` do JS (min(0, tela−altura))
+     já cobre qualquer altura. */
+  #quem .wrap{
+    display:grid;
+    grid-template-columns:minmax(0,30rem) clamp(320px,24vw,360px);
+    column-gap:clamp(32px,3.4vw,56px);
+    grid-template-areas:"idx idx" "bio bio" "a1 foto" "a2 foto" "cta foto";
+    align-items:start;
+  }
+  #quem .idx{ grid-area:idx; }
+  #quem .bio{ grid-area:bio; }
+  #quem .bio + .bio-aside{ grid-area:a1; }
+  #quem .bio-aside + .bio-aside{ grid-area:a2; }
+  #quem .quem-cta{ grid-area:cta; }
+  #quem .portrait{ grid-area:foto; align-self:stretch; margin-top:0; aspect-ratio:auto; max-width:none; }
+
   /* ── RÁDIO TINHOSA ─────────────────────────────────────────────────
      A arte é um cartaz VERTICAL (720×1280). No celular a tela tem quase
      essa proporção e ela aparece inteira; no notebook a caixa fica
