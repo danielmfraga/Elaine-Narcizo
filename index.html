@@ -1441,10 +1441,17 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
    reservar espaço embaixo, então centraliza na tela toda mesmo. */
 .dd-capa .cv-wm{ position:absolute; right:1vw; top:50%; transform:translateY(-50%);
   height:84svh; width:9.7svh; display:flex; align-items:center; justify-content:center; z-index:4; }
-.dd-capa .cv-wm img{ width:84svh; max-width:none; transform:rotate(-90deg); }
+/* 🔧 `flex:none` NAS DUAS IMAGENS (out/2026). A caixa (`.cv-wm`/`.cv-ht`) é `display:flex` e estreita
+   de propósito (9,7svh / 2,2svh) — a imagem de dentro é MAIOR que ela e só "cabe" porque é girada com
+   rotate(-90deg) (transform não muda o layout). Só que item flex ENCOLHE por padrão (flex-shrink:1):
+   Chrome e Firefox espremiam o wordmark de 84svh pra ~10% da altura e a hashtag de 30svh pra ~2%
+   (1×19px: invisível). Medido: 82px em vez de 709px num cartão de 844px. O Safari do iPhone, onde a
+   capa foi aprovada, não encolhia — por isso só os outros navegadores viam o lettering "pequenino".
+   Ver o cartaz de referência assets/Dancadestino/Capa_0.webp: a espinha amarela é ~95% da altura. */
+.dd-capa .cv-wm img{ width:84svh; max-width:none; flex:none; transform:rotate(-90deg); }
 .dd-capa .cv-ht{ position:absolute; right:14svh; top:6%; height:30svh; width:2.2svh;
   display:flex; align-items:center; justify-content:center; z-index:4; }
-.dd-capa .cv-ht img{ width:30svh; max-width:none; transform:rotate(-90deg); }
+.dd-capa .cv-ht img{ width:30svh; max-width:none; flex:none; transform:rotate(-90deg); }
 .dd-capa .cv-yb{ position:absolute; left:1%; top:26%; width:63%; height:43%;
   background:var(--amarelo); transform:rotate(-2deg); z-index:1; }
 .dd-capa .cv-col{ position:absolute; left:-7%; bottom:22%; width:91%; z-index:2;
@@ -1833,6 +1840,15 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
     html body .percursos-scene .perc-espaco{ height:0; }
     html body .percursos-scene .perc-pin{ position:relative; height:100svh; }
   }
+
+  /* ── CAPA DO DANÇADESTINO no Portão 01: folga pro botão de play ───────────────────────
+     Com o lettering finalmente no tamanho do desenho (84svh), a espinha centrada na tela toda
+     TOCA o botão de play (canto de baixo, 58px + 16px de vão = 74px) sempre que o cartão tem
+     menos de ~925px de altura — ou seja, em todo notebook. A página própria do DançaDestino
+     já resolve isso (ver o comentário do `.cv-wm` lá: "o D precisa de folga do #dd-fab"):
+     centraliza no vão ACIMA do botão. Aqui a mesma conta, só em tela larga. No celular o
+     lettering segue centrado na altura toda, como estava (o toque ali é de ~6px). */
+  .dd-capa .cv-wm{ top:calc((100svh - 74px)/2); }
 
   /* ── RÁDIO TINHOSA ─────────────────────────────────────────────────
      A arte é um cartaz VERTICAL (720×1280). No celular a tela tem quase

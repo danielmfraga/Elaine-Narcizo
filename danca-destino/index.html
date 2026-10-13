@@ -61,11 +61,12 @@
   .cv-wm{ position:absolute; right:1vw;
     top:calc((100svh - 74px - env(safe-area-inset-bottom,0px))/2); transform:translateY(-50%);
     height:84svh; width:9.7svh; display:flex; align-items:center; justify-content:center; z-index:4; }
-  .cv-wm img{ width:84svh; max-width:none; transform:rotate(-90deg); }
+  /* `flex:none`: item flex encolhe por padrão e Chrome/Firefox espremiam isto pra ~10% (ver o comentário igual em index.html) */
+  .cv-wm img{ width:84svh; max-width:none; flex:none; transform:rotate(-90deg); }
   /* hashtag vertical, fina, paralela à esquerda do wordmark (não encosta) */
   .cv-ht{ position:absolute; right:14svh; top:6%; height:30svh; width:2.2svh;
     display:flex; align-items:center; justify-content:center; z-index:4; }
-  .cv-ht img{ width:30svh; max-width:none; transform:rotate(-90deg); }
+  .cv-ht img{ width:30svh; max-width:none; flex:none; transform:rotate(-90deg); }
   /* bloco amarelo atrás da colagem */
   .cv-yb{ position:absolute; left:1%; top:26%; width:63%; height:43%;
     background:var(--amarelo); transform:rotate(-2deg); z-index:1; }
