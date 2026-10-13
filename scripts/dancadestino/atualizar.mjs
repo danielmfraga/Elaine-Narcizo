@@ -196,22 +196,23 @@ export function achaMusicaDaSemana(html) {
   return { texto: achado.title, url: achado.url, id: idDoYoutube(achado.url) };
 }
 
-/* 🔑 POR QUE curl E NÃO fetch()/https — descoberto rodando no GitHub (out/2026), em 3 rodadas:
-   o Linktree responde 406 ao servidor do GitHub se o pedido vier do Node.
-     · 1ª tentativa, fetch() do Node ............ 406  (suspeitei dos cabeçalhos de navegador
-                                                        que o fetch() anexa sozinho)
-     · 2ª tentativa, node:https só com UA+accept  406  (então NÃO eram os cabeçalhos)
-     · curl, do mesmo servidor, mesmo user-agent  200  (o que passa é a "impressão digital"
-                                                        da conexão do curl, não a do Node)
-   Medido no diagnóstico: curl simples = 200 · UA de robô = 200 · UA "Chrome" via HTTP/2 = 406.
-   Por isso: curl primeiro; node:https só de reserva se não houver curl instalado.
-   O user-agent é HONESTO de propósito ("dancadestino-bot"): fingir ser Chrome é justamente o
-   que o Linktree recusa. Nada aqui tenta se esconder: é um robô lendo a página pública que
-   o próprio Daniel mantém. */
-const UA_ROBO = 'Mozilla/5.0 (compatible; dancadestino-bot)';
+/* 🔑 O 406 DO LINKTREE (descoberto rodando no GitHub, out/2026) — o que se sabe e o que não.
+   Do servidor do GitHub o Linktree responde 406 DE VEZ EM QUANDO. Medido, 6 pedidos seguidos
+   por variante, mesmo servidor:
+       user-agent "…dancadestino-bot" (HTTP/2) ... 200 406 200 200 200 406
+       user-agent "…dancadestino-bot" (HTTP/1.1) . 406 200 200 406 200 200
+       curl SEM user-agent nenhum ................ 200 200 200 200 200 200
+       user-agent "curl/8.5.0" ................... 200 200 200 200 200 200
+   Ou seja: é intermitente, e o que piorava era a palavra "bot" no user-agent. Antes disso eu
+   tinha culpado o fetch() do Node e depois o node:https — as duas teorias estavam ERRADAS
+   (as duas tentativas só tinham o mesmo user-agent "bot"; o "200" que eu vi no 1º diagnóstico
+   foi sorte de uma tentativa só). Lição: com falha intermitente, UMA medição não prova nada.
+   Por isso agora: curl (que se identifica sozinho como curl — honesto, sem inventar nada)
+   e 5 tentativas com espera crescente. Não sei POR QUE o Linktree implica com "bot"; só sei
+   que isso funcionou 12/12. Se voltar a falhar, o primeiro passo é repetir esta medição. */
 function pegaPagina(url, restantes = 3) {
   return new Promise((ok, falha) => {
-    const req = https.get(url, { headers: { 'user-agent': UA_ROBO, accept: 'text/html' }, timeout: 25000 }, (res) => {
+    const req = https.get(url, { headers: { accept: 'text/html' }, timeout: 25000 }, (res) => {
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location && restantes > 0) {
         res.resume();
         return ok(pegaPagina(new URL(res.headers.location, url).href, restantes - 1));
@@ -230,7 +231,7 @@ function pegaPagina(url, restantes = 3) {
 function pegaComCurl(url) {
   return new Promise((ok, falha) => {
     // sem shell (execFile + lista de argumentos): nada do que vem da rede vira comando
-    execFile('curl', ['-sS', '--max-time', '25', '-L', '--max-redirs', '3', '-A', UA_ROBO, '-w', '\n__HTTP__%{http_code}', url],
+    execFile('curl', ['-sS', '--max-time', '25', '-L', '--max-redirs', '3', '-w', '\n__HTTP__%{http_code}', url],
       { maxBuffer: 20 * 1024 * 1024, encoding: 'utf8' }, (err, out, errout) => {
         if (err && err.code === 'ENOENT') return falha(Object.assign(new Error('curl não instalado'), { semCurl: true }));
         const m = /\n__HTTP__(\d{3})\s*$/.exec(out || '');
@@ -243,14 +244,14 @@ function pegaComCurl(url) {
 
 async function baixaLinktree() {
   let ultimo;
-  for (let t = 1; t <= 3; t++) {
+  for (let t = 1; t <= 5; t++) {
     try {
       try { return await pegaComCurl(LINKTREE); }
       catch (e) { if (!e.semCurl) throw e; }          // sem curl instalado → cai pra reserva
       return await pegaPagina(LINKTREE);
-    } catch (e) { ultimo = e; await new Promise((ok) => setTimeout(ok, t * 4000)); }
+    } catch (e) { ultimo = e; await new Promise((ok) => setTimeout(ok, t * 3000)); }
   }
-  throw new Error(`não consegui abrir o Linktree (3 tentativas): ${ultimo?.message}`);
+  throw new Error(`não consegui abrir o Linktree (5 tentativas): ${ultimo?.message}`);
 }
 
 function saidaParaGithub(chaves) {
