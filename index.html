@@ -1789,6 +1789,17 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   html body .percursos-scene .perc-timer{ display:none; }
   html body .percursos-scene .perc-espaco{ height:35svh; }
   html body .percursos-scene .perc-pin{ position:sticky; top:0; height:100svh; overflow:hidden; }
+  /* 🎨 FRONTEIRA entre a Bilheteria (em cima) e a Escola Vivona (embaixo). Depois de limpar o cinza
+     (ver `.s-obras{clip-path}` abaixo) os dois ficaram UMA faixa creme contínua — o Daniel: "seria
+     melhor ter alguma divisão, porque o de cima é da bilheteria e o de baixo já é Vivona". Usa a
+     linguagem que o site já tem pra "começa outra seção": a LÂMINA — topo arredondado
+     (`var(--radius)`) e a mesma sombra que sobe do `.sheet` (`0 -18px 60px`).
+     🔑 A sombra agora fica ACIMA da borda do cartaz (no creme dos portões), não por cima dele —
+     por isso não volta o cinza que sujava o topo da Vivona e o vão da curva da PONTE.
+     🔑 `z-index:2`: pra a sombra pintar POR CIMA da Bilheteria o pino precisa estar acima dela
+     (`.sheet` é z-index 2 e vem antes no DOM; empate = o que vem depois ganha). A lâmina das
+     Considerações (z-index 2, depois no DOM) continua ACIMA do pino — é o que a faz cobri-lo. */
+  html body .percursos-scene .perc-pin{ z-index:2; border-radius:var(--radius) var(--radius) 0 0; box-shadow:0 -18px 60px rgba(0,0,0,.35); }
   html body .percursos-scene .perc-track{ position:absolute; inset:0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); width:auto; height:100%; animation:none; }
   html body .percursos-scene .perc-card{ position:relative; inset:auto; flex:none; height:auto; min-height:0; animation:none; transform:none; filter:none; box-shadow:none; border-radius:0; }
   /* a PONTE ganha a borda arredondada do lado de dentro (era a do lado que chegava): no creme da Vivona
