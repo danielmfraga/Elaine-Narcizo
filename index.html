@@ -1770,6 +1770,47 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   .s-obras .works{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:clamp(24px,3vw,48px); align-items:start; }
   .s-obras .work{ display:flex; flex-direction:column; align-items:stretch; gap:14px; padding:0; border-top:0; }
 
+  /* ── ESCOLA VIVONA + PONTE — LADO A LADO (pedido do Daniel, out/2026) ──────────────
+     "A escola é seguida do Ponte, que é um dos percursos da escola… acho que perde um pouco
+     em termos de experiência do usuário. Escola na esquerda e Ponte na direita."
+     No celular nada muda: a Vivona fica parada e a PONTE entra por cima, dirigida por scroll.
+     Em tela larga o problema do baralho é que NUNCA se veem os dois juntos — e a PONTE é um
+     percurso da escola, então juntos é como se leem. Aqui o deslize SAI e os dois cartazes
+     viram 2 colunas iguais: Vivona (esq.) · PONTE (dir.).
+     🔑 O que se MANTÉM do original: o pino continua `sticky` e a lâmina das "Considerações
+     finais" (que mora DENTRO desta cena, por causa do sticky) continua subindo POR CIMA dele —
+     o baralho vertical do resto do site. O que sai: o marcador de view-timeline e o deslize.
+     🔑 ESPECIFICIDADE: as regras originais são `html.sdt .perc-*` (0,2,1). `html body …` (0,2,2+)
+     vence sem !important e vale COM e SEM html.sdt (navegador sem scroll-driven também ganha o
+     lado a lado). `.perc-espaco` deixa de ser a pista do deslize e vira só uma pausa curta, pra
+     o par ficar à vista um pouco antes da lâmina começar a cobrir.
+     ⚠️ O iframe da PONTE (`?capa=1`) tem o próprio viewport = o cartaz (metade da tela). Já
+     funcionou em cartaz cheio e em metade de tela nos testes da Rádio; conferir a olho. */
+  html body .percursos-scene .perc-timer{ display:none; }
+  html body .percursos-scene .perc-espaco{ height:35svh; }
+  html body .percursos-scene .perc-pin{ position:sticky; top:0; height:100svh; overflow:hidden; }
+  html body .percursos-scene .perc-track{ position:absolute; inset:0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); width:auto; height:100%; animation:none; }
+  html body .percursos-scene .perc-card{ position:relative; inset:auto; flex:none; height:auto; min-height:0; animation:none; transform:none; filter:none; box-shadow:none; border-radius:0; }
+  /* a PONTE ganha a borda arredondada do lado de dentro (era a do lado que chegava): no creme da Vivona
+     ela lê como um cartão encaixado, não como uma tela cortada ao meio */
+  html body .percursos-scene .perc-card-frame{ border-radius:var(--radius) 0 0 var(--radius); }
+  /* O CARTAZ DA VIVONA foi calibrado pro celular em pé (≈390×844): logo de 520px, ilustração de
+     220px, 60px entre blocos e 80px de padding embaixo. Numa coluna de ~680px de largura por
+     ~650px de altura isso ESTOURAVA 180px — o botão "Quero ser avisada" ficava fora da tela.
+     Aqui tudo passa a escalar pela ALTURA (svh) e os 3 blocos (logo · texto+ilustração · botão)
+     se distribuem pela altura do cartaz: o logo no topo, o botão na base, o meio no meio. O
+     `gap` vira o MÍNIMO entre eles (em janela baixa não se sobrepõem; só encostam). */
+  .percursos-scene .perc-card-vivona{ padding-top:max(76px, 11svh); padding-bottom:max(24px, 4.5svh); }
+  .percursos-scene .viv-inner{ justify-content:space-between; gap:clamp(12px,2.6svh,36px); }
+  .percursos-scene .viv-top{ gap:clamp(10px,2svh,24px); }
+  .percursos-scene .viv-logo{ max-width:min(520px, 50svh); }
+  .percursos-scene .viv-art{ max-width:min(220px, 25svh); }
+  .percursos-scene .viv-foot{ gap:clamp(8px,1.6svh,18px); }
+  @media (prefers-reduced-motion:reduce){
+    html body .percursos-scene .perc-espaco{ height:0; }
+    html body .percursos-scene .perc-pin{ position:relative; height:100svh; }
+  }
+
   /* ── RÁDIO TINHOSA ─────────────────────────────────────────────────
      A arte é um cartaz VERTICAL (720×1280). No celular a tela tem quase
      essa proporção e ela aparece inteira; no notebook a caixa fica
