@@ -1806,6 +1806,18 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   .percursos-scene .viv-logo{ max-width:min(520px, 50svh); }
   .percursos-scene .viv-art{ max-width:min(220px, 25svh); }
   .percursos-scene .viv-foot{ gap:clamp(8px,1.6svh,18px); }
+  /* 🎨 CREME LIMPO no encontro com o cartaz (Daniel, out/2026: "aqui seria mais legal o creme e
+     não branco/cinza como está"). A lâmina da Bilheteria (`.s-obras`) herda do `.sheet` uma sombra
+     de 60px de desfoque desenhada PRA CIMA (`0 -18px 60px`) — mas desfoque vaza pra todos os lados,
+     inclusive PRA BAIXO da borda dela (~40px). Como ela termina exatamente onde o cartaz começa
+     e pinta POR CIMA (z-index 2), a sombra sujava de cinza o topo do cartaz da Vivona e o vão em
+     volta da curva da PONTE: medido rgb(223,218,205) em vez do creme rgb(243,238,224).
+     `clip-path: inset(-120px 0 0 0)` mantém a sombra pra CIMA (120px de folga, mais que os ~78px que
+     ela alcança) e corta o que vazaria pra baixo e pros lados (esses já estão fora da tela).
+     O `1px` no fim recua o corte um pixel: a borda da lâmina cai numa fração de pixel e, sem ele,
+     sobrava uma LINHA de 1px de sombra (rgb(221,216,203)) na emenda. Atrás do corte é o mesmo creme.
+     ⚠️ SÓ AQUI, em tela larga: no celular a mesma sombra existe e o Daniel aprovou assim. */
+  .s-obras{ clip-path:inset(-120px 0 1px 0); }
   @media (prefers-reduced-motion:reduce){
     html body .percursos-scene .perc-espaco{ height:0; }
     html body .percursos-scene .perc-pin{ position:relative; height:100svh; }
