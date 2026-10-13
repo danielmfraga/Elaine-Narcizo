@@ -1692,13 +1692,41 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
      Os `min()` continuam respeitando o teto original: em telas altas
      (1440×1080, por ex.) o valor volta a ser o mesmo de antes. */
   .c-hero{
-    --tw-title-fs:min(8.4rem, 11.8svh);
-    --tw-greet-fs:min(4.3rem, 6.4svh);
-    --tw-aster-size:clamp(110px, 16svh, 240px);
+    --tw-title-fs:min(5.9vw, 11.8svh);   /* ver "COMPOSIÇÃO" abaixo: 5,9vw = ~83% da largura */
+    --tw-greet-fs:min(4.6rem, 8svh);
+    --tw-aster-size:min(12vw, 21svh);
+    --tw-title-align:center;             /* no celular é "left" (padrão da variável) */
+    --tw-title-x:0px;                    /* os 13px do celular são pro bloco alinhado à esquerda */
+    --tw-btn-w:2.5em;
   }
-  /* os respiros são generosos pra dar ar no celular; no notebook são eles
-     que empurram o botão "navegue" pra fora da tela. */
-  .c-hero.cover{ padding-top:calc(58px + 2vh); padding-bottom:clamp(20px,3.4vh,44px); }
+
+  /* ── CAPA — COMPOSIÇÃO CENTRADA (mockup do Daniel, out/2026) ───────────────
+     No celular a capa é uma coluna alinhada à esquerda, com o título em 3 linhas
+     ("Tudo começa / quando a gente / se encontra.") colado embaixo. Numa tela
+     deitada isso vira um bloco pequeno encostado num canto; o mockup pede:
+       · tudo CENTRALIZADO, e o conjunto no centro VERTICAL da tela;
+       · título numa linha só (~83% da largura);
+       · botão "navegue" centralizado embaixo do título.
+     🔑 TAMANHO MEDIDO, não chutado: "TUDO COMEÇA QUANDO A GENTE SE ENCONTRA." mede
+     14,04em em Bebas Neue (canvas, com o letter-spacing .005em da capa) — por isso
+     5,9vw dá 5,9×14,04 = 82,8% da largura. Se mudar a frase ou a fonte, REFAZER a conta.
+     O `min(…, 11.8svh)` segura o título em janelas baixas e largas. */
+  /* DISTRIBUIÇÃO VERTICAL do mockup: saudação perto do topo, título+botão perto da base e os
+     asteriscos NO MEIO entre os dois. Feito com margens `auto` nos asteriscos (e não com
+     `justify-content:space-between`) de propósito: a capa tem um filho extra de altura 0 no fim
+     (`.pin-dim`) que entraria na conta do space-between e empurraria o título pra cima.
+     Com margem auto, a folga se reparte sozinha — e some se a janela for baixa (notebook
+     1366×768 tem só ~657px úteis), sem nunca deixar os blocos se sobreporem. O `padding`
+     do asterisco é a folga MÍNIMA que sobra mesmo no pior caso. */
+  .c-hero.cover{ justify-content:flex-start; padding-top:max(66px, 13svh); padding-bottom:max(40px, 11svh); }
+  .c-hero .hero-aster{ margin-top:auto; margin-bottom:auto; padding:1.5svh 0; }
+  .c-hero .giant{ white-space:nowrap; }
+  /* as 2 <br> de DENTRO do título (as que montam as 3 linhas do celular) somem; a <br>
+     que separa o título do botão fica. Sem a <br>, "começa" e "quando" ficariam
+     COLADAS (não há espaço no HTML ali) — por isso a margem que faz as vezes de espaço:
+     0,165em (largura do espaço em Bebas, medida) + 0,005em do letter-spacing. */
+  .c-hero .giant .wsplit br{ display:none; }
+  .c-hero .giant .wsplit br + .w-line{ margin-left:.17em; }
 
   /* ── RÁDIO TINHOSA ─────────────────────────────────────────────────
      A arte é um cartaz VERTICAL (720×1280). No celular a tela tem quase
