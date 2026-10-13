@@ -19,9 +19,14 @@
      node scripts/dancadestino/atualizar.mjs sync
          reescreve as 3 páginas a partir do playlist.json
      node scripts/dancadestino/atualizar.mjs semana [--dry]
-         lê o Linktree da Elaine, acha "Música da semana: …" e põe no topo.
-         É o que o robô chama toda sexta. Roda quantas vezes quiser: se o
-         vídeo já está na lista, não faz nada.
+         lê o Linktree da Elaine, acha "Música da semana: …", põe no TOPO e
+         dá a ela o selo "Música da semana" (tirando o selo da anterior).
+         É o que o robô chama toda sexta. Roda quantas vezes quiser: se ela
+         já é a primeira da lista, com o selo, não faz nada.
+
+   ORDEM DA LISTA: a mais nova SEMPRE em cima — a lista é lida de cima pra
+   baixo como um calendário que anda pra trás. O selo ("semana:true" no
+   playlist.json) existe em UMA faixa só: a música da semana atual.
 
    🔑 Título e artista saem do TEXTO DO LINKTREE ("Música da semana: Arreuni
    - Doroty Marques" → título "Arreuni", artista "Doroty Marques"). Só se o
@@ -101,7 +106,8 @@ function lePagina(rel) {
 
 export function blocoDe(faixas, indent, quebra) {
   return faixas
-    .map((t, i) => `${indent}{ id:'${esc(t.id)}', title:'${esc(t.title)}', artist:'${esc(t.artist)}' }${i < faixas.length - 1 ? ',' : ''}`)
+    // `semana:true` só existe na faixa que leva o selo "Música da semana" (no máximo UMA)
+    .map((t, i) => `${indent}{ id:'${esc(t.id)}', title:'${esc(t.title)}', artist:'${esc(t.artist)}'${t.semana ? ', semana:true' : ''} }${i < faixas.length - 1 ? ',' : ''}`)
     .join(quebra);
 }
 
@@ -114,6 +120,7 @@ export function leLista() {
     if (vistos.has(t.id)) throw new Error(`playlist.json: id repetido (${t.id})`);
     vistos.add(t.id);
   });
+  if (lista.filter((t) => t.semana).length > 1) throw new Error("playlist.json: mais de uma faixa com o selo da semana.");
   return lista;
 }
 const salvaLista = (lista) => fs.writeFileSync(ARQ_LISTA, JSON.stringify(lista, null, 2) + '\n', 'utf8');
@@ -156,6 +163,20 @@ export async function adiciona({ id, titulo, artista, fim = false }) {
   if (fim) lista.push(faixa); else lista.unshift(faixa);
   salvaLista(lista);
   return { novo: true, faixa };
+}
+
+/* ── a MÚSICA DA SEMANA: vai pro topo e leva o selo; o selo sai de quem tinha ──
+   Pura (sem rede, sem arquivo) pra poder ser testada. `nova` = a faixa pronta,
+   só necessária quando o id ainda não está na lista. */
+export function promoveSemana(lista, id, nova) {
+  const i = lista.findIndex((t) => t.id === id);
+  const comSelo = lista.filter((t) => t.semana);
+  if (i === 0 && comSelo.length === 1) return { mudou: false, lista, faixa: lista[0] };   // já é a da semana
+  const faixa = i >= 0 ? lista[i] : nova;
+  if (!faixa) throw new Error(`promoveSemana: o vídeo ${id} não está na lista e não veio a faixa nova.`);
+  const resto = lista.filter((t) => t.id !== id).map(({ semana, ...t }) => t);   // tira o selo de todo mundo
+  const { semana: _antigo, ...limpa_ } = faixa;
+  return { mudou: true, lista: [{ ...limpa_, semana: true }, ...resto], faixa: limpa_ };
 }
 
 /* ── Linktree ── */
@@ -239,17 +260,27 @@ async function principal() {
     const { texto, id } = achaMusicaDaSemana(await baixaLinktree());
     const { titulo, artista } = partesDoTitulo(texto);
     console.log(`Linktree: "${texto}"  →  vídeo ${id}`);
+    const lista = leLista();
     if (o.dry) {
-      const jaTem = leLista().some((t) => t.id === id);
-      console.log(jaTem ? '[dry] já está na lista — não faria nada.' : `[dry] entraria no topo: "${titulo}" — "${artista ?? '(nome do canal)'}"`);
+      const e = lista.findIndex((t) => t.id === id);
+      console.log(e === 0 && lista[0].semana ? '[dry] já é a música da semana — não faria nada.'
+        : e >= 0 ? `[dry] já está na lista (#${e + 1}); subiria pro topo com o selo "Música da semana".`
+        : `[dry] entraria no topo, com o selo: "${titulo}" — "${artista ?? '(nome do canal)'}"`);
       return;
     }
-    const r = await adiciona({ id, titulo, artista });
-    if (!r.novo) {
-      console.log(`já estava na lista (${r.faixa.title}). Nada a fazer.`);
+    let nova = null;
+    if (!lista.some((t) => t.id === id)) {                 // só confere no YouTube se for faixa nova
+      const yt = await consultaYoutube(id);                // falha aqui = nada é escrito
+      nova = { id, title: limpa(titulo || yt.titulo, 120), artist: limpa(artista || yt.canal, 80) };
+      if (!nova.title || !nova.artist) throw new Error(`faltou título ou artista para ${id}.`);
+    }
+    const r = promoveSemana(lista, id, nova);
+    if (!r.mudou) {
+      console.log(`já é a música da semana (${r.faixa.title}). Nada a fazer.`);
       saidaParaGithub({ mudou: 'false' });
       return;
     }
+    salvaLista(r.lista);
     const mudou = sync();
     const msg = `DançaDestino: música da semana — ${r.faixa.title} (${r.faixa.artist})`;
     console.log(`✓ ${msg}\n  páginas: ${mudou.join(', ')}`);

@@ -147,6 +147,8 @@ a{ color:inherit; }
 .sp-row .sp-n{ font-size:.7rem; color:var(--mute); width:18px; text-align:center; flex-shrink:0; font-variant-numeric:tabular-nums; }
 .sp-row .sp-ti{ flex:1; min-width:0; font-size:.76rem; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .sp-row .sp-du{ font-size:.72rem; color:var(--mute); flex-shrink:0; font-variant-numeric:tabular-nums; }
+/* selo "Música da semana" — só existe na faixa marcada pelo robô; em nenhuma outra linha */
+.sp-row .sp-sem{ flex-shrink:0; font-size:.54rem; font-weight:700; letter-spacing:.06em; line-height:1; text-transform:uppercase; white-space:nowrap; padding:4px 7px; border-radius:999px; background:var(--amarelo); color:var(--ink); }
 
 .sp-bar{ display:flex; align-items:center; gap:10px; flex-shrink:0; }
 .sp-bar .sp-t{ font-size:.66rem; color:var(--mute); font-variant-numeric:tabular-nums; width:34px; flex-shrink:0; }
@@ -362,51 +364,51 @@ body.nav-hidden .back-chip{ box-shadow:0 7px 16px rgba(0,0,0,.3); }
      YouTube (canais "- Topic"/"Oficial" viram só o nome do artista; quando
      o título já trazia o artista embutido, ele venceu o nome do canal). */
   var ytTracks=[
-    { id:'9cFgEvmQdAQ', title:'Dikoboda Sombe', artist:'Tradicional (Aka Pygmy)' },
-    { id:'21IGGuBvE3k', title:'DARPA', artist:'Wim Mertens' },
-    { id:'MnTm36D8tg0', title:'O Trenzinho do Caipira', artist:'Egberto Gismonti' },
-    { id:'cCu_6UpgwRU', title:'Sou do Bem', artist:'Naná Vasconcelos' },
-    { id:'_zBZpjAEorA', title:'Sem Fim', artist:'Rogério Skylab' },
-    { id:'qoe4IruSpKI', title:'Um Girassol da Cor do Seu Cabelo', artist:'Lô Borges' },
-    { id:'d4uNOo4OWa4', title:'Coco Dub (Afrociberdelia)', artist:'Chico Science' },
-    { id:'_nerFs6AN1g', title:'Só Morto', artist:'Jards Macalé' },
-    { id:'rmGCNUEXiRo', title:'Rosa (Que Linda Eres)', artist:'Trinix' },
-    { id:'jf5g0uM0Fc0', title:'Banzo, Pt. 1', artist:'Letieres Leite' },
-    { id:'pHJbwr3GuLA', title:'Canção Kayapo', artist:'Grupo Mawaca' },
-    { id:'tfkEejPAiYo', title:'Quero Ser Locomotiva', artist:'Jorge Mautner' },
-    { id:'iWOyfLBYtuU', title:'Dog Days Are Over', artist:'Florence + The Machine' },
-    { id:'PilUCu6QdKg', title:'Chenrezig', artist:'Don Cherry' },
-    { id:'yWWzIVj3L_M', title:'O Côco do Côco', artist:'Leila Pinheiro' },
-    { id:'TvmwfeCxGIA', title:'É Por Isso Que Sofre', artist:'DJ Batata, Tati Quebra Barraco, Bárbara Labres' },
-    { id:'TNHfGriOn_0', title:'Reza do Vento', artist:'Ale de Maria' },
-    { id:'vEnZJSuEzPE', title:'O Amanhecer do Alexandre', artist:'Luís Capucho' },
-    { id:'00kQeA8XyVA', title:'Pimenta Mumuíla', artist:'Mateus Aleluia' },
-    { id:'0KMbTgr0Q5w', title:'Pitágoras', artist:'Os Mutantes' },
-    { id:'yv5xonFSC4c', title:'Redemption Song', artist:'Bob Marley & The Wailers' },
-    { id:'GgJ8BkxTy3Q', title:'Canto da Revolução', artist:'Doralyce' },
-    { id:'8fvOf1idIiw', title:'Ninguém Manda em Mim', artist:'Lucia Vulcano' },
-    { id:'FuZ0OdtK3P8', title:'É Preciso Dar um Jeito, Meu Amigo', artist:'Erasmo Carlos' },
-    { id:'56mu8KSUYqk', title:'Preciso Me Encontrar', artist:'Cartola' },
-    { id:'znxb6KtOo_c', title:'Djobi, Djoba', artist:'Gipsy Kings' },
-    { id:'argwbQd5dXk', title:'Todos Estão Surdos', artist:'Pato Fu' },
-    { id:'5pzTXOONVRg', title:'O Pulso', artist:'Cida Moreira' },
-    { id:'-K_WebdzmwY', title:'Do Vento', artist:'Arnaldo Antunes' },
-    { id:'_2xYN5hd5aU', title:'Grávida', artist:'Marina Lima' },
-    { id:'GJVWEstu_lM', title:'Bolero', artist:'London Symphony Orchestra (Gergiev)' },
-    { id:'rLsP8NgS01Y', title:'One River', artist:'Benjy Wertheimer' },
-    { id:'AA_8wtG62DI', title:'Jokerman', artist:'Caetano Veloso' },
-    { id:'nAyXMqB_6Kc', title:'Casaco Marron (Bye, Bye, Ceci)', artist:'Evinha' },
-    { id:'oG6fayQBm9w', title:'Walk on the Wild Side', artist:'Lou Reed' },
-    { id:'PIR1f2x1ANk', title:'Galaxia Tropical', artist:'Ranil y Su Conjunto Tropical' },
-    { id:'eH3giaIzONA', title:'I Wanna Dance With Somebody (Who Loves Me)', artist:'Whitney Houston' },
-    { id:'_PpmYjq4cpE', title:'Amor e Paz', artist:'Walter Santos' },
-    { id:'jJTArjsT9mw', title:'Tcheca', artist:'Danny Bond' },
-    { id:'iyLdoQGBchQ', title:'Lambada', artist:'Kaoma' },
-    { id:'CLhjvJkjdho', title:'Eu Despedi o Meu Patrão', artist:'Zeca Baleiro' },
-    { id:'i8WArTByOpM', title:'Ilariê', artist:'Xuxa' },
-    { id:'k1L-EXmR_Vs', title:'Volta Por Cima', artist:'Beth Carvalho' },
+    { id:'oJq2hwQotgA', title:'Guiné-Bissau, Moçambique e Angola Racional', artist:'Tim Maia' },
     { id:'hSXIO0t4OlQ', title:'Zé do Caroço', artist:'Leci Brandão' },
-    { id:'oJq2hwQotgA', title:'Guiné-Bissau, Moçambique e Angola Racional', artist:'Tim Maia' }
+    { id:'k1L-EXmR_Vs', title:'Volta Por Cima', artist:'Beth Carvalho' },
+    { id:'i8WArTByOpM', title:'Ilariê', artist:'Xuxa' },
+    { id:'CLhjvJkjdho', title:'Eu Despedi o Meu Patrão', artist:'Zeca Baleiro' },
+    { id:'iyLdoQGBchQ', title:'Lambada', artist:'Kaoma' },
+    { id:'jJTArjsT9mw', title:'Tcheca', artist:'Danny Bond' },
+    { id:'_PpmYjq4cpE', title:'Amor e Paz', artist:'Walter Santos' },
+    { id:'eH3giaIzONA', title:'I Wanna Dance With Somebody (Who Loves Me)', artist:'Whitney Houston' },
+    { id:'PIR1f2x1ANk', title:'Galaxia Tropical', artist:'Ranil y Su Conjunto Tropical' },
+    { id:'oG6fayQBm9w', title:'Walk on the Wild Side', artist:'Lou Reed' },
+    { id:'nAyXMqB_6Kc', title:'Casaco Marron (Bye, Bye, Ceci)', artist:'Evinha' },
+    { id:'AA_8wtG62DI', title:'Jokerman', artist:'Caetano Veloso' },
+    { id:'rLsP8NgS01Y', title:'One River', artist:'Benjy Wertheimer' },
+    { id:'GJVWEstu_lM', title:'Bolero', artist:'London Symphony Orchestra (Gergiev)' },
+    { id:'_2xYN5hd5aU', title:'Grávida', artist:'Marina Lima' },
+    { id:'-K_WebdzmwY', title:'Do Vento', artist:'Arnaldo Antunes' },
+    { id:'5pzTXOONVRg', title:'O Pulso', artist:'Cida Moreira' },
+    { id:'argwbQd5dXk', title:'Todos Estão Surdos', artist:'Pato Fu' },
+    { id:'znxb6KtOo_c', title:'Djobi, Djoba', artist:'Gipsy Kings' },
+    { id:'56mu8KSUYqk', title:'Preciso Me Encontrar', artist:'Cartola' },
+    { id:'FuZ0OdtK3P8', title:'É Preciso Dar um Jeito, Meu Amigo', artist:'Erasmo Carlos' },
+    { id:'8fvOf1idIiw', title:'Ninguém Manda em Mim', artist:'Lucia Vulcano' },
+    { id:'GgJ8BkxTy3Q', title:'Canto da Revolução', artist:'Doralyce' },
+    { id:'yv5xonFSC4c', title:'Redemption Song', artist:'Bob Marley & The Wailers' },
+    { id:'0KMbTgr0Q5w', title:'Pitágoras', artist:'Os Mutantes' },
+    { id:'00kQeA8XyVA', title:'Pimenta Mumuíla', artist:'Mateus Aleluia' },
+    { id:'vEnZJSuEzPE', title:'O Amanhecer do Alexandre', artist:'Luís Capucho' },
+    { id:'TNHfGriOn_0', title:'Reza do Vento', artist:'Ale de Maria' },
+    { id:'TvmwfeCxGIA', title:'É Por Isso Que Sofre', artist:'DJ Batata, Tati Quebra Barraco, Bárbara Labres' },
+    { id:'yWWzIVj3L_M', title:'O Côco do Côco', artist:'Leila Pinheiro' },
+    { id:'PilUCu6QdKg', title:'Chenrezig', artist:'Don Cherry' },
+    { id:'iWOyfLBYtuU', title:'Dog Days Are Over', artist:'Florence + The Machine' },
+    { id:'tfkEejPAiYo', title:'Quero Ser Locomotiva', artist:'Jorge Mautner' },
+    { id:'pHJbwr3GuLA', title:'Canção Kayapo', artist:'Grupo Mawaca' },
+    { id:'jf5g0uM0Fc0', title:'Banzo, Pt. 1', artist:'Letieres Leite' },
+    { id:'rmGCNUEXiRo', title:'Rosa (Que Linda Eres)', artist:'Trinix' },
+    { id:'_nerFs6AN1g', title:'Só Morto', artist:'Jards Macalé' },
+    { id:'d4uNOo4OWa4', title:'Coco Dub (Afrociberdelia)', artist:'Chico Science' },
+    { id:'qoe4IruSpKI', title:'Um Girassol da Cor do Seu Cabelo', artist:'Lô Borges' },
+    { id:'_zBZpjAEorA', title:'Sem Fim', artist:'Rogério Skylab' },
+    { id:'cCu_6UpgwRU', title:'Sou do Bem', artist:'Naná Vasconcelos' },
+    { id:'MnTm36D8tg0', title:'O Trenzinho do Caipira', artist:'Egberto Gismonti' },
+    { id:'21IGGuBvE3k', title:'DARPA', artist:'Wim Mertens' },
+    { id:'9cFgEvmQdAQ', title:'Dikoboda Sombe', artist:'Tradicional (Aka Pygmy)' }
   ];
   var ytEmbed=document.getElementById('yt-embed');
   var ytCur=-1;
@@ -424,7 +426,10 @@ body.nav-hidden .back-chip{ box-shadow:0 7px 16px rgba(0,0,0,.3); }
       var n=document.createElement('span'); n.className='sp-n'; n.textContent=i===ytCur?'♪':String(i+1);
       var ti=document.createElement('span'); ti.className='sp-ti'; ti.textContent=tr.title;
       var du=document.createElement('span'); du.className='sp-du'; du.textContent=i===ytCur?'':'▶';
-      row.appendChild(n); row.appendChild(ti); row.appendChild(du);
+      row.appendChild(n); row.appendChild(ti);
+      /* selo "Música da semana": só a faixa com `semana:true` (o robô do Linktree marca UMA) */
+      if(tr.semana){ var sm=document.createElement('span'); sm.className='sp-sem'; sm.textContent='Música da semana'; row.appendChild(sm); }
+      row.appendChild(du);
       row.addEventListener('click',function(){ ytPlayIndex(i); });
       spListEl.appendChild(row);
     });

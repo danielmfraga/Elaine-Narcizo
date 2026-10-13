@@ -1,7 +1,7 @@
 // Testes do robô da música da semana.  Rodar:  node --test scripts/dancadestino/
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { idDoYoutube, partesDoTitulo, artistaDoCanal, esc, limpa, blocoDe, achaMusicaDaSemana } from './atualizar.mjs';
+import { idDoYoutube, partesDoTitulo, artistaDoCanal, esc, limpa, blocoDe, achaMusicaDaSemana, promoveSemana } from './atualizar.mjs';
 
 test('idDoYoutube: aceita as formas de link que aparecem de verdade', () => {
   const id = 'KL18rlquCBk';
