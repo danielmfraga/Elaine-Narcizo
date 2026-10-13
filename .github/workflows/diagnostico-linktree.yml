@@ -1,0 +1,32 @@
+# TEMPORÁRIO — descobrir o que o Linktree aceita vindo do servidor do GitHub.
+# Apagar depois do diagnóstico.
+name: Diagnóstico Linktree (temporário)
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  testa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Taxa de acerto por variante (6 tentativas cada, 3s entre elas)
+        run: |
+          U=https://linktr.ee/elainenarcizo
+          BOT="Mozilla/5.0 (compatible; dancadestino-bot)"
+          CH="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+          echo "IP deste servidor: $(curl -s https://api.ipify.org)"
+          rodar() {
+            nome="$1"; shift
+            printf '%-48s ' "$nome"
+            for i in 1 2 3 4 5 6; do
+              c=$(curl -s -o /dev/null -w '%{http_code}' --max-time 25 "$@" "$U"); printf '%s ' "$c"; sleep 3
+            done; echo
+          }
+          rodar "V1 exato do robô (h2, UA bot, -L)"          -L --max-redirs 3 -A "$BOT"
+          rodar "V2 UA bot, HTTP/1.1"                        --http1.1 -A "$BOT"
+          rodar "V3 sem UA nenhum"
+          rodar "V4 UA bot + Accept html, HTTP/1.1"          --http1.1 -A "$BOT" -H "Accept: text/html"
+          rodar "V5 UA Chrome + Accept html, HTTP/1.1"       --http1.1 -A "$CH" -H "Accept: text/html"
+          rodar "V6 UA curl padrão explícito"                -A "curl/8.5.0"
+          echo "--- um 406 completo, pra ver quem responde ---"
+          curl -s -D - -o /tmp/c.html -A "$CH" "$U" | head -3; echo "corpo: $(wc -c < /tmp/c.html) bytes"
