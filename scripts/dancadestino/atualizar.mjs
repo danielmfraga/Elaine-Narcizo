@@ -35,6 +35,7 @@
    nome ("Música da semana" sumir), o robô FALHA em voz alta — não adivinha.
    ════════════════════════════════════════════════════════════════════════ */
 import fs from 'node:fs';
+import https from 'node:https';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -194,14 +195,37 @@ export function achaMusicaDaSemana(html) {
   return { texto: achado.title, url: achado.url, id: idDoYoutube(achado.url) };
 }
 
+/* 🔑 POR QUE node:https E NÃO fetch(): descoberto rodando no GitHub (out/2026). O Linktree
+   responde 406 a quem chega de datacenter parecendo navegador. O fetch() do Node anexa
+   sozinho cabeçalhos de navegador (sec-fetch-mode: cors, accept-language: *) e cai nessa
+   regra — mesmo com user-agent honesto. Daqui de casa passa; do servidor do GitHub, não.
+   Medido no GitHub: curl simples = 200, user-agent de robô = 200, "Chrome" = 406.
+   node:https manda SÓ o que a gente pede. E o user-agent é honesto de propósito: fingir
+   ser Chrome é justamente o que o Linktree recusa. */
+const UA_ROBO = 'Mozilla/5.0 (compatible; dancadestino-bot)';
+function pegaPagina(url, restantes = 3) {
+  return new Promise((ok, falha) => {
+    const req = https.get(url, { headers: { 'user-agent': UA_ROBO, accept: 'text/html' }, timeout: 25000 }, (res) => {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location && restantes > 0) {
+        res.resume();
+        return ok(pegaPagina(new URL(res.headers.location, url).href, restantes - 1));
+      }
+      if (res.statusCode !== 200) { res.resume(); return falha(new Error(`Linktree respondeu ${res.statusCode}`)); }
+      const partes = [];
+      res.on('data', (d) => partes.push(d));
+      res.on('end', () => ok(Buffer.concat(partes).toString('utf8')));
+      res.on('error', falha);
+    });
+    req.on('timeout', () => req.destroy(new Error('tempo esgotado')));
+    req.on('error', falha);
+  });
+}
+
 async function baixaLinktree() {
   let ultimo;
   for (let t = 1; t <= 3; t++) {
-    try {
-      const r = await fetch(LINKTREE, { headers: { 'user-agent': 'Mozilla/5.0 (compatible; dancadestino-bot)' }, signal: AbortSignal.timeout(25000) });
-      if (!r.ok) throw new Error(`Linktree respondeu ${r.status}`);
-      return await r.text();
-    } catch (e) { ultimo = e; await new Promise((ok) => setTimeout(ok, t * 4000)); }
+    try { return await pegaPagina(LINKTREE); }
+    catch (e) { ultimo = e; await new Promise((ok) => setTimeout(ok, t * 4000)); }
   }
   throw new Error(`não consegui abrir o Linktree (3 tentativas): ${ultimo?.message}`);
 }
