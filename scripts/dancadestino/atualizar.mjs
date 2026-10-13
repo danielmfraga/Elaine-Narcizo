@@ -36,6 +36,7 @@
    ════════════════════════════════════════════════════════════════════════ */
 import fs from 'node:fs';
 import https from 'node:https';
+import { execFile } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -195,13 +196,18 @@ export function achaMusicaDaSemana(html) {
   return { texto: achado.title, url: achado.url, id: idDoYoutube(achado.url) };
 }
 
-/* 🔑 POR QUE node:https E NÃO fetch(): descoberto rodando no GitHub (out/2026). O Linktree
-   responde 406 a quem chega de datacenter parecendo navegador. O fetch() do Node anexa
-   sozinho cabeçalhos de navegador (sec-fetch-mode: cors, accept-language: *) e cai nessa
-   regra — mesmo com user-agent honesto. Daqui de casa passa; do servidor do GitHub, não.
-   Medido no GitHub: curl simples = 200, user-agent de robô = 200, "Chrome" = 406.
-   node:https manda SÓ o que a gente pede. E o user-agent é honesto de propósito: fingir
-   ser Chrome é justamente o que o Linktree recusa. */
+/* 🔑 POR QUE curl E NÃO fetch()/https — descoberto rodando no GitHub (out/2026), em 3 rodadas:
+   o Linktree responde 406 ao servidor do GitHub se o pedido vier do Node.
+     · 1ª tentativa, fetch() do Node ............ 406  (suspeitei dos cabeçalhos de navegador
+                                                        que o fetch() anexa sozinho)
+     · 2ª tentativa, node:https só com UA+accept  406  (então NÃO eram os cabeçalhos)
+     · curl, do mesmo servidor, mesmo user-agent  200  (o que passa é a "impressão digital"
+                                                        da conexão do curl, não a do Node)
+   Medido no diagnóstico: curl simples = 200 · UA de robô = 200 · UA "Chrome" via HTTP/2 = 406.
+   Por isso: curl primeiro; node:https só de reserva se não houver curl instalado.
+   O user-agent é HONESTO de propósito ("dancadestino-bot"): fingir ser Chrome é justamente o
+   que o Linktree recusa. Nada aqui tenta se esconder: é um robô lendo a página pública que
+   o próprio Daniel mantém. */
 const UA_ROBO = 'Mozilla/5.0 (compatible; dancadestino-bot)';
 function pegaPagina(url, restantes = 3) {
   return new Promise((ok, falha) => {
@@ -221,11 +227,28 @@ function pegaPagina(url, restantes = 3) {
   });
 }
 
+function pegaComCurl(url) {
+  return new Promise((ok, falha) => {
+    // sem shell (execFile + lista de argumentos): nada do que vem da rede vira comando
+    execFile('curl', ['-sS', '--max-time', '25', '-L', '--max-redirs', '3', '-A', UA_ROBO, '-w', '\n__HTTP__%{http_code}', url],
+      { maxBuffer: 20 * 1024 * 1024, encoding: 'utf8' }, (err, out, errout) => {
+        if (err && err.code === 'ENOENT') return falha(Object.assign(new Error('curl não instalado'), { semCurl: true }));
+        const m = /\n__HTTP__(\d{3})\s*$/.exec(out || '');
+        if (!m) return falha(new Error(`curl falhou: ${String(errout || err?.message || '').trim().slice(0, 200)}`));
+        if (m[1] !== '200') return falha(new Error(`Linktree respondeu ${m[1]}`));
+        ok(out.slice(0, m.index));
+      });
+  });
+}
+
 async function baixaLinktree() {
   let ultimo;
   for (let t = 1; t <= 3; t++) {
-    try { return await pegaPagina(LINKTREE); }
-    catch (e) { ultimo = e; await new Promise((ok) => setTimeout(ok, t * 4000)); }
+    try {
+      try { return await pegaComCurl(LINKTREE); }
+      catch (e) { if (!e.semCurl) throw e; }          // sem curl instalado → cai pra reserva
+      return await pegaPagina(LINKTREE);
+    } catch (e) { ultimo = e; await new Promise((ok) => setTimeout(ok, t * 4000)); }
   }
   throw new Error(`não consegui abrir o Linktree (3 tentativas): ${ultimo?.message}`);
 }
