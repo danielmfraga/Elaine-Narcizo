@@ -659,6 +659,12 @@ body.nav-hidden .back-chip{ box-shadow:0 7px 16px rgba(0,0,0,.3); }
   function spNext(){ if(!spEpisodes.length) return; spPlayIndex(spShuffle?spRandIdx():(spCur+1)%spEpisodes.length); }
   function spSyncBtn(){ if(spPlayBtn){ spPlayBtn.classList.toggle('playing',spPlaying); spPlayBtn.setAttribute('aria-label',spPlaying?'Pausar':'Tocar'); } }
   function spUpdateRowDur(i){
+    /* 🔧 out/2026: as durações dos episódios chegam do R2 em segundo plano e eram escritas na
+       linha de MESMO NÚMERO sem olhar qual aba está aberta — com a aba do Dança aberta (o que o
+       link /radio/?aba=danca faz) 17 músicas ficavam com "6:18, 4:47…" no lugar do ▶. Agora só
+       escreve no podcast; a duração já fica guardada em ep.durSec e o spRender() a redesenha
+       quando a pessoa volta pro podcast. */
+    if(spMode!=='podcast') return;
     if(!spListEl||!spListEl.children[i]) return;
     var ep=spEpisodes[i], du=spListEl.children[i].querySelector('.sp-du');
     if(du&&ep&&ep.durSec) du.textContent=spFmt(ep.durSec*1000);
@@ -738,6 +744,22 @@ body.nav-hidden .back-chip{ box-shadow:0 7px 16px rgba(0,0,0,.3); }
     },{ root:fs, threshold:0.15 });
     [].forEach.call(fs.querySelectorAll('.feed-block'),function(b){ fio.observe(b); });
   });
+
+  /* 🔗 LINK DIRETO pra aba DançaDestino (out/2026) — pro story / Linktree da sexta:
+         /radio/?aba=danca        (ou  /radio/#danca)
+     Qualquer outra coisa, ou nada, abre no podcast como sempre — o link "Sintonize" da
+     home continua caindo no podcast. Roda por último, quando tudo já está definido.
+     O parâmetro tolera tracking do Instagram (…&utm_source=ig etc.): só lê `aba`. */
+  (function(){
+    var aba=''; try{ aba=new URLSearchParams(location.search).get('aba')||''; }catch(e){}
+    if(aba!=='danca' && location.hash!=='#danca') return;
+    /* sem a animação de 0,45s dos cards: quem chega pelo link já nasce na aba certa */
+    var cs=[spCardPodcast,spCardDanca];
+    cs.forEach(function(c){ if(c) c.style.transition='none'; });
+    spSwitchMode('danca');
+    void document.body.offsetWidth;            /* força o layout antes de religar a transição */
+    cs.forEach(function(c){ if(c) c.style.transition=''; });
+  })();
 
 })();
 </script>
