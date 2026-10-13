@@ -1756,6 +1756,20 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
   #quem .quem-cta{ grid-area:cta; }
   #quem .portrait{ grid-area:foto; align-self:stretch; margin-top:0; aspect-ratio:auto; max-width:none; }
 
+  /* ── BILHETERIA — os dois portões LADO A LADO (pedido do Daniel, out/2026) ──
+     No celular são 2 cartões empilhados. A regra antiga de ≥900px (`.work{grid 1.15fr .85fr}` +
+     `:nth-child(even)`) vinha do desenho em que cada obra tinha uma imagem do lado e fazia um
+     ZIGUE-ZAGUE: o Portão 01 ficava só na coluna da direita (490px) e o 02 só na da esquerda
+     (663px), deixando metade da tela vazia em cada um e a seção com 2,75× a janela.
+     Agora: grade de 2 colunas IGUAIS; cada portão é uma pilha (chip → cartão → Embarque).
+     🔑 O CARTÃO continua com a altura de sempre (100svh, mín. 560px): o da DançaDestino mede o
+     painel da lista contra essa altura (`calc(100svh - 176px)`, ver o conserto do painel) e o das
+     Cartas é um iframe cujo "viewport" é o próprio cartão. Só a LARGURA muda (~metade do bloco).
+     O padding/borda do `.work` (a linha entre um portão e o outro, que só faz sentido empilhado)
+     sai, senão o 2º portão começaria mais baixo que o 1º. */
+  .s-obras .works{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:clamp(24px,3vw,48px); align-items:start; }
+  .s-obras .work{ display:flex; flex-direction:column; align-items:stretch; gap:14px; padding:0; border-top:0; }
+
   /* ── RÁDIO TINHOSA ─────────────────────────────────────────────────
      A arte é um cartaz VERTICAL (720×1280). No celular a tela tem quase
      essa proporção e ela aparece inteira; no notebook a caixa fica
