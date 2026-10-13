@@ -1,0 +1,76 @@
+# ══════════════════════════════════════════════════════════════════════════
+# Música da semana → tocador do DançaDestino                       (out/2026)
+#
+# Toda sexta a Elaine põe um link "Música da semana: <música> - <artista>" no
+# Linktree. Este robô lê esse link e põe a música no TOPO do tocador (as 3
+# páginas que têm a playlist), commita no `main` e a Vercel publica sozinha.
+#
+# O trabalho de verdade está em scripts/dancadestino/atualizar.mjs — leia o
+# cabeçalho dele. Aqui é só o relógio e o commit.
+#
+# 🔑 HORÁRIO: o cron do GitHub é em UTC. O Brasil não tem horário de verão
+# desde 2019, então Brasília = UTC−3, fixo:
+#       14:00 UTC = 11:00 · 16:00 UTC = 13:00 · 19:00 UTC = 16:00
+# Roda 3 vezes na sexta DE PROPÓSITO: o robô é idempotente (se o vídeo já está
+# na lista, não faz nada), então as repetições custam nada — e cobrem o caso
+# de o link ser postado depois das 11h, e o de o GitHub atrasar um agendamento
+# (ele atrasa; é "melhor esforço", não relógio suíço).
+#
+# 🔴 SE FALHAR, o GitHub manda e-mail pro dono do repositório. Falha = o
+# Linktree mudou de formato, o link "Música da semana" sumiu/foi renomeado, o
+# vídeo não permite tocar fora do YouTube, ou alguém mexeu numa das 3 playlists
+# à mão (aí as páginas não batem mais com o playlist.json).
+#
+# 🔴 O robô commita no `main`. Antes de dar push do seu lado numa sexta,
+# `git pull` — senão o seu push é recusado por estar atrasado.
+# ══════════════════════════════════════════════════════════════════════════
+name: Música da semana (DançaDestino)
+
+on:
+  schedule:
+    - cron: '0 14 * * 5'
+    - cron: '0 16 * * 5'
+    - cron: '0 19 * * 5'
+  workflow_dispatch:        # botão "Run workflow" na aba Actions, pra rodar na hora
+
+permissions:
+  contents: write           # única permissão: commitar no repositório
+
+concurrency:
+  group: musica-da-semana   # nunca duas execuções ao mesmo tempo
+  cancel-in-progress: false
+
+jobs:
+  semana:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Trava de segurança: se alguém editou uma das 3 playlists à mão, elas
+      # não batem mais com o playlist.json — e o robô sobrescreveria a edição
+      # em silêncio. Melhor parar e avisar.
+      - name: As 3 páginas batem com o playlist.json?
+        run: node scripts/dancadestino/atualizar.mjs status
+
+      - name: Ler o Linktree e atualizar a playlist
+        id: semana
+        run: node scripts/dancadestino/atualizar.mjs semana
+
+      - name: Publicar
+        if: steps.semana.outputs.mudou == 'true'
+        env:
+          # vem do TEXTO do Linktree → passa por variável de ambiente, nunca
+          # colado direto no comando (evita injeção de código pelo título)
+          MSG: ${{ steps.semana.outputs.mensagem }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/dancadestino/playlist.json radio/index.html index.html danca-destino/index.html
+          git commit -m "$MSG" -m "Publicado automaticamente pelo robô da música da semana (lido do Linktree)."
+          git pull --rebase origin main
+          git push origin HEAD:main

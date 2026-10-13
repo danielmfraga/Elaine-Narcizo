@@ -8,3 +8,6 @@ _desativado/
 
 # Peça de e-mail da Produtividade Saudável (corpo de e-mail, não é página)
 _email/
+
+# Robô da música da semana (DançaDestino): scripts e playlist.json são só do repositório
+scripts/
