@@ -79,9 +79,20 @@ export function idDoYoutube(url) {
   return id && /^[A-Za-z0-9_-]{11}$/.test(id) ? id : null;
 }
 
-/* ── "Música da semana: Arreuni - Doroty Marques" → { titulo, artista } ── */
+/* ── o texto do link no Linktree → { titulo, artista } ──
+   O Daniel escreve esse texto à mão toda semana e o jeito de escrever VARIOU (out/2026):
+       "Música da semana: Arreuni - Doroty Marques"            ← o combinado original
+       "A música desta semana é: "É" de Gonzaguinha"            ← 16/out: frase + aspas + "de"
+   Em vez de obrigá-lo a decorar um formato, o robô entende os dois (e variações óbvias). Dois
+   passos: (1) tira a frase de abertura ("A música desta semana é:"); (2) o que sobra pode ser
+   `"Título" de Artista` (aspas + de/do/da/por) ou `Título - Artista`. Sem nenhum dos dois, o
+   artista vem do canal do YouTube. */
+export const ABERTURA = /^\s*(?:a\s+)?m[uú]sica\s+(?:da|desta|dessa)\s+semana(?:\s+é)?\s*[:：\-–—]?\s*/i;
 export function partesDoTitulo(texto) {
-  const resto = String(texto).replace(/^\s*m[uú]sica\s+da\s+semana\s*[:：\-–—]?\s*/i, '').trim();
+  const resto = String(texto).replace(ABERTURA, '').trim();
+  // `"Título" de Artista` — aspas retas OU curvas, e de/do/da/por/by antes do artista
+  const q = resto.match(/^[“"'‘«]\s*(.+?)\s*[”"'’»]\s+(?:de|do|da|por|by)\s+(.+)$/i);
+  if (q) return { titulo: q[1].trim(), artista: q[2].trim() };
   // separador = " - " / " – " / " — " COM espaços (o hífen de "Guiné-Bissau" não conta);
   // vale o ÚLTIMO, porque o nome do artista raramente tem hífen e o da música às vezes tem
   const i = Math.max(resto.lastIndexOf(' - '), resto.lastIndexOf(' – '), resto.lastIndexOf(' — '));
@@ -188,7 +199,9 @@ export function achaMusicaDaSemana(html) {
   const links = JSON.parse(m[1])?.props?.pageProps?.links;
   if (!Array.isArray(links)) throw new Error('o Linktree não trouxe a lista de links — o formato da página pode ter mudado.');
   const sem = (s) => String(s || '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
-  const achado = links.find((l) => /musica\s+da\s+semana/.test(sem(l.title)) && idDoYoutube(l.url));
+  // acha o link por PALAVRAS, não por frase exata: "música" ... "semana" (acento/caixa tanto faz) E endereço do
+  // YouTube. Cobre "Música da semana", "A música desta semana é", "música dessa semana"…
+  const achado = links.find((l) => /musica.*semana/.test(sem(l.title)) && idDoYoutube(l.url));
   if (!achado) {
     const nomes = links.map((l) => `"${l.title}"`).join(', ');
     throw new Error(`não achei um link "Música da semana…" com endereço do YouTube no Linktree. Links que existem: ${nomes}`);
