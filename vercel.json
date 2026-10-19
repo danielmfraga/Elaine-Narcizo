@@ -29,6 +29,11 @@
       "source": "/links",
       "destination": "/links/",
       "permanent": false
+    },
+    {
+      "source": "/engenhoca",
+      "destination": "/engenhoca/",
+      "permanent": false
     }
   ],
   "headers": [
@@ -38,6 +43,15 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=604800, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/engenhoca/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
         }
       ]
     }

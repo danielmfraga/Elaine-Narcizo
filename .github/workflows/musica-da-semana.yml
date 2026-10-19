@@ -8,6 +8,11 @@
 # O trabalho de verdade está em scripts/dancadestino/atualizar.mjs — leia o
 # cabeçalho dele. Aqui é só o relógio e o commit.
 #
+# 🆕 ENGENHOCA (out/2026): a página /engenhoca/ chama a função api/musica.js, que
+# dispara ESTE workflow (workflow_dispatch) com o link + "Música - Intérprete".
+# Mesmo caminho do Linktree daí pra frente. O Linktree só entra com música NOVA,
+# então não desfaz a escolha da engenhoca.
+#
 # 🔑 HORÁRIO: o cron do GitHub é em UTC. O Brasil não tem horário de verão
 # desde 2019, então Brasília = UTC−3, fixo:
 #       14:00 UTC = 11:00 · 16:00 UTC = 13:00 · 19:00 UTC = 16:00
@@ -31,7 +36,21 @@ on:
     - cron: '0 14 * * 5'
     - cron: '0 16 * * 5'
     - cron: '0 19 * * 5'
-  workflow_dispatch:        # botão "Run workflow" na aba Actions, pra rodar na hora
+  workflow_dispatch:        # botão "Run workflow" na aba Actions — e é por aqui que a ENGENHOCA entra
+    inputs:
+      link:
+        description: 'Link do YouTube da música (a engenhoca preenche). Vazio = ler o Linktree'
+        required: false
+        type: string
+      texto:
+        description: 'Nome da música e intérprete, assim:  Música - Intérprete'
+        required: false
+        type: string
+      simular:
+        description: 'Só simular: mostra o que faria, não publica nada'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write           # única permissão: commitar no repositório
@@ -57,20 +76,32 @@ jobs:
       - name: As 3 páginas batem com o playlist.json?
         run: node scripts/dancadestino/atualizar.mjs status
 
-      - name: Ler o Linktree e atualizar a playlist
+      # Duas fontes pra mesma ação: o que a ENGENHOCA mandou (link + texto) ou, sem isso, o Linktree.
+      # 🔴 link/texto são texto DIGITADO (por quem passou na senha da engenhoca ou por quem aperta o botão
+      # aqui): passam por variável de ambiente e viram argumentos de lista — NUNCA colados no comando
+      # (evita injeção de código). O script ainda revalida tudo (id do YouTube, tamanho, HTML escapado).
+      - name: Atualizar a playlist (engenhoca ou Linktree)
         id: semana
-        run: node scripts/dancadestino/atualizar.mjs semana
+        env:
+          LINK: ${{ inputs.link }}
+          TEXTO: ${{ inputs.texto }}
+          SIMULAR: ${{ inputs.simular }}
+        run: |
+          args=()
+          if [ -n "$LINK" ] || [ -n "$TEXTO" ]; then args+=(--link "$LINK" --texto "$TEXTO"); fi
+          if [ "$SIMULAR" = "true" ]; then args+=(--dry); fi
+          node scripts/dancadestino/atualizar.mjs semana "${args[@]}"
 
       - name: Publicar
         if: steps.semana.outputs.mudou == 'true'
         env:
-          # vem do TEXTO do Linktree → passa por variável de ambiente, nunca
-          # colado direto no comando (evita injeção de código pelo título)
+          # vem do TEXTO digitado/do Linktree → variável de ambiente, nunca colado no comando
           MSG: ${{ steps.semana.outputs.mensagem }}
+          ORIGEM: ${{ steps.semana.outputs.origem }}
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add scripts/dancadestino/playlist.json radio/index.html index.html danca-destino/index.html
-          git commit -m "$MSG" -m "Publicado automaticamente pelo robô da música da semana (lido do Linktree)."
+          git add scripts/dancadestino/playlist.json radio/index.html index.html danca-destino/index.html links/index.html
+          git commit -m "$MSG" -m "Publicado automaticamente pelo robô da música da semana (origem: $ORIGEM)."
           git pull --rebase origin main
           git push origin HEAD:main

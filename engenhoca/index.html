@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     ENGENHOCA — a "paginazinha" da música da semana (out/2026)
+     Uso INTERNO (Daniel/Elaine): toda sexta, cola o link do YouTube + escreve
+     "Música - Intérprete" + a senha. A página chama /api/musica (api/musica.js),
+     que confere tudo e manda o robô do GitHub publicar nos 3 tocadores e no
+     cartão da página /links/. Nada aqui escreve no site: só aperta o botão.
+
+     • Não tem link em lugar nenhum do site e está fora do Google (noindex).
+       A proteção de verdade é a SENHA (variável ENGENHOCA_SENHA na Vercel).
+     • O texto "Música - Intérprete" é entendido igual ao do robô
+       (scripts/dancadestino/atualizar.mjs → partesDoTitulo). Se mudar lá, mudar
+       a função `partes` aqui embaixo — é só a PRÉVIA; quem manda é o robô.
+     • Não guarda nada no aparelho (nem a senha): o gerenciador de senhas do
+       celular é que lembra.
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<title>Engenhoca — música da semana</title>
+<link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=DM+Sans:opsz,wght@9..40,300..500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --lilas:#B9A7DC; --roxo:#6C4BB6; --amarelo:#F5D731;
+  --ink:#0F0E0C; --paper:#F3EEE0; --white:#FFFFFF;
+  --mute:#6E6A60; --line:rgba(15,14,12,.14);
+  --ok:#1F6B3A; --ok-bg:#E3F1E0; --erro:#A8281F; --erro-bg:#F8E3E0;
+  --disp:"Archivo",sans-serif;
+  --sans:"DM Sans",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  --mono:"Space Mono",ui-monospace,monospace;
+  --pad:clamp(20px,5vw,64px);
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; }
+html,body{ background:var(--paper); }
+body{ font-family:var(--sans); color:var(--ink); font-size:1.05rem; line-height:1.55; -webkit-font-smoothing:antialiased; min-height:100svh; }
+a{ color:inherit; }
+::selection{ background:var(--amarelo); color:var(--ink); }
+:focus-visible{ outline:2px solid var(--roxo); outline-offset:3px; }
+
+.topo{ display:flex; justify-content:space-between; align-items:center; gap:16px; padding:14px var(--pad); font-family:var(--mono); font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--mute); }
+.topo a{ text-decoration:none; padding:10px 0; }
+.topo a:hover{ color:var(--ink); }
+
+main{ padding:clamp(8px,3vh,28px) var(--pad) clamp(40px,8vh,80px); }
+.col{ width:100%; max-width:30rem; margin:0 auto; }
+
+h1{ font-family:var(--disp); font-weight:760; font-stretch:92%; letter-spacing:-.01em; font-size:clamp(1.9rem,7.5vw,2.4rem); line-height:1.04; }
+.sub{ margin-top:10px; color:rgba(15,14,12,.78); font-size:1rem; line-height:1.45; text-wrap:balance; }
+
+form{ margin-top:26px; display:flex; flex-direction:column; gap:22px; }
+.campo label{ display:block; margin-bottom:7px; font-family:var(--mono); font-size:.74rem; letter-spacing:.08em; text-transform:uppercase; }
+.campo label b{ color:var(--roxo); font-weight:700; }
+.campo input{
+  width:100%; min-height:52px; padding:12px 14px; border:1.5px solid var(--line); border-radius:14px; background:var(--white);
+  font:inherit; font-size:1rem; /* 16px+: o iPhone não dá zoom ao tocar */ color:var(--ink); transition:border-color .15s, box-shadow .15s;
+}
+.campo input:focus{ outline:none; border-color:var(--roxo); box-shadow:0 0 0 3px rgba(108,75,182,.18); }
+.campo input::placeholder{ color:rgba(15,14,12,.38); }
+.dica{ margin-top:7px; font-size:.84rem; line-height:1.4; color:var(--mute); }
+.dica.erro{ color:var(--erro); }
+
+/* o vídeo reconhecido: miniatura + nome, pra ele CONFERIR que é o vídeo certo */
+.confere{ margin-top:10px; display:none; gap:12px; align-items:center; padding:8px; background:var(--white); border:1px solid var(--line); border-radius:14px; }
+.confere.on{ display:flex; }
+.confere img{ flex:none; width:96px; aspect-ratio:16/9; object-fit:cover; border-radius:8px; background:#1c1a17; }
+.confere .t{ min-width:0; font-size:.86rem; line-height:1.3; }
+.confere .t b{ display:block; font-weight:600; overflow-wrap:anywhere; }
+.confere .t span{ color:var(--mute); }
+.confere.ruim{ border-color:var(--erro); background:var(--erro-bg); }
+
+/* a prévia do cartão — igual ao da página /links/ */
+.previa-rot{ margin:12px 0 7px; font-family:var(--mono); font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--mute); }
+.card{ display:flex; align-items:center; gap:14px; min-height:66px; padding:9px 14px 9px 9px; background:var(--white); border:1px solid var(--line); border-radius:18px; }
+.card::after{ content:""; flex:none; width:48px; }
+.thumb{ flex:none; width:48px; height:48px; border-radius:12px; overflow:hidden; background:#5A1FB8; display:flex; align-items:center; justify-content:center; }
+.thumb img{ width:100%; height:100%; object-fit:contain; padding:3px; display:block; }
+@media(prefers-reduced-motion:no-preference){
+  .thumb img{ animation:selo-gira 18s linear infinite; }
+  @keyframes selo-gira{ to{ transform:rotate(360deg); } }
+}
+.txt{ flex:1; min-width:0; text-align:center; font-weight:600; font-size:1.02rem; line-height:1.25; }
+.txt small{ display:block; margin-top:2px; font-weight:400; font-size:.8rem; color:var(--mute); text-wrap:balance; overflow-wrap:anywhere; }
+.txt small b{ font-weight:600; color:var(--ink); }
+.sel{ display:block; width:fit-content; margin:0 auto 5px; padding:4px 8px; border-radius:999px; background:var(--amarelo); font-weight:700; font-size:.54rem; letter-spacing:.06em; line-height:1; text-transform:uppercase; }
+
+button.publicar{
+  min-height:56px; border:0; border-radius:16px; background:var(--ink); color:var(--paper); cursor:pointer;
+  font-family:var(--disp); font-weight:760; font-stretch:105%; font-size:1.05rem; letter-spacing:.01em;
+  transition:transform .12s var(--ease), background .15s, opacity .15s; -webkit-tap-highlight-color:transparent;
+}
+button.publicar:hover:not(:disabled){ background:#26231f; }
+button.publicar:active:not(:disabled){ transform:scale(.985); }
+button.publicar:disabled{ opacity:.35; cursor:not-allowed; }
+
+/* o que está acontecendo (enviando → atualizando o site → no ar) */
+.estado{ display:none; margin-top:4px; padding:14px 16px; border-radius:14px; border:1px solid var(--line); background:var(--white); font-size:.95rem; line-height:1.45; }
+.estado.on{ display:block; }
+.estado.ok{ background:var(--ok-bg); border-color:rgba(31,107,58,.35); color:var(--ok); }
+.estado.erro{ background:var(--erro-bg); border-color:rgba(168,40,31,.35); color:var(--erro); }
+.estado strong{ font-weight:700; }
+.estado .links{ margin-top:10px; display:flex; flex-wrap:wrap; gap:8px 16px; font-weight:600; }
+.estado .links a{ padding:6px 0; }
+.giro{ display:inline-block; width:.9em; height:.9em; margin-right:8px; border:2px solid currentColor; border-right-color:transparent; border-radius:50%; vertical-align:-.1em; animation:gira .8s linear infinite; }
+@keyframes gira{ to{ transform:rotate(360deg); } }
+@media(prefers-reduced-motion:reduce){ .giro{ animation:none; border-right-color:currentColor; } }
+
+.rodape{ margin-top:34px; padding-top:16px; border-top:1px solid var(--line); font-size:.82rem; line-height:1.5; color:var(--mute); }
+.rodape p + p{ margin-top:6px; }
+.sr{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+</style>
+</head>
+<body>
+
+<div class="topo"><span>Engenhoca · uso interno</span><a href="/">← site</a></div>
+
+<main>
+  <div class="col">
+    <h1>Música da semana</h1>
+    <p class="sub">Cole o link do YouTube e escreva o nome. Em uns 2 minutos ela entra nos tocadores e na página de links.</p>
+
+    <form id="f" novalidate autocomplete="on">
+      <!-- campo de usuário escondido: só pro gerenciador de senhas do celular oferecer salvar a senha -->
+      <input class="sr" type="text" name="usuario" value="engenhoca" autocomplete="username" tabindex="-1" aria-hidden="true" />
+
+      <div class="campo">
+        <label for="link"><b>1</b> · Link do YouTube</label>
+        <input id="link" name="link" type="url" inputmode="url" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="https://youtu.be/…" />
+        <div id="dica-link" class="dica" hidden></div>
+        <div id="confere" class="confere" aria-live="polite">
+          <img id="conf-img" alt="" width="96" height="54" />
+          <div class="t"><b id="conf-titulo">Procurando o vídeo…</b><span id="conf-canal"></span></div>
+        </div>
+      </div>
+
+      <div class="campo">
+        <label for="texto"><b>2</b> · Nome da música e intérprete</label>
+        <input id="texto" name="texto" type="text" autocomplete="off" spellcheck="false" placeholder="É - Gonzaguinha" maxlength="160" />
+        <div id="dica-texto" class="dica">Escreva assim: <strong>Música - Intérprete</strong> (com espaço dos dois lados do traço).</div>
+        <div class="previa-rot">Assim vai aparecer na página de links</div>
+        <div class="card" aria-hidden="true">
+          <span class="thumb"><img src="/assets/Dancadestino/Lettering%20Redondo.webp" alt="" width="48" height="48" /></span>
+          <span class="txt"><span class="sel">Música da semana</span>Ouça no nosso tocador<small id="previa"><b>…</b></small></span>
+        </div>
+      </div>
+
+      <div class="campo">
+        <label for="senha"><b>3</b> · Senha</label>
+        <input id="senha" name="senha" type="password" autocomplete="current-password" autocapitalize="none" />
+      </div>
+
+      <button id="publicar" class="publicar" type="submit" disabled>Publicar música da semana</button>
+      <div id="estado" class="estado" role="status" aria-live="polite"></div>
+    </form>
+
+    <div class="rodape">
+      <p>A música vai pro <strong>topo</strong> da lista do DançaDestino (na Rádio, na home e na página dele) com o selo “Música da semana”, e a anterior perde o selo.</p>
+      <p>Só serve vídeo do YouTube que deixa tocar fora do YouTube — a engenhoca avisa se não deixar.</p>
+    </div>
+  </div>
+</main>
+
+<script>
+(function(){
+  'use strict';
+  var $ = function(s){ return document.querySelector(s); };
+  var link = $('#link'), texto = $('#texto'), senha = $('#senha'), btn = $('#publicar'), form = $('#f');
+  var confere = $('#confere'), dicaLink = $('#dica-link'), dicaTexto = $('#dica-texto'), previa = $('#previa'), estado = $('#estado');
+  var DICA_TEXTO = dicaTexto.innerHTML;
+  var embedBloqueado = false, enviando = false, token = 0;
+
+  /* mesma regra do robô (idDoYoutube) */
+  function idDe(url){
+    var u; try { u = new URL(String(url).trim()); } catch(e){ return null; }
+    var host = u.hostname.replace(/^(www|m|music)\./, ''), id = null;
+    if (host === 'youtu.be') id = u.pathname.slice(1).split('/')[0];
+    else if (host === 'youtube.com') {
+      id = u.searchParams.get('v');
+      if (!id) { var m = u.pathname.match(/^\/(?:shorts|embed|live)\/([^\/?]+)/); if (m) id = m[1]; }
+    }
+    return id && /^[A-Za-z0-9_-]{11}$/.test(id) ? id : null;
+  }
+  /* mesma regra do robô (partesDoTitulo) — aqui só pra PRÉVIA; quem decide de verdade é o robô */
+  function partes(t){
+    t = String(t).replace(/^\s*(?:a\s+)?m[uú]sica\s+(?:da|desta|dessa)\s+semana(?:\s+é)?\s*[:：\-–—]?\s*/i, '').trim();
+    var q = t.match(/^[“"'‘«]\s*(.+?)\s*[”"'’»]\s+(?:de|do|da|por|by)\s+(.+)$/i);
+    if (q) return { t: q[1].trim(), a: q[2].trim() };
+    var i = Math.max(t.lastIndexOf(' - '), t.lastIndexOf(' – '), t.lastIndexOf(' — '));
+    if (i > 0) return { t: t.slice(0, i).trim(), a: t.slice(i + 3).trim() };
+    return { t: t, a: null };
+  }
+
+  function pronto(){
+    var p = partes(texto.value);
+    return !!idDe(link.value) && !embedBloqueado && !!p.t && !!p.a && senha.value.length > 0 && !enviando;
+  }
+  function atualiza(){ btn.disabled = !pronto(); }
+
+  /* 1 · o link: mostra o vídeo (miniatura agora; nome do vídeo e canal quando o YouTube responder) */
+  function conferirLink(){
+    var meu = ++token, v = link.value.trim(), id = idDe(v);
+    embedBloqueado = false; confere.classList.remove('ruim');
+    if (!v) { confere.classList.remove('on'); dicaLink.hidden = true; return atualiza(); }
+    if (!id) {
+      confere.classList.remove('on');
+      dicaLink.hidden = false; dicaLink.className = 'dica erro';
+      dicaLink.textContent = 'Isso ainda não parece um link de vídeo do YouTube (youtube.com/watch?v=… ou youtu.be/…).';
+      return atualiza();
+    }
+    dicaLink.hidden = true;
+    $('#conf-img').src = 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg';
+    $('#conf-titulo').textContent = 'Procurando o vídeo…'; $('#conf-canal').textContent = '';
+    confere.classList.add('on');
+    atualiza();
+    var c = ('AbortController' in window) ? new AbortController() : null;
+    if (c) setTimeout(function(){ c.abort(); }, 8000);
+    fetch('https://www.youtube.com/oembed?format=json&url=' + encodeURIComponent('https://www.youtube.com/watch?v=' + id), c ? { signal: c.signal } : {})
+      .then(function(r){
+        if (meu !== token) return;
+        if (r.status === 401 || r.status === 403) {
+          embedBloqueado = true; confere.classList.add('ruim');
+          $('#conf-titulo').textContent = 'Esse vídeo não deixa tocar fora do YouTube';
+          $('#conf-canal').textContent = 'No nosso tocador ele ficaria mudo. Escolha outro vídeo da mesma música.';
+        } else if (r.status === 404) {
+          embedBloqueado = true; confere.classList.add('ruim');
+          $('#conf-titulo').textContent = 'Não achei esse vídeo';
+          $('#conf-canal').textContent = 'Foi apagado ou está privado. Confira o link.';
+        } else if (r.ok) {
+          return r.json().then(function(j){
+            if (meu !== token) return;
+            $('#conf-titulo').textContent = j.title || 'Vídeo encontrado';
+            $('#conf-canal').textContent = j.author_name || '';
+          });
+        } else { $('#conf-titulo').textContent = 'Vídeo reconhecido'; }
+      })
+      .catch(function(){ if (meu === token) $('#conf-titulo').textContent = 'Vídeo reconhecido'; })   // sem resposta do YouTube: segue (o robô confere de novo)
+      .then(atualiza);
+  }
+
+  /* 2 · o nome: prévia do cartão, com o que o robô vai entender */
+  function conferirTexto(){
+    var p = partes(texto.value);
+    previa.textContent = '';
+    var b = document.createElement('b'); b.textContent = p.t || '…'; previa.appendChild(b);
+    if (p.a) previa.appendChild(document.createTextNode(' · ' + p.a));
+    if (texto.value.trim() && !p.a) {
+      dicaTexto.className = 'dica erro';
+      dicaTexto.innerHTML = 'Falta o intérprete. Escreva assim: <strong>Música - Intérprete</strong>.';
+    } else { dicaTexto.className = 'dica'; dicaTexto.innerHTML = DICA_TEXTO; }
+    atualiza();
+  }
+
+  /* o que a página /links/ mostra no ar agora (o id da música dentro da marca do cartão) */
+  function idNoAr(){
+    return fetch('/links/?c=' + Date.now(), { cache: 'no-store' })
+      .then(function(r){ return r.ok ? r.text() : ''; })
+      .then(function(h){ var m = h.match(/<!--semana:([A-Za-z0-9_-]+)-->/); return m ? m[1] : null; })
+      .catch(function(){ return null; });
+  }
+
+  function mostra(tipo, html){
+    estado.className = 'estado on ' + (tipo || '');
+    estado.innerHTML = html;
+    // no celular o aviso nasce abaixo do botão, fora da tela: traz pra vista
+    if (estado.scrollIntoView) estado.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+  var esc = function(s){ return String(s).replace(/[&<>"]/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]; }); };
+  var LINKS_FINAIS = '<div class="links"><a href="/radio/?aba=danca">Ver no tocador →</a><a href="/links/">Ver a página de links →</a></div>';
+
+  function espera(id, ate){
+    idNoAr().then(function(atual){
+      if (atual === id) {
+        enviando = false; atualiza();
+        mostra('ok', '<strong>No ar! ✓</strong> A música da semana já está nos tocadores e na página de links.' + LINKS_FINAIS);
+        link.value = ''; texto.value = ''; conferirLink(); conferirTexto();
+      } else if (Date.now() > ate) {
+        enviando = false; atualiza();
+        mostra('erro', '<strong>Está demorando mais que o normal.</strong> O pedido foi enviado, mas o site ainda não mostra a música. Costuma ser só atraso — olhe de novo em alguns minutos. Se não aparecer, o GitHub manda um e-mail dizendo o que houve (ou veja em <a href="https://github.com/danielmfraga/Elaine-Narcizo/actions" target="_blank" rel="noopener">github.com/…/actions</a>).');
+      } else { setTimeout(function(){ espera(id, ate); }, 6000); }
+    });
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if (!pronto()) return;
+    var id = idDe(link.value), p = partes(texto.value);
+    enviando = true; atualiza();
+    mostra('', '<span class="giro" aria-hidden="true"></span>Enviando…');
+    idNoAr().then(function(antes){
+      return fetch('/api/musica', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ senha: senha.value, link: link.value.trim(), texto: p.t + ' - ' + p.a })
+      }).then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ return { r: r, j: j, antes: antes }; }); });
+    }).then(function(x){
+      if (!x.r.ok || !x.j.ok) {
+        enviando = false; atualiza();
+        mostra('erro', '<strong>Não foi dessa vez.</strong> ' + esc(x.j.mensagem || ('Algo deu errado (código ' + x.r.status + ').')));
+        if (x.r.status === 401) { senha.select(); }
+        return;
+      }
+      if (x.antes === id) {
+        enviando = false; atualiza();
+        mostra('ok', '<strong>Essa já é a música da semana agora.</strong> O robô conferiu e não mudou nada.' + LINKS_FINAIS);
+        return;
+      }
+      mostra('', '<span class="giro" aria-hidden="true"></span><strong>Enviado ao robô ✓</strong> Agora o site está sendo atualizado — leva de 1 a 2 minutos. Pode deixar esta tela aberta.');
+      espera(id, Date.now() + 5 * 60 * 1000);
+    }).catch(function(){
+      enviando = false; atualiza();
+      mostra('erro', '<strong>Sem conexão.</strong> Não consegui falar com o site. Confira a internet e tente de novo.');
+    });
+  });
+
+  link.addEventListener('input', conferirLink);
+  link.addEventListener('paste', function(){ setTimeout(conferirLink, 0); });
+  texto.addEventListener('input', conferirTexto);
+  senha.addEventListener('input', atualiza);
+  conferirTexto();
+})();
+</script>
+</body>
+</html>

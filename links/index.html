@@ -12,16 +12,19 @@
      https://www.elainenarcizo.com.br/links/ — o domínio sem www está
      instável em algumas redes).
 
-     🔑 O CARTÃO "MÚSICA DA SEMANA" É PERENE: não cita uma faixa (ficaria velho
-     toda sexta). Leva pro NOSSO tocador (/radio/?aba=danca), onde a mais nova
-     fica em 1º, com o selo. Se um dia mostrar o nome da faixa, tem que vir de
-     dado, nunca de texto escrito à mão aqui.
+     🔑 O CARTÃO "MÚSICA DA SEMANA" MOSTRA A FAIXA DA SEMANA (nome · intérprete) —
+     mas esse texto NÃO é escrito à mão: mora entre duas marcas (comentários HTML
+     "semana:ID" e "/semana", dentro do cartão lá embaixo) e é reescrito pelo robô
+     (scripts/dancadestino/atualizar.mjs) a cada música nova, a partir da faixa com
+     o selo no playlist.json. NÃO apagar as marcas (sem elas o robô só avisa e o
+     cartão fica velho) e NÃO escrever o formato literal delas aqui em cima: um
+     comentário não pode conter o fecha-comentário e o robô acharia esta cópia. Leva pro NOSSO
+     tocador (/radio/?aba=danca), onde a mais nova fica em 1º, com o selo.
 
-     🔮 PLANO DO DANIEL (out/2026): numa etapa final o robô passa a LER o link da
-     música da semana DESTA página, em vez do Linktree — sem terceiro e sem o
-     problema do texto escrito de jeitos diferentes. Falta decidir ONDE ele
-     digita o link toda sexta (a página é estática). Até lá o robô SEGUE
-     lendo o Linktree (linktr.ee/elainenarcizo): NÃO apagar a conta dele.
+     🔮 ONDE O DANIEL DIGITA O LINK TODA SEXTA: na ENGENHOCA (/engenhoca/) — cola o
+     link do YouTube + "Música - Intérprete", e ela publica nos tocadores e aqui.
+     O robô ainda lê o Linktree como rede de segurança (só música NOVA): não
+     apagar a conta de lá até a engenhoca estar provada numa sexta de verdade.
      Os outros cartões são fixos (trocar = editar este arquivo).
      ═══════════════════════════════════════════════════════════════════════ -->
 
@@ -166,8 +169,14 @@ main{ flex:1; padding:calc(78px + 3vh) var(--pad) clamp(40px,8vh,80px); }
 /* a miniatura do DançaDestino: o selo redondo é BRANCO sobre transparente — precisa do roxo da identidade dele */
 .thumb.dd{ background:#5A1FB8; }
 .thumb.dd img{ object-fit:contain; padding:3px; }
+/* o texto do selo GIRA (o quadrado roxo fica parado) — mesma volta lenta do selo da capa do DançaDestino */
+@media(prefers-reduced-motion:no-preference){
+  .thumb.dd img{ animation:selo-gira 18s linear infinite; }
+  @keyframes selo-gira{ to{ transform:rotate(360deg); } }
+}
 .txt{ flex:1; min-width:0; text-align:center; font-weight:600; font-size:.98rem; line-height:1.25; }
-.txt small{ display:block; margin-top:2px; font-weight:400; font-size:.8rem; color:var(--mute); }
+.txt small{ display:block; margin-top:2px; font-weight:400; font-size:.8rem; color:var(--mute); text-wrap:balance; }
+.txt small b{ font-weight:600; color:var(--ink); }   /* o nome da música em destaque; o intérprete fica apagado */
 /* espelha a miniatura do outro lado, pra o texto ficar CENTRADO de verdade */
 .card:not(.destaque)::after{ content:""; flex:none; width:48px; }
 
@@ -311,7 +320,7 @@ footer a:hover{ opacity:1; text-decoration:underline; }
       <li style="--i:2">
         <a class="card semana" href="/radio/?aba=danca">
           <span class="thumb dd" aria-hidden="true"><img src="/assets/Dancadestino/Lettering%20Redondo.webp" alt="" width="48" height="48" loading="lazy" /></span>
-          <span class="txt"><span class="sel">Música da semana</span>Ouça no nosso tocador<small>DançaDestino · toda sexta</small></span>
+          <span class="txt"><span class="sel">Música da semana</span>Ouça no nosso tocador<small><!--semana:-YmuHTOUYB4--><b>É</b> · Gonzaguinha<!--/semana--></small></span>
         </a>
       </li>
 

@@ -23,6 +23,15 @@
          dá a ela o selo "Música da semana" (tirando o selo da anterior).
          É o que o robô chama toda sexta. Roda quantas vezes quiser: se ela
          já é a primeira da lista, com o selo, não faz nada.
+         ⚠️ Do Linktree só entra música NOVA: se o vídeo já está na lista, ele
+         é ignorado (senão o link velho de lá desfaria a escolha da engenhoca).
+     node scripts/dancadestino/atualizar.mjs semana --link <youtube> --texto "Música - Intérprete" [--dry]
+         MESMA ação, mas com o link e o nome digitados pelo Daniel na ENGENHOCA
+         (/engenhoca/ → função → este comando no GitHub). Aqui o vídeo pode ser
+         um que já está na lista: sobe pro topo e leva o selo.
+
+   O CARTÃO da página /links/ ("Ouça no nosso tocador · <música> · <intérprete>")
+   é reescrito junto, sempre que `sync` roda, a partir da faixa que tem o selo.
 
    ORDEM DA LISTA: a mais nova SEMPRE em cima — a lista é lida de cima pra
    baixo como um calendário que anda pra trás. O selo ("semana:true" no
@@ -45,6 +54,7 @@ const RAIZ = path.resolve(AQUI, '../..');
 export const ARQ_LISTA = path.join(AQUI, 'playlist.json');
 export const PAGINAS = ['radio/index.html', 'index.html', 'danca-destino/index.html'];
 export const LINKTREE = 'https://linktr.ee/elainenarcizo';
+export const PAGINA_LINKS = 'links/index.html';        // o cartão "Música da semana" da página /links/
 
 // separadores de linha do Unicode (U+2028/2029): num texto JS eles QUEBRAM a linha. Montado por código de propósito.
 const SEP_LINHA_UNICODE = new RegExp('[' + String.fromCharCode(0x2028) + String.fromCharCode(0x2029) + ']', 'g');
@@ -138,6 +148,38 @@ export function leLista() {
 }
 const salvaLista = (lista) => fs.writeFileSync(ARQ_LISTA, JSON.stringify(lista, null, 2) + '\n', 'utf8');
 
+/* ── o cartão "Música da semana" da página /links/ ──
+   O texto dele (nome da música · intérprete) NUNCA é escrito à mão: sai da faixa com o selo, no
+   playlist.json, e mora entre duas marcas de comentário que o robô reconhece:
+       <small><!--semana:ID--> … <!--/semana--></small>
+   Só o que está ENTRE as marcas é reescrito — o resto da página não é tocado. */
+export const RE_CARTAO = /(<!--semana:)([A-Za-z0-9_-]*)(-->)([\s\S]*?)(<!--\/semana-->)/;
+export const escHtml = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+export const cartaoHtml = (faixa) => `<b>${escHtml(faixa.title)}</b> · ${escHtml(faixa.artist)}`;
+/** html da página + faixa da semana → html novo; `null` se a página perdeu as marcas */
+export function trocaCartao(html, faixa) {
+  if (!RE_CARTAO.test(html)) return null;
+  // função (não texto) no replace: um "$&" no nome da música não pode virar código de substituição
+  return html.replace(RE_CARTAO, (_, ini, __, meio, ___, fim) => ini + faixa.id + meio + cartaoHtml(faixa) + fim);
+}
+function syncCartao({ escreve = true } = {}) {
+  const faixa = leLista().find((t) => t.semana);
+  if (!faixa) return false;
+  const caminho = path.join(RAIZ, PAGINA_LINKS);
+  if (!fs.existsSync(caminho)) return false;
+  const texto = fs.readFileSync(caminho, 'utf8');
+  const novo = trocaCartao(texto, faixa);
+  if (novo === null) {
+    // NÃO derruba a publicação: as playlists são o que importa; o cartão é o enfeite que acompanha
+    const aviso = `${PAGINA_LINKS}: perdeu a marca <!--semana:…--> — o cartão da música NÃO foi atualizado (as playlists sim).`;
+    console.warn(process.env.GITHUB_ACTIONS ? `::warning::${aviso}` : `⚠ ${aviso}`);
+    return false;
+  }
+  if (novo === texto) return false;
+  if (escreve) fs.writeFileSync(caminho, novo, 'utf8');
+  return true;
+}
+
 export function sync({ escreve = true } = {}) {
   const lista = leLista();
   const mudou = [];
@@ -146,6 +188,7 @@ export function sync({ escreve = true } = {}) {
     const novo = p.texto.replace(RE_ARRAY, (_, ini, qb, __, fim) => ini + qb + blocoDe(lista, p.indent, p.quebra) + fim);
     if (novo !== p.texto) { mudou.push(rel); if (escreve) fs.writeFileSync(p.caminho, novo, 'utf8'); }
   }
+  if (syncCartao({ escreve })) mudou.push(PAGINA_LINKS);
   return mudou;
 }
 
@@ -318,10 +361,27 @@ async function principal() {
   }
 
   if (cmd === 'semana') {
-    const { texto, id } = achaMusicaDaSemana(await baixaLinktree());
+    // DUAS fontes pra mesma ação: (a) a engenhoca (--link e --texto, digitados pelo Daniel) ou (b) o Linktree.
+    const manual = !!(o.link || o.texto);
+    let texto, id;
+    if (manual) {
+      id = idDoYoutube(o.link);
+      if (!id) throw new Error('--link: não é um link de vídeo do YouTube (youtube.com/watch?v=… ou youtu.be/…).');
+      texto = limpa(o.texto, 200);
+      console.log(`Engenhoca: "${texto}"  →  vídeo ${id}`);
+    } else {
+      ({ texto, id } = achaMusicaDaSemana(await baixaLinktree()));
+      console.log(`Linktree: "${texto}"  →  vídeo ${id}`);
+    }
     const { titulo, artista } = partesDoTitulo(texto);
-    console.log(`Linktree: "${texto}"  →  vídeo ${id}`);
     const lista = leLista();
+    // 🔑 O Linktree só CONTRIBUI COM MÚSICA NOVA. Sem isso, o link velho que ficou lá (o Daniel já não o atualiza
+    // — usa a engenhoca) subiria de volta pro topo na sexta e DESFARIA a escolha dele.
+    if (!manual && lista.some((t) => t.id === id)) {
+      console.log('o vídeo do Linktree já está na lista — o Linktree só traz música NOVA. Nada a fazer.');
+      saidaParaGithub({ mudou: 'false' });
+      return;
+    }
     if (o.dry) {
       const e = lista.findIndex((t) => t.id === id);
       console.log(e === 0 && lista[0].semana ? '[dry] já é a música da semana — não faria nada.'
@@ -345,11 +405,11 @@ async function principal() {
     const mudou = sync();
     const msg = `DançaDestino: música da semana — ${r.faixa.title} (${r.faixa.artist})`;
     console.log(`✓ ${msg}\n  páginas: ${mudou.join(', ')}`);
-    saidaParaGithub({ mudou: 'true', mensagem: msg.replace(/[\r\n]/g, ' ') });
+    saidaParaGithub({ mudou: 'true', mensagem: msg.replace(/[\r\n]/g, ' '), origem: manual ? 'engenhoca' : 'Linktree' });
     return;
   }
 
-  console.log('uso: atualizar.mjs  status | sync | add <link> [--titulo X] [--artista Y] [--fim] | semana [--dry]');
+  console.log('uso: atualizar.mjs  status | sync | add <link> [--titulo X] [--artista Y] [--fim] | semana [--link L --texto "Música - Artista"] [--dry]');
   process.exit(cmd ? 2 : 0);
 }
 
