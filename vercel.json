@@ -24,6 +24,11 @@
       "source": "/produtividade-saudavel-2/",
       "destination": "/produtividade-saudavel/",
       "permanent": false
+    },
+    {
+      "source": "/links",
+      "destination": "/links/",
+      "permanent": false
     }
   ],
   "headers": [
