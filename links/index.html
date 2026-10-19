@@ -199,6 +199,24 @@ footer{ background:var(--ink); color:rgba(243,238,224,.6); padding:clamp(24px,5v
 footer .in{ max-width:64rem; margin:0 auto; display:flex; flex-wrap:wrap; gap:14px 32px; justify-content:space-between; align-items:center; font-family:var(--mono); font-size:.76rem; }
 footer a{ color:var(--paper); text-decoration:none; opacity:.8; }
 footer a:hover{ opacity:1; text-decoration:underline; }
+
+/* 🔧 MENU DE TELA CHEIA CABE NA ALTURA (out/2026) ─────────────────────────────────────────────────
+   Sintoma (Daniel, desktop): o menu aparecia CORTADO — "Home" e "Quem sou eu" sumiam atrás do
+   cabeçalho e "Para empresas" + os links do rodapé sumiam embaixo.
+   Duas causas: (1) o menu é uma coluna `justify-content:center` SEM rolagem — quando o conteúdo
+   passa da altura, ele estoura IGUAL pra cima e pra baixo e a parte de cima fica inalcançável;
+   (2) as letras (até 64px) eram dimensionadas pela LARGURA da tela, nunca pela altura: 10 linhas
+   de 87–95px = mais de 900px. Com o 10º item ("Para empresas", out/2026) estourou até em 1920×950
+   — e no celular o "Home" passou a ficar POR BAIXO do cabeçalho.
+   Conserto: (A) começa abaixo do cabeçalho e ROLA se não couber; centraliza com margens `auto`
+   (igual ao `center` quando cabe, mas sem cortar o topo quando não cabe); (B) as letras e o
+   respiro passam a respeitar a ALTURA (svh), com o MESMO teto de antes — em tela alta nada muda.
+   ⚠️ Esta regra existe em cada página (cópia). Se mexer no menu, mexer em TODAS: grep "MENU DE TELA CHEIA CABE NA ALTURA". */
+.menu{ justify-content:flex-start; overflow-y:auto; overscroll-behavior:contain; padding-top:74px; padding-bottom:20px; }
+.menu > :first-child{ margin-top:auto; }
+.menu > :last-child{ margin-bottom:auto; }
+.menu a.mi{ font-size:min(clamp(1.9rem,7.5vw,4rem), 5.3svh); padding:clamp(5px,1.1svh,16px) 0; }
+.menu .mfoot{ margin-top:clamp(14px,3svh,40px); }
 </style>
 </head>
 <body>
