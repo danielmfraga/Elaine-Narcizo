@@ -164,6 +164,7 @@ button.publicar:disabled{ opacity:.35; cursor:not-allowed; }
 
     <div class="rodape">
       <p>A música vai pro <strong>topo</strong> da lista do DançaDestino (na Rádio, na home e na página dele) com o selo “Música da semana”, e a anterior perde o selo.</p>
+      <p>Errou o nome? Mande de novo o <strong>mesmo link</strong> com o nome certo — ele corrige.</p>
       <p>Só serve vídeo do YouTube que deixa tocar fora do YouTube — a engenhoca avisa se não deixar.</p>
     </div>
   </div>
@@ -259,13 +260,21 @@ button.publicar:disabled{ opacity:.35; cursor:not-allowed; }
     atualiza();
   }
 
-  /* o que a página /links/ mostra no ar agora (o id da música dentro da marca do cartão) */
-  function idNoAr(){
+  var norm = function(s){ return String(s).replace(/\s+/g, ' ').trim(); };
+  /* o que a página /links/ mostra no ar agora: o id da música (marca do cartão) e o texto "Música · Intérprete" */
+  function cartaoNoAr(){
     return fetch('/links/?c=' + Date.now(), { cache: 'no-store' })
       .then(function(r){ return r.ok ? r.text() : ''; })
-      .then(function(h){ var m = h.match(/<!--semana:([A-Za-z0-9_-]+)-->/); return m ? m[1] : null; })
+      .then(function(h){
+        var m = h.match(/<!--semana:([A-Za-z0-9_-]+)-->([\s\S]*?)<!--\/semana-->/);
+        if (!m) return null;
+        // DOMParser: lê o HTML do cartão como TEXTO, sem executar nada
+        return { id: m[1], texto: norm(new DOMParser().parseFromString(m[2], 'text/html').body.textContent) };
+      })
       .catch(function(){ return null; });
   }
+  /* o cartão no ar já está igual ao que eu quero publicar? (mesmo vídeo E mesmo nome) */
+  function igual(c, id, p){ return !!c && c.id === id && c.texto === norm(p.t) + ' · ' + norm(p.a); }
 
   function mostra(tipo, html){
     estado.className = 'estado on ' + (tipo || '');
@@ -276,16 +285,16 @@ button.publicar:disabled{ opacity:.35; cursor:not-allowed; }
   var esc = function(s){ return String(s).replace(/[&<>"]/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]; }); };
   var LINKS_FINAIS = '<div class="links"><a href="/radio/?aba=danca">Ver no tocador →</a><a href="/links/">Ver a página de links →</a></div>';
 
-  function espera(id, ate){
-    idNoAr().then(function(atual){
-      if (atual === id) {
+  function espera(id, p, ate){
+    cartaoNoAr().then(function(atual){
+      if (igual(atual, id, p)) {
         enviando = false; atualiza();
         mostra('ok', '<strong>No ar! ✓</strong> A música da semana já está nos tocadores e na página de links.' + LINKS_FINAIS);
         link.value = ''; texto.value = ''; conferirLink(); conferirTexto();
       } else if (Date.now() > ate) {
         enviando = false; atualiza();
         mostra('erro', '<strong>Está demorando mais que o normal.</strong> O pedido foi enviado, mas o site ainda não mostra a música. Costuma ser só atraso — olhe de novo em alguns minutos. Se não aparecer, o GitHub manda um e-mail dizendo o que houve (ou veja em <a href="https://github.com/danielmfraga/Elaine-Narcizo/actions" target="_blank" rel="noopener">github.com/…/actions</a>).');
-      } else { setTimeout(function(){ espera(id, ate); }, 6000); }
+      } else { setTimeout(function(){ espera(id, p, ate); }, 6000); }
     });
   }
 
@@ -295,7 +304,7 @@ button.publicar:disabled{ opacity:.35; cursor:not-allowed; }
     var id = idDe(link.value), p = partes(texto.value);
     enviando = true; atualiza();
     mostra('', '<span class="giro" aria-hidden="true"></span>Enviando…');
-    idNoAr().then(function(antes){
+    cartaoNoAr().then(function(antes){
       return fetch('/api/musica', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ senha: senha.value, link: link.value.trim(), texto: p.t + ' - ' + p.a })
@@ -307,13 +316,13 @@ button.publicar:disabled{ opacity:.35; cursor:not-allowed; }
         if (x.r.status === 401) { senha.select(); }
         return;
       }
-      if (x.antes === id) {
+      if (igual(x.antes, id, p)) {
         enviando = false; atualiza();
-        mostra('ok', '<strong>Essa já é a música da semana agora.</strong> O robô conferiu e não mudou nada.' + LINKS_FINAIS);
+        mostra('ok', '<strong>Essa já é a música da semana agora, com esse mesmo nome.</strong> O robô conferiu e não mudou nada.' + LINKS_FINAIS);
         return;
       }
       mostra('', '<span class="giro" aria-hidden="true"></span><strong>Enviado ao robô ✓</strong> Agora o site está sendo atualizado — leva de 1 a 2 minutos. Pode deixar esta tela aberta.');
-      espera(id, Date.now() + 5 * 60 * 1000);
+      espera(id, p, Date.now() + 5 * 60 * 1000);
     }).catch(function(){
       enviando = false; atualiza();
       mostra('erro', '<strong>Sem conexão.</strong> Não consegui falar com o site. Confira a internet e tente de novo.');

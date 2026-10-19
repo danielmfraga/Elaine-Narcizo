@@ -28,7 +28,8 @@
      node scripts/dancadestino/atualizar.mjs semana --link <youtube> --texto "Música - Intérprete" [--dry]
          MESMA ação, mas com o link e o nome digitados pelo Daniel na ENGENHOCA
          (/engenhoca/ → função → este comando no GitHub). Aqui o vídeo pode ser
-         um que já está na lista: sobe pro topo e leva o selo.
+         um que já está na lista: sobe pro topo e leva o selo. E o que foi DIGITADO
+         manda: mandar de novo o mesmo vídeo com o nome certo CORRIGE o nome.
 
    O CARTÃO da página /links/ ("Ouça no nosso tocador · <música> · <intérprete>")
    é reescrito junto, sempre que `sync` roda, a partir da faixa que tem o selo.
@@ -374,7 +375,7 @@ async function principal() {
       console.log(`Linktree: "${texto}"  →  vídeo ${id}`);
     }
     const { titulo, artista } = partesDoTitulo(texto);
-    const lista = leLista();
+    let lista = leLista();
     // 🔑 O Linktree só CONTRIBUI COM MÚSICA NOVA. Sem isso, o link velho que ficou lá (o Daniel já não o atualiza
     // — usa a engenhoca) subiria de volta pro topo na sexta e DESFARIA a escolha dele.
     if (!manual && lista.some((t) => t.id === id)) {
@@ -382,13 +383,20 @@ async function principal() {
       saidaParaGithub({ mudou: 'false' });
       return;
     }
+    // 🔑 Na engenhoca o que foi DIGITADO manda: mandar de novo o mesmo vídeo com o nome certo CORRIGE o nome
+    // (é o jeito de consertar um erro de digitação), mesmo que ele já seja a música da semana.
+    const ja = lista.find((t) => t.id === id);
+    const nomeNovo = manual && ja && titulo && artista
+      && (ja.title !== limpa(titulo, 120) || ja.artist !== limpa(artista, 80)) ? { title: limpa(titulo, 120), artist: limpa(artista, 80) } : null;
     if (o.dry) {
       const e = lista.findIndex((t) => t.id === id);
-      console.log(e === 0 && lista[0].semana ? '[dry] já é a música da semana — não faria nada.'
+      console.log(nomeNovo ? `[dry] já está na lista, mas o nome mudaria pra "${nomeNovo.title}" — "${nomeNovo.artist}" (e subiria pro topo com o selo).`
+        : e === 0 && lista[0].semana ? '[dry] já é a música da semana — não faria nada.'
         : e >= 0 ? `[dry] já está na lista (#${e + 1}); subiria pro topo com o selo "Música da semana".`
         : `[dry] entraria no topo, com o selo: "${titulo}" — "${artista ?? '(nome do canal)'}"`);
       return;
     }
+    if (nomeNovo) lista = lista.map((t) => (t.id === id ? { ...t, ...nomeNovo } : t));
     let nova = null;
     if (!lista.some((t) => t.id === id)) {                 // só confere no YouTube se for faixa nova
       const yt = await consultaYoutube(id);                // falha aqui = nada é escrito
@@ -396,7 +404,7 @@ async function principal() {
       if (!nova.title || !nova.artist) throw new Error(`faltou título ou artista para ${id}.`);
     }
     const r = promoveSemana(lista, id, nova);
-    if (!r.mudou) {
+    if (!r.mudou && !nomeNovo) {
       console.log(`já é a música da semana (${r.faixa.title}). Nada a fazer.`);
       saidaParaGithub({ mudou: 'false' });
       return;

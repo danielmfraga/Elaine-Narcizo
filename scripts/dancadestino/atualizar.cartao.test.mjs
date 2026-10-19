@@ -56,6 +56,10 @@ test('semana --link (dry): o vídeo que JÁ é a música da semana não faz nada
   const s = roda('--link', 'https://www.youtube.com/watch?v=-YmuHTOUYB4', '--texto', 'É - Gonzaguinha');
   assert.match(s, /já é a música da semana/);
 });
+test('semana --link (dry): mesmo vídeo com o nome CORRIGIDO → mudaria o nome (é como se conserta um erro de digitação)', () => {
+  const s = roda('--link', 'https://www.youtube.com/watch?v=-YmuHTOUYB4', '--texto', 'É - Gonzaguinha (ao vivo)');
+  assert.ok(s.includes('o nome mudaria pra "É" — "Gonzaguinha (ao vivo)"'), s);
+});
 test('semana --link: link que não é do YouTube é recusado em voz alta', () => {
   assert.throws(() => roda('--link', 'https://evil.com/watch?v=ABCDEFGHIJK', '--texto', 'X - Y'), /não é um link de vídeo do YouTube/);
 });
