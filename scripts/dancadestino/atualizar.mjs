@@ -31,7 +31,7 @@
          um que já está na lista: sobe pro topo e leva o selo. E o que foi DIGITADO
          manda: mandar de novo o mesmo vídeo com o nome certo CORRIGE o nome.
 
-   O CARTÃO da página /links/ ("Ouça no nosso tocador · <música> · <intérprete>")
+   O CARTÃO da página /sintonize/ ("Ouça no nosso tocador · <música> · <intérprete>")
    é reescrito junto, sempre que `sync` roda, a partir da faixa que tem o selo.
 
    ORDEM DA LISTA: a mais nova SEMPRE em cima — a lista é lida de cima pra
@@ -57,7 +57,7 @@ const RAIZ = path.resolve(AQUI, '../..');
 export const ARQ_LISTA = path.join(AQUI, 'playlist.json');
 export const PAGINAS = ['radio/index.html', 'index.html', 'danca-destino/index.html'];
 export const LINKTREE = 'https://linktr.ee/elainenarcizo';
-export const PAGINA_LINKS = 'links/index.html';        // o cartão "Música da semana" da página /links/
+export const PAGINA_SINTONIZE = 'sintonize/index.html';        // o cartão "Música da semana" da página /sintonize/
 
 // separadores de linha do Unicode (U+2028/2029): num texto JS eles QUEBRAM a linha. Montado por código de propósito.
 const SEP_LINHA_UNICODE = new RegExp('[' + String.fromCharCode(0x2028) + String.fromCharCode(0x2029) + ']', 'g');
@@ -165,7 +165,7 @@ export function leLista() {
 }
 const salvaLista = (lista) => fs.writeFileSync(ARQ_LISTA, JSON.stringify(lista, null, 2) + '\n', 'utf8');
 
-/* ── o cartão "Música da semana" da página /links/ ──
+/* ── o cartão "Música da semana" da página /sintonize/ ──
    O texto dele (nome da música · intérprete) NUNCA é escrito à mão: sai da faixa com o selo, no
    playlist.json, e mora entre duas marcas de comentário que o robô reconhece:
        <small><!--semana:ID--> … <!--/semana--></small>
@@ -188,13 +188,13 @@ export function trocaCartao(html, faixa) {
 function syncCartao({ escreve = true } = {}) {
   const faixa = leLista().find((t) => t.semana);
   if (!faixa) return false;
-  const caminho = path.join(RAIZ, PAGINA_LINKS);
+  const caminho = path.join(RAIZ, PAGINA_SINTONIZE);
   if (!fs.existsSync(caminho)) return false;
   const texto = fs.readFileSync(caminho, 'utf8');
   const novo = trocaCartao(texto, faixa);
   if (novo === null) {
     // NÃO derruba a publicação: as playlists são o que importa; o cartão é o enfeite que acompanha
-    const aviso = `${PAGINA_LINKS}: perdeu a marca <!--semana:…--> — o cartão da música NÃO foi atualizado (as playlists sim).`;
+    const aviso = `${PAGINA_SINTONIZE}: perdeu a marca <!--semana:…--> — o cartão da música NÃO foi atualizado (as playlists sim).`;
     console.warn(process.env.GITHUB_ACTIONS ? `::warning::${aviso}` : `⚠ ${aviso}`);
     return false;
   }
@@ -211,7 +211,7 @@ export function sync({ escreve = true } = {}) {
     const novo = p.texto.replace(RE_ARRAY, (_, ini, qb, __, fim) => ini + qb + blocoDe(lista, p.indent, p.quebra) + fim);
     if (novo !== p.texto) { mudou.push(rel); if (escreve) fs.writeFileSync(p.caminho, novo, 'utf8'); }
   }
-  if (syncCartao({ escreve })) mudou.push(PAGINA_LINKS);
+  if (syncCartao({ escreve })) mudou.push(PAGINA_SINTONIZE);
   return mudou;
 }
 

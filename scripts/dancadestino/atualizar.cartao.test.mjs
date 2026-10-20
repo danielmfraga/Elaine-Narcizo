@@ -1,4 +1,4 @@
-// Testes do cartão "Música da semana" da página /links/ e do modo manual (engenhoca).
+// Testes do cartão "Música da semana" da página /sintonize/ e do modo manual (engenhoca).
 // Rodar:  node --test scripts/dancadestino/atualizar.cartao.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';

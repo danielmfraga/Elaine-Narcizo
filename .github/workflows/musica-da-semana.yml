@@ -101,7 +101,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add scripts/dancadestino/playlist.json radio/index.html index.html danca-destino/index.html links/index.html
+          git add scripts/dancadestino/playlist.json radio/index.html index.html danca-destino/index.html sintonize/index.html
           git commit -m "$MSG" -m "Publicado automaticamente pelo robô da música da semana (origem: $ORIGEM)."
           git pull --rebase origin main
           git push origin HEAD:main

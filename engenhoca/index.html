@@ -10,7 +10,7 @@
      Uso INTERNO (Daniel/Elaine): toda sexta, cola o link do YouTube + escreve
      "Música - Intérprete" + a senha. A página chama /api/musica (api/musica.js),
      que confere tudo e manda o robô do GitHub publicar nos 3 tocadores e no
-     cartão da página /links/. Nada aqui escreve no site: só aperta o botão.
+     cartão da página /sintonize/. Nada aqui escreve no site: só aperta o botão.
 
      • Não tem link em lugar nenhum do site e está fora do Google (noindex).
        A proteção de verdade é a SENHA (variável ENGENHOCA_SENHA na Vercel).
@@ -78,7 +78,7 @@ form{ margin-top:26px; display:flex; flex-direction:column; gap:22px; }
 .confere .t span{ color:var(--mute); }
 .confere.ruim{ border-color:var(--erro); background:var(--erro-bg); }
 
-/* a prévia do cartão — igual ao da página /links/ */
+/* a prévia do cartão — igual ao da página /sintonize/ */
 .previa-rot{ margin:12px 0 7px; font-family:var(--mono); font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--mute); }
 .card{ display:flex; align-items:center; gap:14px; min-height:66px; padding:9px 14px 9px 9px; background:var(--white); border:1px solid var(--line); border-radius:18px; }
 .card::after{ content:""; flex:none; width:48px; }
@@ -269,9 +269,9 @@ button.publicar:disabled{ opacity:.35; cursor:not-allowed; }
   }
 
   var norm = function(s){ return String(s).replace(/\s+/g, ' ').trim(); };
-  /* o que a página /links/ mostra no ar agora: o id da música (marca do cartão) e o texto "Música · Intérprete" */
+  /* o que a página /sintonize/ mostra no ar agora: o id da música (marca do cartão) e o texto "Música · Intérprete" */
   function cartaoNoAr(){
-    return fetch('/links/?c=' + Date.now(), { cache: 'no-store' })
+    return fetch('/sintonize/?c=' + Date.now(), { cache: 'no-store' })
       .then(function(r){ return r.ok ? r.text() : ''; })
       .then(function(h){
         var m = h.match(/<!--semana:([A-Za-z0-9_-]+)-->([\s\S]*?)<!--\/semana-->/);
@@ -291,7 +291,7 @@ button.publicar:disabled{ opacity:.35; cursor:not-allowed; }
     if (estado.scrollIntoView) estado.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }
   var esc = function(s){ return String(s).replace(/[&<>"]/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]; }); };
-  var LINKS_FINAIS = '<div class="links"><a href="/radio/?aba=danca">Ver no tocador →</a><a href="/links/">Ver a página de links →</a></div>';
+  var LINKS_FINAIS = '<div class="links"><a href="/radio/?aba=danca">Ver no tocador →</a><a href="/sintonize/">Ver a página de links →</a></div>';
 
   function espera(id, p, ate){
     cartaoNoAr().then(function(atual){

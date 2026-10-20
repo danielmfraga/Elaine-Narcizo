@@ -27,7 +27,17 @@
     },
     {
       "source": "/links",
-      "destination": "/links/",
+      "destination": "/sintonize/",
+      "permanent": false
+    },
+    {
+      "source": "/links/",
+      "destination": "/sintonize/",
+      "permanent": false
+    },
+    {
+      "source": "/sintonize",
+      "destination": "/sintonize/",
       "permanent": false
     },
     {

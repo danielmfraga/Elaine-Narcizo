@@ -7,7 +7,7 @@
        1. confere a senha;
        2. confere o link (é um vídeo do YouTube? existe? deixa tocar fora do YouTube?);
        3. pede ao GitHub pra rodar o robô (workflow musica-da-semana.yml) com o link e o texto.
-   O robô é que mexe nas playlists e na página /links/, commita, e a Vercel publica.
+   O robô é que mexe nas playlists e na página /sintonize/, commita, e a Vercel publica.
    ESTA FUNÇÃO NUNCA ESCREVE NO SITE — só aperta o botão do robô.
 
    ── CONFIGURAÇÃO (Vercel → Settings → Environment Variables) ─────────────
