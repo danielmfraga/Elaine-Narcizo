@@ -35,8 +35,10 @@
    é reescrito junto, sempre que `sync` roda, a partir da faixa que tem o selo.
 
    ORDEM DA LISTA: a mais nova SEMPRE em cima — a lista é lida de cima pra
-   baixo como um calendário que anda pra trás. O selo ("semana:true" no
-   playlist.json) existe em UMA faixa só: a música da semana atual.
+   baixo como um calendário que anda pra trás. O selo ("semana" no
+   playlist.json) existe em UMA faixa só: a música da semana atual. O valor dele
+   é a DATA em que ela virou a da semana ("semana": "2026-10-16", horário de
+   Brasília) e o selo mostra "Música da semana · 16-10-26".
 
    🔑 Título e artista saem do TEXTO DO LINKTREE ("Música da semana: Arreuni
    - Doroty Marques" → título "Arreuni", artista "Doroty Marques"). Só se o
@@ -128,10 +130,22 @@ function lePagina(rel) {
   return { caminho, texto, m, faixas, indent, quebra: m[2] };
 }
 
+/* ── a DATA do selo "Música da semana" ──
+   No playlist.json: `"semana": "2026-10-16"` (ISO, o dia em que ela virou a música da semana, no horário de Brasília).
+   Nas páginas e no cartão o selo mostra do jeito que o Daniel escreveu o exemplo: "Música da semana · 16-10-26".
+   `"semana": true` (sem data) ainda vale: selo sem data. */
+export function dataCurta(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso ?? ''));
+  return m ? `${m[3]}-${m[2]}-${m[1].slice(2)}` : null;
+}
+/** hoje no horário de Brasília — o robô roda em UTC, onde às 21h de Brasília já é "amanhã" */
+export const hojeBRT = (agora = new Date()) =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(agora);
+
 export function blocoDe(faixas, indent, quebra) {
   return faixas
-    // `semana:true` só existe na faixa que leva o selo "Música da semana" (no máximo UMA)
-    .map((t, i) => `${indent}{ id:'${esc(t.id)}', title:'${esc(t.title)}', artist:'${esc(t.artist)}'${t.semana ? ', semana:true' : ''} }${i < faixas.length - 1 ? ',' : ''}`)
+    // `semana` só existe na faixa que leva o selo "Música da semana" (no máximo UMA): com data vira texto ('16-10-26'), sem data, true
+    .map((t, i) => `${indent}{ id:'${esc(t.id)}', title:'${esc(t.title)}', artist:'${esc(t.artist)}'${t.semana ? (dataCurta(t.semana) ? `, semana:'${dataCurta(t.semana)}'` : ', semana:true') : ''} }${i < faixas.length - 1 ? ',' : ''}`)
     .join(quebra);
 }
 
@@ -145,6 +159,8 @@ export function leLista() {
     vistos.add(t.id);
   });
   if (lista.filter((t) => t.semana).length > 1) throw new Error("playlist.json: mais de uma faixa com o selo da semana.");
+  const ruim = lista.find((t) => t.semana && t.semana !== true && !dataCurta(t.semana));
+  if (ruim) throw new Error(`playlist.json (${ruim.id}): "semana" tem que ser true ou uma data AAAA-MM-DD, não "${ruim.semana}".`);
   return lista;
 }
 const salvaLista = (lista) => fs.writeFileSync(ARQ_LISTA, JSON.stringify(lista, null, 2) + '\n', 'utf8');
@@ -157,11 +173,17 @@ const salvaLista = (lista) => fs.writeFileSync(ARQ_LISTA, JSON.stringify(lista, 
 export const RE_CARTAO = /(<!--semana:)([A-Za-z0-9_-]*)(-->)([\s\S]*?)(<!--\/semana-->)/;
 export const escHtml = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 export const cartaoHtml = (faixa) => `<b>${escHtml(faixa.title)}</b> · ${escHtml(faixa.artist)}`;
+// a data mora noutro par de marcas, DENTRO do selo amarelo: <span class="sel">Música da semana<!--semana-data--> · 16-10-26<!--/semana-data--></span>
+// (par OPCIONAL: sem ele o cartão só não mostra a data)
+export const RE_CARTAO_DATA = /(<!--semana-data-->)([\s\S]*?)(<!--\/semana-data-->)/;
 /** html da página + faixa da semana → html novo; `null` se a página perdeu as marcas */
 export function trocaCartao(html, faixa) {
   if (!RE_CARTAO.test(html)) return null;
+  const d = dataCurta(faixa.semana);
   // função (não texto) no replace: um "$&" no nome da música não pode virar código de substituição
-  return html.replace(RE_CARTAO, (_, ini, __, meio, ___, fim) => ini + faixa.id + meio + cartaoHtml(faixa) + fim);
+  return html
+    .replace(RE_CARTAO, (_, ini, __, meio, ___, fim) => ini + faixa.id + meio + cartaoHtml(faixa) + fim)
+    .replace(RE_CARTAO_DATA, (_, ini, __, fim) => ini + (d ? ` · ${d}` : '') + fim);
 }
 function syncCartao({ escreve = true } = {}) {
   const faixa = leLista().find((t) => t.semana);
@@ -225,7 +247,7 @@ export async function adiciona({ id, titulo, artista, fim = false }) {
 /* ── a MÚSICA DA SEMANA: vai pro topo e leva o selo; o selo sai de quem tinha ──
    Pura (sem rede, sem arquivo) pra poder ser testada. `nova` = a faixa pronta,
    só necessária quando o id ainda não está na lista. */
-export function promoveSemana(lista, id, nova) {
+export function promoveSemana(lista, id, nova, data) {
   const i = lista.findIndex((t) => t.id === id);
   const comSelo = lista.filter((t) => t.semana);
   if (i === 0 && comSelo.length === 1) return { mudou: false, lista, faixa: lista[0] };   // já é a da semana
@@ -233,7 +255,7 @@ export function promoveSemana(lista, id, nova) {
   if (!faixa) throw new Error(`promoveSemana: o vídeo ${id} não está na lista e não veio a faixa nova.`);
   const resto = lista.filter((t) => t.id !== id).map(({ semana, ...t }) => t);   // tira o selo de todo mundo
   const { semana: _antigo, ...limpa_ } = faixa;
-  return { mudou: true, lista: [{ ...limpa_, semana: true }, ...resto], faixa: limpa_ };
+  return { mudou: true, lista: [{ ...limpa_, semana: data || true }, ...resto], faixa: limpa_ };   // `data` = AAAA-MM-DD do dia em que virou a da semana
 }
 
 /* ── Linktree ── */
@@ -375,6 +397,9 @@ async function principal() {
       console.log(`Linktree: "${texto}"  →  vídeo ${id}`);
     }
     const { titulo, artista } = partesDoTitulo(texto);
+    // a data do selo = o dia (de Brasília) em que ela virou a da semana; `--data AAAA-MM-DD` força outro (backfill/teste)
+    const data = o.data || hojeBRT();
+    if (!dataCurta(data)) throw new Error(`--data: use AAAA-MM-DD (ex.: 2026-10-16), não "${o.data}".`);
     let lista = leLista();
     // 🔑 O Linktree só CONTRIBUI COM MÚSICA NOVA. Sem isso, o link velho que ficou lá (o Daniel já não o atualiza
     // — usa a engenhoca) subiria de volta pro topo na sexta e DESFARIA a escolha dele.
@@ -403,7 +428,7 @@ async function principal() {
       nova = { id, title: limpa(titulo || yt.titulo, 120), artist: limpa(artista || yt.canal, 80) };
       if (!nova.title || !nova.artist) throw new Error(`faltou título ou artista para ${id}.`);
     }
-    const r = promoveSemana(lista, id, nova);
+    const r = promoveSemana(lista, id, nova, data);
     if (!r.mudou && !nomeNovo) {
       console.log(`já é a música da semana (${r.faixa.title}). Nada a fazer.`);
       saidaParaGithub({ mudou: 'false' });

@@ -149,7 +149,7 @@ button.publicar:disabled{ opacity:.35; cursor:not-allowed; }
         <div class="previa-rot">Assim vai aparecer na página de links</div>
         <div class="card" aria-hidden="true">
           <span class="thumb"><img src="/assets/Dancadestino/Lettering%20Redondo.webp" alt="" width="48" height="48" /></span>
-          <span class="txt"><span class="sel">Música da semana</span>Ouça no nosso tocador<small id="previa"><b>…</b></small></span>
+          <span class="txt"><span class="sel" id="previa-sel">Música da semana</span>Ouça no nosso tocador<small id="previa"><b>…</b></small></span>
         </div>
       </div>
 
@@ -163,7 +163,7 @@ button.publicar:disabled{ opacity:.35; cursor:not-allowed; }
     </form>
 
     <div class="rodape">
-      <p>A música vai pro <strong>topo</strong> da lista do DançaDestino (na Rádio, na home e na página dele) com o selo “Música da semana”, e a anterior perde o selo.</p>
+      <p>A música vai pro <strong>topo</strong> da lista do DançaDestino (na Rádio, na home e na página dele) com o selo “Música da semana” e a <strong>data de hoje</strong>, e a anterior perde o selo.</p>
       <p>Errou o nome? Mande de novo o <strong>mesmo link</strong> com o nome certo — ele corrige.</p>
       <p>Só serve vídeo do YouTube que deixa tocar fora do YouTube — a engenhoca avisa se não deixar.</p>
     </div>
@@ -199,6 +199,14 @@ button.publicar:disabled{ opacity:.35; cursor:not-allowed; }
     if (i > 0) return { t: t.slice(0, i).trim(), a: t.slice(i + 3).trim() };
     return { t: t, a: null };
   }
+
+  /* hoje no horário de Brasília, "16-10-26" — a data que o selo amarelo mostra (o robô usa a mesma regra) */
+  function hoje(){
+    var p = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', year: '2-digit' }).formatToParts(new Date());
+    var g = function(t){ for (var i = 0; i < p.length; i++) if (p[i].type === t) return p[i].value; return ''; };
+    return g('day') + '-' + g('month') + '-' + g('year');
+  }
+  $('#previa-sel').textContent = 'Música da semana · ' + hoje();
 
   function pronto(){
     var p = partes(texto.value);

@@ -364,7 +364,7 @@ body.nav-hidden .back-chip{ box-shadow:0 7px 16px rgba(0,0,0,.3); }
      YouTube (canais "- Topic"/"Oficial" viram só o nome do artista; quando
      o título já trazia o artista embutido, ele venceu o nome do canal). */
   var ytTracks=[
-    { id:'-YmuHTOUYB4', title:'É', artist:'Gonzaguinha', semana:true },
+    { id:'-YmuHTOUYB4', title:'É', artist:'Gonzaguinha', semana:'16-10-26' },
     { id:'KL18rlquCBk', title:'Arreuni', artist:'Doroty Marques' },
     { id:'oJq2hwQotgA', title:'Guiné-Bissau, Moçambique e Angola Racional', artist:'Tim Maia' },
     { id:'hSXIO0t4OlQ', title:'Zé do Caroço', artist:'Leci Brandão' },
@@ -430,7 +430,7 @@ body.nav-hidden .back-chip{ box-shadow:0 7px 16px rgba(0,0,0,.3); }
       var du=document.createElement('span'); du.className='sp-du'; du.textContent=i===ytCur?'':'▶';
       row.appendChild(n); row.appendChild(ti);
       /* selo "Música da semana": só a faixa com `semana:true` (o robô do Linktree marca UMA) */
-      if(tr.semana){ var sm=document.createElement('span'); sm.className='sp-sem'; sm.textContent='Música da semana'; row.appendChild(sm); }
+      if(tr.semana){ var sm=document.createElement('span'); sm.className='sp-sem'; sm.textContent='Música da semana'+(typeof tr.semana==='string'?' · '+tr.semana:''); row.appendChild(sm); }
       row.appendChild(du);
       row.addEventListener('click',function(){ ytPlayIndex(i); });
       spListEl.appendChild(row);

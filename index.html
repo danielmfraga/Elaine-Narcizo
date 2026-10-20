@@ -1538,7 +1538,9 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
 .dd-capa .dd-row .t{ flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .dd-capa .dd-row .p{ color:var(--amarelo); font-size:.58rem; }
 /* selo "Música da semana" — só existe na faixa marcada pelo robô; em nenhuma outra linha */
-.dd-capa .dd-row .dd-sem{ flex-shrink:0; font-size:.5rem; font-weight:700; letter-spacing:.06em; line-height:1; text-transform:uppercase; white-space:nowrap; padding:3px 6px; border-radius:999px; background:var(--amarelo); color:#0F0E0C; }
+.dd-capa .dd-row .dd-sem{ flex-shrink:0; font-size:.5rem; font-weight:700; letter-spacing:.06em; line-height:1.2; text-align:center; text-transform:uppercase; white-space:nowrap; padding:3px 6px; border-radius:10px; background:var(--amarelo); color:#0F0E0C; }
+/* a data vai numa 2ª linha do selo: no painel estreito o selo de uma linha só (com a data) roubava o lugar do nome e do intérprete */
+.dd-capa .dd-row .dd-sem-d{ display:block; }
 .dd-capa .dd-row.live, .dd-capa .dd-row.live .n{ color:var(--amarelo); }
 @media (prefers-reduced-motion:reduce){ .dd-capa #dd-fab::before,.dd-capa #dd-fab::after,.dd-capa .dd-eq i{ animation:none !important; } }
 
@@ -3429,7 +3431,7 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
 <script>
 (function(){
   var ddTracks=[
-    { id:'-YmuHTOUYB4', title:'É', artist:'Gonzaguinha', semana:true },
+    { id:'-YmuHTOUYB4', title:'É', artist:'Gonzaguinha', semana:'16-10-26' },
     { id:'KL18rlquCBk', title:'Arreuni', artist:'Doroty Marques' },
     { id:'oJq2hwQotgA', title:'Guiné-Bissau, Moçambique e Angola Racional', artist:'Tim Maia' },
     { id:'hSXIO0t4OlQ', title:'Zé do Caroço', artist:'Leci Brandão' },
@@ -3496,7 +3498,7 @@ html.lenta #formacoes{ margin-top:var(--pista,0px); }
       var p=document.createElement('span'); p.className='p'; p.textContent=i===ddCur?'':'▶';
       r.appendChild(n); r.appendChild(t);
       /* selo "Música da semana": só a faixa com `semana:true` (o robô do Linktree marca UMA) */
-      if(tr.semana){ var sm=document.createElement('span'); sm.className='dd-sem'; sm.textContent='Música da semana'; r.appendChild(sm); }
+      if(tr.semana){ var sm=document.createElement('span'); sm.className='dd-sem'; sm.appendChild(document.createTextNode('Música da semana')); if(typeof tr.semana==='string'){ var sd=document.createElement('span'); sd.className='dd-sem-d'; sd.textContent=tr.semana; sm.appendChild(sd); } r.appendChild(sm); }
       r.appendChild(p);
       r.addEventListener('click',function(){ ddPlayIndex(i); });
       ddList.appendChild(r);

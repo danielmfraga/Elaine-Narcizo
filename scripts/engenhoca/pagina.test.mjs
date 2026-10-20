@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { partesDoTitulo, idDoYoutube } from '../dancadestino/atualizar.mjs';
+import { partesDoTitulo, idDoYoutube, dataCurta, hojeBRT } from '../dancadestino/atualizar.mjs';
 
 const html = fs.readFileSync(fileURLToPath(new URL('../../engenhoca/index.html', import.meta.url)), 'utf8');
 const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
@@ -36,6 +36,11 @@ test('a PRÉVIA entende o texto igual ao robô (partes ≡ partesDoTitulo)', () 
     const robo = partesDoTitulo(c), pag = partes(c);
     assert.deepEqual({ t: pag.t, a: pag.a }, { t: robo.titulo, a: robo.artista }, `diferem em: ${c}`);
   }
+});
+test('a prévia mostra a MESMA data de hoje que o robô vai gravar no selo (hoje ≡ dataCurta(hojeBRT))', () => {
+  const hoje = funcao('hoje');
+  assert.match(hoje(), /^\d{2}-\d{2}-\d{2}$/);
+  assert.equal(hoje(), dataCurta(hojeBRT()));
 });
 test('a página reconhece os mesmos links do YouTube que o robô (idDe ≡ idDoYoutube)', () => {
   const idDe = funcao('idDe');

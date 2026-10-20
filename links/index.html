@@ -16,7 +16,9 @@
      mas esse texto NÃO é escrito à mão: mora entre duas marcas (comentários HTML
      "semana:ID" e "/semana", dentro do cartão lá embaixo) e é reescrito pelo robô
      (scripts/dancadestino/atualizar.mjs) a cada música nova, a partir da faixa com
-     o selo no playlist.json. NÃO apagar as marcas (sem elas o robô só avisa e o
+     o selo no playlist.json. A DATA do selo amarelo ("Música da semana · 16-10-26")
+     mora noutro par de marcas ("semana-data" e "/semana-data") e é a data em que a
+     faixa virou a da semana. NÃO apagar as marcas (sem elas o robô só avisa e o
      cartão fica velho) e NÃO escrever o formato literal delas aqui em cima: um
      comentário não pode conter o fecha-comentário e o robô acharia esta cópia. Leva pro NOSSO
      tocador (/radio/?aba=danca), onde a mais nova fica em 1º, com o selo.
@@ -320,7 +322,7 @@ footer a:hover{ opacity:1; text-decoration:underline; }
       <li style="--i:2">
         <a class="card semana" href="/radio/?aba=danca">
           <span class="thumb dd" aria-hidden="true"><img src="/assets/Dancadestino/Lettering%20Redondo.webp" alt="" width="48" height="48" loading="lazy" /></span>
-          <span class="txt"><span class="sel">Música da semana</span>Ouça no nosso tocador<small><!--semana:-YmuHTOUYB4--><b>É</b> · Gonzaguinha<!--/semana--></small></span>
+          <span class="txt"><span class="sel">Música da semana<!--semana-data--> · 16-10-26<!--/semana-data--></span>Ouça no nosso tocador<small><!--semana:-YmuHTOUYB4--><b>É</b> · Gonzaguinha<!--/semana--></small></span>
         </a>
       </li>
 
