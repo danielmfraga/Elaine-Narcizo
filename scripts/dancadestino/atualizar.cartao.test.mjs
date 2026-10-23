@@ -3,6 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { trocaCartao, cartaoHtml, escHtml, RE_CARTAO } from './atualizar.mjs';
 
@@ -52,13 +53,16 @@ test('semana --link --texto (dry): aceita "Título" de Artista (como o Daniel j�
   const s = roda('--link', 'https://youtu.be/ABCDEFGHIJK', '--texto', '"Tempo de Amor" de Vinicius de Moraes');
   assert.match(s, /"Tempo de Amor" — "Vinicius de Moraes"/);
 });
-test('semana --link (dry): o vídeo que JÁ é a música da semana não faz nada', () => {
-  const s = roda('--link', 'https://www.youtube.com/watch?v=-YmuHTOUYB4', '--texto', 'É - Gonzaguinha');
+// ⚠️ lê a música da semana ATUAL do playlist.json: o teste não pode depender de qual música está em 1º hoje
+// (ele quebrou quando a "É" deixou de ser a da semana). Pula se a lista não tiver faixa com selo.
+const atual = JSON.parse(readFileSync(fileURLToPath(new URL('./playlist.json', import.meta.url)), 'utf8')).find((t) => t.semana);
+test('semana --link (dry): o vídeo que JÁ é a música da semana não faz nada', { skip: !atual }, () => {
+  const s = roda('--link', `https://www.youtube.com/watch?v=${atual.id}`, '--texto', `${atual.title} - ${atual.artist}`);
   assert.match(s, /já é a música da semana/);
 });
-test('semana --link (dry): mesmo vídeo com o nome CORRIGIDO → mudaria o nome (é como se conserta um erro de digitação)', () => {
-  const s = roda('--link', 'https://www.youtube.com/watch?v=-YmuHTOUYB4', '--texto', 'É - Gonzaguinha (ao vivo)');
-  assert.ok(s.includes('o nome mudaria pra "É" — "Gonzaguinha (ao vivo)"'), s);
+test('semana --link (dry): mesmo vídeo com o nome CORRIGIDO → mudaria o nome (é como se conserta um erro de digitação)', { skip: !atual }, () => {
+  const s = roda('--link', `https://www.youtube.com/watch?v=${atual.id}`, '--texto', `${atual.title} - ${atual.artist} (ao vivo)`);
+  assert.ok(s.includes(`o nome mudaria pra "${atual.title}" — "${atual.artist} (ao vivo)"`), s);
 });
 test('semana --link: link que não é do YouTube é recusado em voz alta', () => {
   assert.throws(() => roda('--link', 'https://evil.com/watch?v=ABCDEFGHIJK', '--texto', 'X - Y'), /não é um link de vídeo do YouTube/);
