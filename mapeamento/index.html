@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     OFICINA "MAPEAMENTO DAS RELAÇÕES" — hotpage (out/2026)  →  /mapeamento/
+     Estratégia (decisão do Daniel): o PERCURSO gratuito (/percurso/mapeamento/) é o
+     CHAMARIZ; a OFICINA (online, 2 h, até 10 pessoas, R$ 50) é o que se vende; e a
+     LISTA DE ESPERA é a conversão enquanto não há datas.
+     Duas CTAs: (1) "Fazer o percurso grátis" · (2) "Entrar na lista de espera".
+
+     🎯 PÚBLICO AMPLO DE PROPÓSITO. O texto de divulgação original ("Sozinha? Vamos
+     conferir.") fala com UM público. O instrumental serve a mais gente, então a
+     página tem UMA promessa e QUATRO PORTAS (cards "Para quem é"): você · quem
+     trabalha com pessoas e grupos · um momento de virada · grupos e equipes.
+     Cada porta tem um link próprio (?para=voce|profissionais|virada|grupos): troca a
+     frase do topo, destaca o card e já marca o interesse na lista — dá pra usar
+     textos/anúncios diferentes apontando pra mesma página. A lista de espera guarda o
+     "interesse" e a "origem" pra o Daniel ver QUEM está chegando.
+
+     ⚠️ SÓ FATOS DO DOCUMENTO DA OFICINA: R$ 50,00 por participante, online, 2 horas,
+     até 10 pessoas, folha + lápis de cor + caneta, instrumental de 20 anos de prática,
+     "poderá reproduzir esse instrumental em seu próprio trabalho". DATAS, forma de
+     pagamento, plataforma: NÃO inventar — vão pro e-mail/WhatsApp de quem está na lista.
+
+     📮 LISTA DE ESPERA → Google Sheets via Apps Script (mesma receita do "Quero ser
+     avisada" e do formulário do Produtividade Saudável). A constante FORM_ENDPOINT lá
+     no fim: se estiver VAZIA, o envio cai no WhatsApp da Elaine (não perde o contato).
+     O código do Apps Script está comentado junto dela.
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<title>Oficina Mapeamento das relações — online, 2 horas | Elaine Narcizo</title>
+<meta name="description" content="Oficina online de 2 horas, em grupo de até 10 pessoas, para descobrir a extensão e a diversidade das relações que já constituem a sua vida. Com o Mapeamento das Relações, instrumental de Elaine Narcizo. R$ 50. Faça antes o percurso gratuito e entre na lista de espera." />
+<meta name="author" content="Elaine Narcizo" />
+<link rel="canonical" href="https://www.elainenarcizo.com.br/mapeamento/" />
+
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="pt_BR" />
+<meta property="og:site_name" content="Elaine Narcizo" />
+<meta property="og:title" content="Oficina Mapeamento das relações" />
+<meta property="og:description" content="O seu mundo de relações é maior do que você imagina. Oficina online, 2 horas, até 10 pessoas. Experimente antes, de graça, com o percurso." />
+<meta property="og:url" content="https://www.elainenarcizo.com.br/mapeamento/" />
+<meta property="og:image" content="https://www.elainenarcizo.com.br/assets/elaine-narcizo.jpeg" />
+<meta name="twitter:card" content="summary" />
+
+<link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Archivo:wdth,wght@62..125,100..900&family=DM+Sans:opsz,wght@9..40,300..500&family=Quicksand:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "Oficina Mapeamento das relações",
+  "description": "Oficina online de 2 horas, em grupo de até 10 pessoas, com o Mapeamento das Relações — instrumental desenvolvido por Elaine Narcizo ao longo de 20 anos de prática como educadora e assistente social.",
+  "inLanguage": "pt-BR",
+  "provider": { "@type": "Person", "name": "Elaine Narcizo", "url": "https://www.elainenarcizo.com.br/" },
+  "offers": { "@type": "Offer", "price": "50.00", "priceCurrency": "BRL", "url": "https://www.elainenarcizo.com.br/mapeamento/#lista" }
+}
+</script>
+
+<style>
+:root{
+  --lilas:#B9A7DC; --lilas-bg:#BCAFD5; --roxo:#6C4BB6;
+  --amarelo:#F5D731;
+  --ink:#0F0E0C; --paper:#F3EEE0; --white:#FFFFFF;
+  --mute:#6E6A60; --line:rgba(15,14,12,.14);
+  --disp:"Archivo",sans-serif;
+  --sans:"DM Sans",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  --mono:"Space Mono",ui-monospace,monospace;
+  --pad:clamp(20px,5vw,64px);
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+html,body{ background:var(--paper); }
+body{
+  font-family:var(--sans); color:var(--ink);
+  font-size:clamp(1.02rem,1rem + .3vw,1.15rem); line-height:1.6;
+  -webkit-font-smoothing:antialiased; overflow-x:clip;
+  min-height:100svh; display:flex; flex-direction:column;
+}
+a{ color:inherit; }
+::selection{ background:var(--amarelo); color:var(--ink); }
+:focus-visible{ outline:2px solid var(--roxo); outline-offset:3px; }
+
+/* ── Cabeçalho padrão do site ─────────────────────────────────────── */
+.hdr{
+  position:fixed; top:0; left:0; right:0; z-index:80;
+  display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:16px;
+  padding:10px var(--pad); background:transparent; color:var(--ink);
+  transition:background .35s var(--ease), color .35s var(--ease), padding .35s var(--ease), box-shadow .35s var(--ease);
+}
+.hdr.scrolled{ background:var(--white); color:var(--ink); padding:8px var(--pad); box-shadow:0 1px 0 var(--line); }
+.hdr.menu-open{ background:transparent; color:var(--paper); box-shadow:none; }
+.hdr .wordmark{ display:flex; align-items:center; color:currentColor; flex-shrink:0; text-decoration:none; }
+.hdr .wordmark svg{ display:block; height:46px; width:auto; fill:currentColor; }
+.hdr-right{ display:flex; align-items:center; justify-content:center; gap:26px; }
+.hdr-ic{ display:flex; align-items:center; justify-content:center; width:20px; height:20px; flex-shrink:0; opacity:.85; transition:opacity .2s; color:currentColor; }
+.hdr-ic:hover{ opacity:1; }
+.hdr-ic svg{ width:100%; height:100%; }
+.burger{ border:0; background:none; cursor:pointer; color:currentColor; display:flex; align-items:center; gap:10px; padding:0; flex-shrink:0; justify-self:end; }
+.burger .b-label{ font-family:var(--disp); font-weight:560; font-stretch:100%; font-size:16px; }
+.burger .b-bars{ width:20px; height:14px; position:relative; }
+.burger .b-bars i{ display:block; position:absolute; left:0; width:20px; height:2px; background:currentColor; transition:transform .3s var(--ease), opacity .3s; }
+.burger .b-bars i:nth-child(1){ top:0; }
+.burger .b-bars i:nth-child(2){ top:6px; }
+.burger .b-bars i:nth-child(3){ top:12px; }
+.burger.open .b-bars i:nth-child(1){ top:6px; transform:rotate(45deg); }
+.burger.open .b-bars i:nth-child(2){ opacity:0; }
+.burger.open .b-bars i:nth-child(3){ top:6px; transform:rotate(-45deg); }
+.menu{ position:fixed; inset:0; z-index:75; background:var(--ink); color:var(--paper); display:flex; flex-direction:column; justify-content:center; padding:0 var(--pad); opacity:0; visibility:hidden; pointer-events:none; transition:opacity .38s var(--ease), visibility .38s; }
+.menu.open{ opacity:1; visibility:visible; pointer-events:auto; }
+.menu a.mi{ display:flex; align-items:baseline; gap:18px; padding:clamp(8px,1.6vh,16px) 0; border-bottom:1px solid rgba(250,248,243,.08); font-family:var(--disp); font-weight:820; font-stretch:115%; text-transform:uppercase; letter-spacing:-.01em; font-size:clamp(1.9rem,7.5vw,4rem); line-height:1; color:rgba(250,248,243,.5); text-decoration:none; opacity:0; transform:translateY(14px); transition:transform .4s var(--ease), opacity .4s, color .2s; transition-delay:calc(var(--i)*45ms); }
+.menu.open a.mi{ opacity:1; transform:none; }
+.menu a.mi:hover{ color:var(--amarelo); }
+.menu a.mi small{ font-family:var(--mono); font-weight:400; font-size:11px; letter-spacing:.14em; color:rgba(250,248,243,.35); flex:0 0 30px; }
+.menu .mfoot{ margin-top:5vh; font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:rgba(250,248,243,.4); display:flex; gap:22px; flex-wrap:wrap; }
+.menu .mfoot a{ color:inherit; text-decoration:none; }
+.menu .mfoot a:hover{ color:var(--amarelo); }
+
+/* ═════════ a página da oficina (identidade do percurso Mapeamento: a do PDF) ═════════ */
+:root{
+  --m-creme:#FDF9E4; --m-ink:#1B1A17; --m-mute:#6B675C; --m-linha:rgba(27,26,23,.14);
+  --m-amarelo:#F5A524; --m-amarelo-cl:#FCD78F; --m-amarelo-tx:#A8620A;
+  --m-rosa:#E5264F; --m-rosa-cl:#F69AA6; --m-rosa-tx:#C71D43; --m-oliva:#4B5A3C;
+  --m-titulo:"Amatic SC","Quicksand",cursive; --m-corpo:"Quicksand",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  --m-col:42rem;
+}
+html,body{ background:var(--m-creme); }
+body{ font-family:var(--m-corpo); font-weight:500; color:var(--m-ink); line-height:1.66; }
+::selection{ background:var(--m-amarelo); color:var(--m-ink); }
+:focus-visible{ outline:2px solid var(--m-rosa); outline-offset:3px; }
+main{ display:block; }
+.sec{ position:relative; overflow:clip; padding:clamp(46px,9vw,88px) var(--pad); }
+.sec > .in{ position:relative; z-index:1; max-width:var(--m-col); margin:0 auto; }
+.sec.larga > .in{ max-width:64rem; }
+.deco{ position:absolute; z-index:0; pointer-events:none; width:min(54vw,300px); opacity:.85; }
+.deco svg{ display:block; width:100%; height:auto; }
+.d-tl{ top:70px; left:calc(min(54vw,300px) * -.46); } .d-tr{ top:70px; right:calc(min(54vw,300px) * -.5); }
+.d-bl{ bottom:-30px; left:calc(min(54vw,300px) * -.5); } .d-br{ bottom:-30px; right:calc(min(54vw,300px) * -.46); }
+.d-fio{ display:none; top:140px; right:14px; width:36px; opacity:.55; }   /* o fio só aparece em tela larga: no celular cruzava o texto */
+@media(min-width:760px){ .d-fio{ display:block; right:8%; } }
+.hero .btn-linha{ background:var(--m-creme); }   /* a mancha rosa passa por trás do botão */
+.hero .btn-linha:hover{ background:var(--m-ink); }
+
+h1,h2,h3{ font-weight:700; line-height:1.14; letter-spacing:-.01em; }
+h2{ font-size:clamp(1.7rem,6.4vw,2.5rem); margin-bottom:16px; }
+h3{ font-size:1.12rem; line-height:1.25; }
+.rot{ font-family:"Space Mono",ui-monospace,monospace; font-size:.7rem; letter-spacing:.13em; text-transform:uppercase; color:var(--m-mute); }
+p + p{ margin-top:1em; }
+.sub{ color:rgba(27,26,23,.8); }
+
+/* botões */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:52px; padding:14px 26px; border-radius:16px;
+  font-family:var(--m-corpo); font-weight:700; font-size:1rem; line-height:1.2; text-decoration:none; cursor:pointer;
+  border:2px solid transparent; transition:transform .16s var(--ease), background .16s, opacity .16s; -webkit-tap-highlight-color:transparent;
+}
+.btn:hover{ transform:translateY(-1px); }
+.btn-rosa{ background:var(--m-rosa); color:#fff; }
+.btn-rosa:hover{ background:#cf1f46; }
+.btn-linha{ background:transparent; color:var(--m-ink); border-color:var(--m-ink); }
+.btn-linha:hover{ background:var(--m-ink); color:var(--m-creme); }
+.btn-preto{ background:var(--m-ink); color:var(--m-creme); }
+.btn .seta{ transition:transform .16s var(--ease); }
+.btn:hover .seta{ transform:translateX(3px); }
+
+/* ── topo ── */
+.hero{ text-align:center; padding-top:clamp(112px,20vh,170px); padding-bottom:clamp(54px,10vw,96px); }
+.hero .rot{ margin-bottom:14px; color:var(--m-ink); opacity:.75; }
+.hero h1{ font-family:var(--m-titulo); font-weight:700; text-transform:uppercase; letter-spacing:.012em; font-size:clamp(3.4rem,17vw,7rem); line-height:.95; margin:0 0 18px; }
+.lead{ font-size:clamp(1.18rem,4.8vw,1.55rem); line-height:1.38; font-weight:700; max-width:24ch; margin:0 auto 10px; text-wrap:balance; }
+.hero .sub{ max-width:32rem; margin:0 auto; font-size:clamp(1.02rem,4vw,1.14rem); text-wrap:balance; }
+.ctas{ display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:28px; }
+.preco{ margin-top:18px; font-family:"Space Mono",ui-monospace,monospace; font-size:.78rem; letter-spacing:.06em; color:var(--m-mute); }
+
+/* ── as perguntas (isca) ── */
+.perguntas{ background:var(--m-ink); color:var(--m-creme); }
+.perguntas h2{ color:var(--m-creme); }
+.perguntas .rot{ color:var(--m-amarelo-cl); }
+.perguntas .sub{ color:rgba(253,249,228,.82); }
+.qs{ list-style:none; display:grid; gap:12px; margin:26px 0 22px; }
+.qs li{
+  padding:20px 22px; border-radius:18px; background:rgba(253,249,228,.08); border:1px solid rgba(253,249,228,.2);
+  font-size:clamp(1.15rem,4.8vw,1.4rem); line-height:1.3; font-weight:700;
+}
+.qs li:nth-child(1){ border-left:5px solid var(--m-amarelo); }
+.qs li:nth-child(2){ border-left:5px solid var(--m-rosa-cl); }
+.qs li:nth-child(3){ border-left:5px solid var(--m-amarelo-cl); }
+.perguntas .fecho{ font-size:.96rem; color:rgba(253,249,228,.78); }
+.perguntas .btn-linha{ color:var(--m-creme); border-color:var(--m-creme); margin-top:22px; }
+.perguntas .btn-linha:hover{ background:var(--m-creme); color:var(--m-ink); }
+
+/* ── para quem é ── */
+.portas{ list-style:none; display:grid; gap:14px; margin-top:26px; }
+.porta{ position:relative; padding:22px 22px 20px; border-radius:20px; background:#fff; border:1.5px solid var(--m-linha); border-top:6px solid var(--c, var(--m-amarelo)); scroll-margin-top:90px; transition:box-shadow .2s, transform .2s, border-color .2s; }
+.porta[data-c="rosa"]{ --c:var(--m-rosa); } .porta[data-c="oliva"]{ --c:var(--m-oliva); } .porta[data-c="amarelo"]{ --c:var(--m-amarelo); } .porta[data-c="rosacl"]{ --c:var(--m-rosa-cl); }
+.porta h3{ margin-bottom:8px; }
+.porta p{ font-size:.98rem; }
+.porta .quem{ margin-top:10px; font-size:.88rem; color:var(--m-mute); }
+.porta[data-foco]{ box-shadow:0 14px 34px rgba(27,26,23,.14); border-color:var(--c); transform:translateY(-2px); }
+.porta .mais{ display:inline-block; margin-top:12px; font-weight:700; font-size:.92rem; text-decoration:none; border-bottom:2px solid var(--c); }
+@media(min-width:760px){ .portas{ grid-template-columns:1fr 1fr; } }
+
+/* ── a oficina ── */
+.fatos{ list-style:none; display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:24px 0 28px; }
+.fatos li{ padding:16px 14px; border-radius:16px; background:#fff; border:1.5px solid var(--m-linha); text-align:center; }
+.fatos b{ display:block; font-family:var(--m-titulo); font-weight:700; font-size:2.1rem; line-height:1; color:var(--m-rosa-tx); }
+.fatos span{ font-size:.82rem; color:var(--m-mute); line-height:1.3; display:block; margin-top:4px; }
+@media(min-width:760px){ .fatos{ grid-template-columns:repeat(4,1fr); } }
+.lista-pontos{ list-style:none; margin:12px 0 0; }
+.lista-pontos li{ position:relative; padding-left:24px; margin-bottom:12px; }
+.lista-pontos li::before{ content:""; position:absolute; left:0; top:.6em; width:9px; height:9px; border-radius:50%; background:var(--m-amarelo); }
+.bloco{ margin-top:30px; }
+.destaque{ margin:26px 0 0; padding:20px 22px; border-radius:18px; background:var(--m-amarelo-cl); font-weight:700; font-size:1.06rem; line-height:1.45; }
+.aviso{ margin-top:18px; font-size:.9rem; color:var(--m-mute); }
+
+/* ── quem conduz ── */
+.condutora{ display:flex; gap:18px; align-items:center; }
+.condutora img{ flex:none; width:96px; height:96px; border-radius:50%; object-fit:cover; background:var(--m-rosa-cl); box-shadow:0 0 0 4px #fff, 0 8px 22px rgba(27,26,23,.15); }
+.condutora h2{ font-size:1.5rem; margin:0 0 4px; }
+.condutora p{ font-size:.97rem; }
+
+/* ── caixa do percurso ── */
+.cx-percurso{ padding:clamp(26px,6vw,40px); border-radius:26px; background:var(--m-rosa); color:#fff; text-align:center; position:relative; overflow:hidden; }
+.cx-percurso h2{ color:#fff; margin-bottom:10px; }
+.cx-percurso p{ opacity:.96; max-width:30rem; margin:0 auto; }
+.cx-percurso .btn{ margin-top:20px; background:#fff; color:var(--m-rosa-tx); }
+.cx-percurso .btn:hover{ background:var(--m-creme); }
+
+/* ── lista de espera ── */
+.lista{ background:#fff; border-top:1px solid var(--m-linha); border-bottom:1px solid var(--m-linha); }
+.campo{ margin-top:16px; }
+.campo label, .campo legend{ display:block; margin-bottom:6px; font-weight:700; font-size:.95rem; }
+.campo .op{ font-weight:500; color:var(--m-mute); font-size:.85rem; }
+.campo input[type=text], .campo input[type=email], .campo input[type=tel], .campo textarea{
+  width:100%; min-height:52px; padding:13px 15px; border-radius:14px; border:1.5px solid var(--m-linha); background:var(--m-creme);
+  font-family:var(--m-corpo); font-weight:500; font-size:1rem; color:var(--m-ink);            /* 16px+: o iPhone não dá zoom */
+  transition:border-color .16s, background .16s;
+}
+.campo textarea{ min-height:96px; resize:vertical; line-height:1.5; }
+.campo input:focus, .campo textarea:focus{ outline:none; border-color:var(--m-rosa); background:#fff; }
+fieldset{ border:0; min-width:0; }
+.radios{ display:grid; gap:8px; }
+.radio{ position:relative; display:flex; gap:12px; align-items:flex-start; padding:13px 15px; border-radius:14px; border:1.5px solid var(--m-linha); background:var(--m-creme); cursor:pointer; line-height:1.35; font-weight:600; font-size:.97rem; }
+.radio input{ flex:none; margin-top:.08em; width:20px; height:20px; accent-color:var(--m-rosa); }
+.radio:has(input:checked){ border-color:var(--m-rosa); background:#fff; box-shadow:0 0 0 3px rgba(229,38,79,.14); }
+.consente{ display:flex; gap:12px; align-items:flex-start; margin-top:18px; font-size:.88rem; line-height:1.45; color:rgba(27,26,23,.82); }
+.consente input{ flex:none; margin-top:.2em; width:19px; height:19px; accent-color:var(--m-rosa); }
+.isca{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+.enviar{ width:100%; margin-top:22px; }
+.enviar[disabled]{ opacity:.6; cursor:wait; }
+.feito{ padding:26px 24px; border-radius:20px; background:var(--m-amarelo-cl); text-align:center; }
+.feito[hidden], #formArea[hidden]{ display:none; }
+.feito h3{ font-size:1.5rem; margin-bottom:8px; }
+.feito .ctas{ margin-top:18px; }
+
+/* ── perguntas frequentes ── */
+.faq details{ border-top:1.5px solid var(--m-linha); padding:2px 0; }
+.faq details:last-child{ border-bottom:1.5px solid var(--m-linha); }
+.faq summary{ list-style:none; cursor:pointer; padding:16px 36px 16px 0; font-weight:700; position:relative; line-height:1.35; }
+.faq summary::-webkit-details-marker{ display:none; }
+.faq summary::after{ content:"+"; position:absolute; right:4px; top:50%; translate:0 -50%; font-size:1.5rem; font-weight:500; color:var(--m-rosa-tx); }
+.faq details[open] summary::after{ content:"–"; }
+.faq details p{ padding:0 0 16px; font-size:.97rem; }
+
+@media(prefers-reduced-motion:reduce){ *{ transition:none !important; } }
+
+footer{ background:var(--ink); color:rgba(243,238,224,.6); padding:clamp(24px,5vw,36px) var(--pad); }
+footer .in{ max-width:64rem; margin:0 auto; display:flex; flex-wrap:wrap; gap:14px 32px; justify-content:space-between; align-items:center; font-family:var(--mono); font-size:.76rem; }
+footer a{ color:var(--paper); text-decoration:none; opacity:.8; }
+footer a:hover{ opacity:1; text-decoration:underline; }
+
+/* 🔧 MENU DE TELA CHEIA CABE NA ALTURA (out/2026) ─────────────────────────────────────────────────
+   Sintoma (Daniel, desktop): o menu aparecia CORTADO — "Home" e "Quem sou eu" sumiam atrás do
+   cabeçalho e "Para empresas" + os links do rodapé sumiam embaixo.
+   Duas causas: (1) o menu é uma coluna `justify-content:center` SEM rolagem — quando o conteúdo
+   passa da altura, ele estoura IGUAL pra cima e pra baixo e a parte de cima fica inalcançável;
+   (2) as letras (até 64px) eram dimensionadas pela LARGURA da tela, nunca pela altura: 10 linhas
+   de 87–95px = mais de 900px. Com o 10º item ("Para empresas", out/2026) estourou até em 1920×950
+   — e no celular o "Home" passou a ficar POR BAIXO do cabeçalho.
+   Conserto: (A) começa abaixo do cabeçalho e ROLA se não couber; centraliza com margens `auto`
+   (igual ao `center` quando cabe, mas sem cortar o topo quando não cabe); (B) as letras e o
+   respiro passam a respeitar a ALTURA (svh), com o MESMO teto de antes — em tela alta nada muda.
+   ⚠️ Esta regra existe em cada página (cópia). Se mexer no menu, mexer em TODAS: grep "MENU DE TELA CHEIA CABE NA ALTURA". */
+.menu{ justify-content:flex-start; overflow-y:auto; overscroll-behavior:contain; padding-top:74px; padding-bottom:20px; }
+.menu > :first-child{ margin-top:auto; }
+.menu > :last-child{ margin-bottom:auto; }
+.menu a.mi{ font-size:min(clamp(1.9rem,7.5vw,4rem), 5.3svh); padding:clamp(5px,1.1svh,16px) 0; }
+.menu .mfoot{ margin-top:clamp(14px,3svh,40px); }
+</style>
+</head>
+<body>
+
+<header class="hdr" id="hdr">
+  <a class="wordmark" href="/#inicio" aria-label="Elaine Narcizo">
+    <svg viewBox="378 -10 480 227" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M657.71,130.97c-4.21.02-8.44.85-12.49,2.55-12.93,5.42-21.33,18.51-21.37,32.97-.03,14.46,8.28,27.61,21.18,33.11,12.95,5.52,27.76,2.18,37.41-8.33.88-.96.82-2.45-.14-3.34l-1.74-1.6c-.96-.88-2.45-.81-3.34.14-7.63,8.33-19.3,10.9-29.4,6.6-10.16-4.34-16.91-14.82-16.87-26.55.03-11.73,6.85-22.16,17.03-26.43,10.13-4.25,21.74-1.6,29.33,6.77.88.97,2.37,1.03,3.34.16l1.76-1.58c.98-.88,1.07-2.39.19-3.37-4.78-5.27-10.87-8.8-17.4-10.3-2.46-.56-4.98-.82-7.49-.81"/>
+      <path d="M555.23,131.37c-5.11.05-10.05.9-14.8,2.78-4.7,1.86-8.72,4.37-12.07,7.54-.96.92-.98,2.44-.05,3.39l1.77,1.77c.9.91,2.35.93,3.29.07,2.62-2.46,5.8-4.5,9.59-6.08,3.68-1.53,7.84-2.24,12.5-2.36,13.54-.36,19.71,12.13,9.86,19.1-3.75,2.65-5.87,3.44-14.2,3.85-8.7.42-10.99,1-14.48,2.74-3.71,1.76-6.56,4.18-8.37,7.4-1.63,2.97-2.41,6.21-2.41,9.69,0,4.02.98,7.66,3.04,10.89,2.12,3.19,5.13,5.59,8.93,7.26,3.81,1.67,8.31,2.43,13.41,2.43,7.18,0,13.27-1.65,18.12-5.2,1.87-1.34,2.84-3.37,4.27-5.06v7.52c0,1.31,1.05,2.36,2.36,2.37h2.53c1.31,0,2.36-1.06,2.36-2.37v-28.19c0-1.31-1.05-2.36-2.36-2.37h-2.53c-1.31,0-2.36,1.06-2.36,2.37v8.9c-1.95,4.77-4.69,8.47-8.31,11.05-3.52,2.5-8.18,3.88-14.08,3.88s-10.53-1.36-13.57-3.76c-2.98-2.43-4.55-5.73-4.55-9.86,0-3.66,1.32-6.66,3.85-8.91,2.59-2.32,7.16-3.67,14.27-3.67s13.31-1.61,18.14-5.24c16.38-12.29,5.38-32.12-14.15-31.93"/>
+      <path d="M698.29,132.51c-1.31,0-2.36,1.06-2.37,2.36v65c0,1.31,1.06,2.36,2.37,2.36h2.5c1.31,0,2.36-1.05,2.37-2.36v-65c0-1.3-1.06-2.36-2.37-2.36h-2.5ZM703.51,117.5s0,.05-.03.07l.12-.12s-.07.01-.1.05M703.43,109.75s.12.03.17.07l-.23-.23s.03.12.07.16h0ZM699.4,107.99c-1.5.04-2.71.69-3.71,1.67-1.17,1.06-1.79,2.32-1.79,3.96s.65,2.88,1.72,3.94c1.1,1.1,2.31,1.7,3.92,1.7s2.87-.56,3.97-1.77c1.04-1.07,1.67-2.37,1.67-3.88s-.6-2.82-1.74-3.88c-1.06-1.15-2.29-1.76-3.9-1.76,0,0-.07,0-.14,0"/>
+      <path d="M490.83,131.2c-7.43,0-13.82,1.74-18.97,5.42-2.85,1.98-4.08,5.26-5.94,8.03v-10.73c0-1.3-1.06-2.36-2.37-2.36h-2.5c-1.31,0-2.36,1.06-2.37,2.36v65c0,1.31,1.06,2.36,2.37,2.36h2.5c1.31,0,2.36-1.05,2.37-2.36v-35.32c0-5.21,1.04-9.64,3.01-13.37,1.96-3.76,4.8-6.68,8.5-8.72,3.68-2.11,8.16-3.2,13.53-3.2,6.87,0,12.01,1.96,15.55,5.56,3.53,3.61,5.48,9.09,5.48,16.71v38.33c0,1.31,1.06,2.36,2.36,2.36h2.53c1.31,0,2.37-1.05,2.37-2.36v-38.33c0-6.16-1.13-11.52-3.53-15.94-2.32-4.46-5.62-7.81-9.91-10.05-4.28-2.32-9.29-3.41-14.97-3.41"/>
+      <path d="M621.54,131.56c-7.02,0-13.04,1.69-17.96,5.22-2.49,1.78-3.51,4.88-5.19,7.4v-9.89c0-1.3-1.07-2.36-2.37-2.36h-2.51c-1.3,0-2.36,1.06-2.36,2.36v65c0,1.31,1.07,2.36,2.36,2.36h2.51c1.31,0,2.36-1.05,2.37-2.36v-34.95c0-8.2,2.07-14.4,5.96-18.81,3.78-4.37,9.29-6.73,16.44-6.73h.74c1.31,0,2.36-1.06,2.36-2.36v-2.51c0-1.31-1.06-2.36-2.36-2.36"/>
+      <path d="M721.97,131.74c-1.31,0-2.36,1.06-2.37,2.36v2.39c0,1.31,1.06,2.36,2.37,2.37h40.42l-42.95,56.91c-.31.41-.47.92-.46,1.44v1.88c0,1.31,1.06,2.36,2.37,2.36h49.91c1.3,0,2.36-1.05,2.36-2.36v-2.39c0-1.3-1.06-2.36-2.36-2.36h-41.65l42.92-56.92c.31-.41.47-.92.46-1.44v-1.88c0-1.3-1.06-2.36-2.36-2.36h-48.66Z"/>
+      <path d="M804.78,131.29c-7.97,1.1-15.56,5.11-21.17,11.81-11.19,13.37-11.26,33.32-.16,46.78,11.15,13.54,30.2,16.33,44.51,6.47,14.22-9.8,19.28-29.02,12.02-45.04-.55-1.18-1.94-1.72-3.13-1.18l-2.16.98c-1.18.54-1.72,1.93-1.18,3.13,5.88,12.96,1.72,28.48-9.58,36.27-11.24,7.74-26.12,5.59-34.97-5.15-8.91-10.81-8.85-26.92.13-37.66,8.93-10.66,23.82-12.71,34.99-4.87,1.08.76,2.56.5,3.32-.58l1.37-1.95c.75-1.07.5-2.57-.58-3.32-7.09-4.97-15.45-6.78-23.41-5.69"/>
+      <path d="M647.85,27.27c-5.11.05-10.05.9-14.8,2.78-4.7,1.86-8.72,4.38-12.07,7.54-.96.92-.98,2.45-.05,3.39l1.77,1.77c.9.91,2.35.93,3.29.07,2.62-2.46,5.8-4.5,9.59-6.08,3.68-1.53,7.84-2.24,12.5-2.36,13.54-.36,19.71,12.13,9.86,19.1-3.75,2.65-5.87,3.44-14.2,3.85-8.7.42-10.99,1-14.48,2.74-3.71,1.76-6.56,4.18-8.37,7.4-1.63,2.97-2.41,6.21-2.41,9.69,0,4.02.98,7.66,3.04,10.89,2.12,3.19,5.13,5.59,8.93,7.26,3.81,1.67,8.31,2.43,13.41,2.43,7.18,0,13.27-1.65,18.12-5.2,1.87-1.34,2.84-3.37,4.27-5.06v7.52c0,1.31,1.05,2.36,2.36,2.37h2.53c1.31,0,2.36-1.06,2.36-2.37v-28.19c0-1.31-1.05-2.36-2.36-2.37h-2.53c-1.31,0-2.36,1.06-2.36,2.37v8.9c-1.95,4.77-4.69,8.47-8.31,11.05-3.52,2.5-8.18,3.88-14.08,3.88s-10.53-1.36-13.57-3.76c-2.98-2.43-4.55-5.73-4.55-9.86,0-3.66,1.32-6.66,3.85-8.91,2.59-2.32,7.16-3.67,14.27-3.67s13.31-1.62,18.14-5.24c16.38-12.29,5.38-32.12-14.15-31.93"/>
+      <path d="M692.94,28.49c-1.31,0-2.36,1.06-2.37,2.36v64.99c0,1.31,1.06,2.36,2.37,2.36h2.5c1.31,0,2.36-1.06,2.37-2.36V30.85c0-1.3-1.06-2.36-2.37-2.36h-2.5ZM698.16,13.48s0,.05-.03.07l.12-.12s-.07.01-.1.05M698.08,5.73s.12.03.17.07l-.23-.23s.03.11.08.16h0ZM694.05,3.97c-1.5.04-2.71.69-3.71,1.67-1.17,1.06-1.79,2.32-1.79,3.96s.65,2.88,1.72,3.94c1.1,1.1,2.31,1.7,3.92,1.7s2.87-.56,3.97-1.77c1.04-1.07,1.67-2.37,1.67-3.88s-.6-2.82-1.74-3.88c-1.06-1.15-2.29-1.76-3.9-1.76,0,0-.07,0-.14,0"/>
+      <path d="M601.19,1c-1.31,0-2.36,1.06-2.36,2.36v93.28c0,1.31,1.05,2.36,2.36,2.36h2.51c1.3,0,2.36-1.05,2.36-2.36V3.36c0-1.3-1.06-2.36-2.36-2.36h-2.51Z"/>
+      <path d="M742.66,29.05c-7.43,0-13.82,1.74-18.98,5.42-2.85,1.98-4.08,5.26-5.94,8.03v-10.72c0-1.3-1.06-2.36-2.37-2.36h-2.5c-1.31,0-2.36,1.06-2.37,2.36v64.99c0,1.31,1.06,2.36,2.37,2.36h2.5c1.31,0,2.36-1.05,2.37-2.36v-35.31c0-5.21,1.04-9.64,3.01-13.37,1.96-3.77,4.8-6.69,8.5-8.72,3.68-2.1,8.16-3.2,13.53-3.2,6.87,0,12.01,1.96,15.55,5.56,3.53,3.61,5.48,9.09,5.48,16.71v38.33c0,1.31,1.06,2.36,2.36,2.36h2.53c1.31,0,2.37-1.05,2.37-2.36v-38.33c0-6.16-1.13-11.52-3.53-15.94-2.32-4.46-5.62-7.81-9.91-10.05-4.28-2.32-9.29-3.41-14.97-3.41"/>
+      <path d="M556.65,26.86c-14.18.05-27.04,9.38-31.93,23.55-5.47,15.88.45,33.69,14.3,42.53,13.93,8.9,31.91,6.17,42.88-6.4.86-.99.76-2.48-.23-3.34l-1.78-1.56c-.99-.85-2.48-.75-3.34.23-8.7,9.96-22.74,12.04-33.67,5.06-11-7.02-15.83-21.34-11.4-34.2,4.43-12.82,16.71-20.41,29.31-18.4,6.21.99,10.9,4.15,14.2,8.77,2.64,3.7,3.71,8.93,4.43,14.36h-39.7c-1.3,0-2.36,1.07-2.36,2.37v2.39c0,1.31,1.06,2.36,2.36,2.36h45.69c1.36,0,2.44-1.14,2.36-2.5l-.07-1.23c-.36-8.18-2.62-15.83-6.92-21.86-4.36-6.1-10.71-10.41-18.89-11.71-1.75-.28-3.5-.43-5.25-.42"/>
+      <path d="M812.15,26.86c-14.18.05-27.04,9.38-31.93,23.55-5.47,15.88.44,33.69,14.29,42.53,13.93,8.9,31.91,6.17,42.88-6.4.86-.99.76-2.48-.23-3.34l-1.79-1.56c-.99-.85-2.48-.75-3.34.23-8.7,9.96-22.74,12.04-33.67,5.06-11-7.02-15.83-21.34-11.4-34.2,4.43-12.82,16.71-20.41,29.31-18.4,6.21.99,10.9,4.15,14.2,8.77,2.64,3.7,3.71,8.93,4.43,14.36h-39.7c-1.3,0-2.36,1.07-2.36,2.37v2.39c0,1.31,1.06,2.36,2.36,2.36h45.69c1.36,0,2.44-1.14,2.36-2.5l-.07-1.23c-.36-8.18-2.62-15.83-6.92-21.86-4.36-6.1-10.71-10.41-18.89-11.71-1.75-.28-3.5-.43-5.25-.42"/>
+      <path d="M508.97,59.06c-.14-.65-.35-1.31-.35-1.96.02-1.24-1.31-2.09-.91-3.41.02-.07-.09-.2-.17-.29-.46-.51-.94-1-1.38-1.52-.1-.12-.18-.33-.16-.49.1-.93-.46-1.5-1.11-1.99-.63-.48-1.34-.84-1.58-1.69-.04-.15-.23-.33-.39-.38-1.42-.4-2.83-.99-4.27-1.12-6.08-.57-12.18-1.01-18.27-1.49-.34-.03-.68-.04-1.03-.07-.58-.04-.53-.28-.19-.62.83-.84,1.68-1.67,2.49-2.53,2.97-3.18,5.89-6.4,8.9-9.54,1.23-1.29.89-2.86,1.09-4.34.02-.15-.16-.33-.26-.49-.4-.6-.52-1.19-.18-1.89.42-.87.25-1.17-.78-1.39-.5-.1-.61-.24-.48-.76.08-.33-.09-1.02-.23-1.05-.73-.13-1.29-.51-1.9-.87-1.03-.62-2.15-1.07-3.2-1.66-.81-.45-1.51-1.1-2.56-.9-.16.03-.38-.17-.55-.28-.18-.12-.36-.38-.52-.37-.72.05-1.45.11-2.15.28-.72.18-1.39.47-2.17.22-.24-.08-.66.13-.89.32-3.54,2.91-7.07,5.83-10.57,8.78-1.4,1.18-2.71,2.47-4.07,3.7-.13.12-.32.16-.48.24-.02-.18-.06-.36-.05-.53.16-1.52.35-3.03.5-4.56.13-1.4.25-2.8.31-4.21.04-1.07.94-14.01.14-17.58-.53-2.34-2.16-.86-2.77-1.06-.21-.07-.48-.4-.47-.6.04-.71-.22-1.07-.93-1.15-.25-.03-.54-.15-.71-.33-.96-1.04-2.59-.44-3.54-1.48-.04-.04-.22.07-.32.05-.82-.18-1.55.2-2.33.34-.54.09-1.11-.03-1.67-.08-.34-.04-.7-.08-1.02-.2-1.16-.42-2.15.99-3.33.31-.02-.01-.07.02-.1.04-.53.51-1,1.13-1.61,1.51-.69.43-1.34.83-1.55,1.67,0,.02-.06.04-.1.04-.93.02-.93.72-1.02,1.37-1.15,7.74-2.56,15.45-3.13,23.27-.01.21-.11.41-.16.61-.17-.14-.34-.28-.49-.44-.13-.14-.24-.3-.36-.45-2.52-3.17-4.97-6.39-7.58-9.48-1.29-1.53-2.42-3.19-4.45-4.11-1.28-.58-2.8-.53-3.88-1.54-.02-.02-.07-.01-.11,0-.85.13-1.81-.14-2.52.41-.61.47-1.2.36-1.77.19-.7-.21-.96.02-1.19.64-.09.24-.43.51-.68.53-.6.06-.92.28-.95.9,0,.14-.2.4-.28.38-1.27-.18-1.38.59-1.34,1.54.01.37-.09.75-.1,1.13-.02.44-.12.72-.66.7-.61-.02-.77.37-.71.92.06.48.31,1.07.12,1.43-.59,1.11.74,2.27-.16,3.33-.06.07.1.35.2.51,1.22,2.01,2.02,4.24,3.47,6.14,3.23,4.22,6.36,8.5,9.53,12.76.17.23.29.51.44.76-.28.08-.56.2-.85.22-2.44.18-4.88.31-7.31.52-5.9.5-11.79,1.05-17.69,1.53-2.46.2-4.54,1.06-6.14,2.97-.09.11-.25.2-.39.22-1.04.14-1.26.94-1.45,1.77-.14.63-.26,1.26-.97,1.58-.42.19-.56.54-.06.86.7.46.88,1.19,1.05,1.94.14.62.82,1.21.1,1.89,0,0,.28.42.48.54.9.54,1.19,1.47,1.28,2.36.05.51.12.78.51,1.11s.85.9.83,1.34c-.06,1.15.91,1.62,1.46,2.13.75.69,1.96.91,2.99,1.28,2.5.89,5.13.83,7.71.85,4.89.04,9.78-.14,14.66-.22.25,0,.51.06.76.09-.14.21-.26.43-.42.62-3.78,4.35-7.59,8.68-11.34,13.06-1.43,1.67-2.7,3.49-4.13,5.16-.47.55-.92,1.02-.78,1.77.14.75.15,1.47-.02,2.23-.06.28.29.64.41.98.07.2.15.52.05.62-.49.53-.79,1.01-.08,1.61.23.19.36.5.53.75.39.6,1.07,1.04.78,1.97-.16.5.21.82.75.55.65-.31,1.1-.21,1.57.37.17.22.75.31,1.05.2,1.69-.61,3.17,1.04,4.84.4.03,0,.08,0,.11.03,1.41.84,2.76.4,4.08-.23,2.99-1.43,5.6-3.41,8.15-5.49,3.26-2.65,6.52-5.3,9.78-7.94.23-.19.5-.32.76-.49.09.32.19.63.26.95.04.19.03.38.06.57.38,3.22.68,6.46,1.17,9.67,1.09,7.28,1.42,8.29,4.09,14.18.19.42.39.92.99.64.87-.4,1.62.02,2.4.26.33.1.68.11,1.03.14.22.02.47-.07.65.01.78.35,1.61.34,2.42.3.77-.04,1.56-.23,2.3-.47,1.54-.48,2.64-1.58,3.5-2.87.49-.73,1-1.59,1.1-2.44.34-3.19.58-6.39.74-9.59.19-3.82.24-7.64.37-11.45,0-.25.1-.5.16-.74.2.17.41.32.59.5,2.57,2.56,5.11,5.14,7.7,7.68.71.69,1.51,1.28,2.3,1.88.48.36.98.4,1.61.22.53-.15,1.22-.08,1.73.14,1.14.49,2.08,1.22,3.55,1.02,1.16-.16,2.46.39,3.67.64,1.51.31,2.68,0,3.92-.66,1.17-.62,1.88-1.69,2.76-2.6,1.25-1.29,1.08-2.79.73-4.28-.15-.63-.45-1.13-.07-1.81.15-.27-.03-.85-.24-1.16-1.08-1.52-2.09-3.11-3.36-4.47-4.32-4.64-8.73-9.19-13.11-13.78-.17-.18-.27-.43-.4-.64.21-.04.42-.12.64-.12,5.3-.22,10.61-.43,15.91-.64,0,.04,0,.09,0,.14,3.44,0,6.87.02,10.31,0,2.4-.02,4.8-.1,7.2-.18,1.19-.04,1.66-1.29,2.67-1.65.05-.02.08-.13.1-.2.18-.81.72-1.17,1.49-1.35.89-.21,1.09-.59.66-1.4-.32-.59-.08-.71.39-.85.44-.13.74-.37.62-.91"/>
+    </svg>
+  </a>
+  <div class="hdr-right">
+    <a class="hdr-ic" href="https://www.instagram.com/elaine.c.narcizo/" target="_blank" rel="noopener" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none"/></svg>
+    </a>
+    <a class="hdr-ic" href="https://open.spotify.com/show/3yCNwDaO1KVVuyfAbxXbXV" target="_blank" rel="noopener" aria-label="Spotify">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9.3"/><path d="M7 9.6c3.6-1 7.2-.6 10 1.1M7.3 13c3-.8 5.9-.5 8.3.9M7.6 16.2c2.4-.6 4.7-.4 6.6.7"/></svg>
+    </a>
+  </div>
+  <button class="burger" id="burger" aria-label="Menu" aria-expanded="false">
+    <span class="b-label">Menu</span>
+    <span class="b-bars"><i></i><i></i><i></i></span>
+  </button>
+</header>
+
+<div class="menu" id="menu" aria-hidden="true">
+  <!-- mesmo índice do menu da home; âncoras absolutas porque isto é subpágina. -->
+  <a class="mi" style="--i:0" href="/#inicio"><small>00</small>Home</a>
+  <a class="mi" style="--i:1" href="/#quem"><small>01</small>Quem sou eu</a>
+  <a class="mi" style="--i:2" href="/#radio"><small>02</small>Rádio Tinhosa</a>
+  <a class="mi" style="--i:3" href="/#formacoes"><small>03</small>Formações</a>
+  <a class="mi" style="--i:4" href="/#cartaz"><small>04</small>Bilheteria</a>
+  <a class="mi" style="--i:5" href="/#vivona"><small>05</small>Escola Vivona</a>
+  <a class="mi" style="--i:6" href="/#reflexoes"><small>06</small>Biblioteca Tinhosa</a>
+  <a class="mi" style="--i:7" href="/#conectar"><small>07</small>Conectar</a>
+  <a class="mi" style="--i:8" href="/#informacoes"><small>08</small>Informações gerais</a>
+  <a class="mi" style="--i:9" href="/produtividade-saudavel/"><small></small>Para empresas</a>
+  <div class="mfoot">
+    <a href="https://www.instagram.com/elaine.c.narcizo/" target="_blank" rel="noopener">Instagram</a>
+    <a href="/blog/">Blog</a>
+    <a href="/percurso/ponte/">Percurso Ponte</a>
+    <a href="/danca-destino/">DançaDestino</a>
+    <a href="/cartas-entre-homens/v2.html">Cartas entre Homens</a>
+    <a href="https://www.youtube.com/@elainenarc" target="_blank" rel="noopener">YouTube</a>
+    <a href="https://api.whatsapp.com/send?phone=5516991595707" target="_blank" rel="noopener">WhatsApp</a>
+  </div>
+</div>
+
+<main>
+
+  <!-- ═══════ TOPO ═══════ -->
+  <section class="sec hero" aria-labelledby="t-hero">
+    <div class="deco d-tl" style="color:#FCD78F"><svg viewBox="-6 -6 212 212" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="currentColor" d="M171.1,100.0C169.2,119.1 163.1,138.7 151.3,151.3C139.4,163.8 116.2,176.3 100.0,175.4C83.8,174.4 69.0,158.4 54.1,145.9C39.3,133.3 14.3,118.7 10.8,100.0C7.4,81.3 18.5,44.3 33.4,33.4C48.3,22.5 78.4,34.2 100.0,34.8C121.6,35.3 151.3,26.0 163.1,36.9C175.0,47.7 173.1,80.9 171.1,100.0Z"/></svg></div>
+    <div class="deco d-br" style="color:#F69AA6"><svg viewBox="-6 -6 212 212" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="currentColor" d="M172.2,100.0C172.8,121.3 177.6,151.1 165.5,165.5C153.5,180.0 121.5,187.0 100.0,186.7C78.5,186.4 51.0,178.2 36.3,163.7C21.5,149.3 11.1,121.0 11.4,100.0C11.6,79.0 23.1,48.9 37.8,37.8C52.6,26.7 79.3,33.4 100.0,33.4C120.7,33.5 150.1,26.8 162.1,37.9C174.2,49.0 171.6,78.7 172.2,100.0Z"/></svg></div>
+    <div class="deco d-fio" style="color:#4B5A3C"><svg viewBox="0 0 120 320" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" d="M60,4C112,52 8,96 56,150S112,236 60,316"/></svg></div>
+    <div class="in">
+      <p class="rot">Oficina online · 2 horas · até 10 pessoas</p>
+      <h1 id="t-hero">Mapeamento das relações</h1>
+      <p class="lead" id="heroLead">O seu mundo de relações é maior do que você imagina.</p>
+      <p class="sub" id="heroSub">Descubra a extensão e a diversidade das relações que já constituem a sua vida.</p>
+      <div class="ctas">
+        <a class="btn btn-rosa" href="/percurso/mapeamento/" data-cta="percurso-topo">Fazer o percurso grátis <span class="seta" aria-hidden="true">→</span></a>
+        <a class="btn btn-linha" href="#lista" data-cta="lista-topo">Entrar na lista de espera</a>
+      </div>
+      <p class="preco">R$ 50,00 por participante</p>
+    </div>
+  </section>
+
+  <!-- ═══════ A ISCA: 3 DAS 8 PERGUNTAS ═══════ -->
+  <section class="sec perguntas" aria-labelledby="t-perg">
+    <div class="in">
+      <p class="rot">Experimente agora</p>
+      <h2 id="t-perg">Comece por três perguntas.</h2>
+      <p class="sub">Responda só para você, sem pressa:</p>
+      <ul class="qs">
+        <li>Para quem você pediria R$ 500,00 emprestado?</li>
+        <li>Com quem você conversaria durante 4 horas seguidas?</li>
+        <li>Quem aprende com você?</li>
+      </ul>
+      <p class="fecho">São 8 perguntas no total. As respostas podem revelar mais gente — e mais coisas — do que a gente costuma supor.</p>
+      <a class="btn btn-linha" href="/percurso/mapeamento/" data-cta="percurso-perguntas">Fazer o percurso grátis <span class="seta" aria-hidden="true">→</span></a>
+    </div>
+  </section>
+
+  <!-- ═══════ PARA QUEM É (as quatro portas) ═══════ -->
+  <section class="sec larga" id="paraquem" aria-labelledby="t-quem">
+    <div class="deco d-bl" style="color:#FCD78F"><svg viewBox="-6 -6 212 212" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="currentColor" d="M171.4,100.0C174.5,119.6 180.2,153.6 168.3,168.3C156.4,182.9 122.0,188.4 100.0,187.7C78.0,186.9 51.1,178.4 36.2,163.8C21.4,149.1 9.0,119.3 11.0,100.0C12.9,80.7 33.1,63.6 48.0,48.0C62.8,32.3 83.1,5.5 100.0,5.9C116.9,6.4 137.5,34.9 149.4,50.6C161.3,66.2 168.3,80.4 171.4,100.0Z"/></svg></div>
+    <div class="in">
+      <p class="rot">Para quem é</p>
+      <h2 id="t-quem">Um instrumental simples, que serve a muita gente.</h2>
+      <p class="sub" style="max-width:var(--m-col)">O Mapeamento das Relações é feito de perguntas. Por isso cabe em vidas e trabalhos diferentes. Veja onde você se encontra:</p>
+      <ul class="portas">
+        <li class="porta" id="voce" data-c="rosa" data-para="voce">
+          <h3>Para você</h3>
+          <p>Se às vezes você sente que está sozinha(o) ou que tudo depende de você, reconhecer os recursos, apoios e possibilidades que já existem na sua vida pode aliviar essa sensação e tornar o dia a dia mais leve.</p>
+          <a class="mais" href="#lista" data-interesse="pessoal">Quero para mim →</a>
+        </li>
+        <li class="porta" id="profissionais" data-c="oliva" data-para="profissionais">
+          <h3>Para quem trabalha com pessoas e grupos</h3>
+          <p>Você vivencia o instrumental na oficina e <strong>poderá reproduzi-lo no seu próprio trabalho</strong>, com os públicos e os grupos com quem você atua.</p>
+          <p class="quem">Assistentes sociais, educadoras e educadores, arteterapeutas, psicólogas e psicólogos, facilitadoras e facilitadores, lideranças comunitárias…</p>
+          <a class="mais" href="#lista" data-interesse="trabalho">Quero levar para o meu trabalho →</a>
+        </li>
+        <li class="porta" id="virada" data-c="amarelo" data-para="virada">
+          <h3>Para um momento de virada</h3>
+          <p>Mudança de cidade, de trabalho, de fase da vida: quando o chão muda, vale olhar com quem — e com o quê — você já conta. A ideia de “segunda chance” atravessa todo o percurso.</p>
+          <a class="mais" href="#lista" data-interesse="pessoal">Quero olhar para isso →</a>
+        </li>
+        <li class="porta" id="grupos" data-c="rosacl" data-para="grupos">
+          <h3>Para grupos e equipes</h3>
+          <p>Quer fazer com o seu grupo, coletivo ou equipe? Marque essa opção na lista de espera e conte um pouco sobre o grupo.</p>
+          <a class="mais" href="#lista" data-interesse="grupo">Quero para o meu grupo →</a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ═══════ COMO É A OFICINA ═══════ -->
+  <section class="sec" id="oficina" aria-labelledby="t-of">
+    <div class="in">
+      <p class="rot">A oficina</p>
+      <h2 id="t-of">Descobrir o tamanho do seu mundo de relações.</h2>
+      <ul class="fatos" aria-label="Resumo da oficina">
+        <li><b>2 h</b><span>de duração</span></li>
+        <li><b>Online</b><span>de onde você estiver</span></li>
+        <li><b>até 10</b><span>pessoas por turma</span></li>
+        <li><b>R$ 50</b><span>por participante</span></li>
+      </ul>
+      <p>O objetivo é ampliar o seu próprio conceito de relação, reconhecendo que você já participa de um mundo relacional muito mais amplo do que costuma supor. <strong>Não se trata de valorizar mais as suas relações, mas de descobrir a extensão e a diversidade das relações que já constituem a sua vida.</strong></p>
+
+      <div class="bloco">
+        <h3>O que isso pode produzir?</h3>
+        <ul class="lista-pontos">
+          <li>Reconhecer que o seu mundo de vida já oferece recursos, apoios e possibilidades que nem sempre são percebidos. Essa descoberta pode aliviar a sensação de que tudo depende de você, diminuir as exigências que você faz a si e tornar a vida mais leve.</li>
+          <li>Sair do isolamento e da solidão ao reconhecer a comunidade de vida da qual você já faz parte, mesmo que ela seja muito diferente daquela que você imaginava ou reconhecia até agora.</li>
+        </ul>
+      </div>
+
+      <div class="bloco">
+        <h3>Como isso será feito?</h3>
+        <p>Vamos trabalhar com o <strong>Mapeamento das Relações</strong>, um instrumental que a Elaine desenvolveu ao longo de 20 anos de prática como educadora e assistente social. Para participar, você só precisa de uma folha de papel, lápis de cor e uma caneta.</p>
+      </div>
+
+      <p class="destaque">Você poderá reproduzir esse instrumental em seu próprio trabalho com pessoas e grupos.</p>
+      <p class="aviso">É uma vivência reflexiva em grupo, baseada em perguntas. Não substitui acompanhamento psicológico.</p>
+    </div>
+  </section>
+
+  <!-- ═══════ QUEM CONDUZ ═══════ -->
+  <section class="sec" style="padding-top:0" aria-labelledby="t-eu">
+    <div class="in">
+      <div class="condutora">
+        <img src="/assets/links-avatar.webp" alt="Elaine Narcizo" width="96" height="96" loading="lazy" />
+        <div>
+          <p class="rot">Quem conduz</p>
+          <h2 id="t-eu">Elaine Narcizo</h2>
+          <p>Mestra em Serviço Social, especialista em dança, música e teatro para educadores, arteterapeuta e artista. O Mapeamento nasceu da sua prática como assistente social, educadora popular, artista e pesquisadora.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ CTA 1 (de novo): O PERCURSO ═══════ -->
+  <section class="sec" style="padding-top:0" aria-labelledby="t-perc">
+    <div class="in">
+      <div class="cx-percurso">
+        <h2 id="t-perc">Quer sentir como é antes de decidir?</h2>
+        <p>Faça o percurso Mapeamento: dois instrumentais, no seu ritmo, no seu aparelho — e de graça. O que você escreve fica só com você.</p>
+        <a class="btn" href="/percurso/mapeamento/" data-cta="percurso-caixa">Fazer o percurso grátis <span class="seta" aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ CTA 2: A LISTA DE ESPERA ═══════ -->
+  <section class="sec lista" id="lista" aria-labelledby="t-lista">
+    <div class="in">
+      <p class="rot">Lista de espera</p>
+      <h2 id="t-lista">Quer ser avisada(o) quando abrir uma turma?</h2>
+      <p class="sub">As turmas são pequenas (até 10 pessoas). Deixe o seu contato e a gente avisa quando abrir uma nova — sem compromisso.</p>
+
+      <div id="formArea">
+        <form id="listaForm" novalidate>
+          <div class="campo">
+            <label for="f-nome">Seu nome</label>
+            <input id="f-nome" name="nome" type="text" autocomplete="name" required />
+          </div>
+          <div class="campo">
+            <label for="f-email">E-mail</label>
+            <input id="f-email" name="email" type="email" inputmode="email" autocomplete="email" required />
+          </div>
+          <div class="campo">
+            <label for="f-zap">WhatsApp <span class="op">(opcional)</span></label>
+            <input id="f-zap" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" />
+          </div>
+          <fieldset class="campo">
+            <legend>Eu quero a oficina… <span class="op">(opcional)</span></legend>
+            <div class="radios">
+              <label class="radio"><input type="radio" name="interesse" value="pessoal" /><span>Para mim, no meu dia a dia</span></label>
+              <label class="radio"><input type="radio" name="interesse" value="trabalho" /><span>Para levar ao meu trabalho com pessoas e grupos</span></label>
+              <label class="radio"><input type="radio" name="interesse" value="ambos" /><span>Para os dois</span></label>
+              <label class="radio"><input type="radio" name="interesse" value="grupo" /><span>Para um grupo ou equipe (conto abaixo)</span></label>
+            </div>
+          </fieldset>
+          <div class="campo">
+            <label for="f-msg">Quer contar mais? <span class="op">(opcional)</span></label>
+            <textarea id="f-msg" name="mensagem" rows="3" maxlength="600"></textarea>
+          </div>
+          <label class="consente"><input type="checkbox" name="aceite" required /><span>Concordo em ser contactada(o) sobre a oficina. Usamos estes dados só para isso.</span></label>
+          <!-- campo-isca: gente de verdade não vê nem preenche; robô preenche -->
+          <div class="isca" aria-hidden="true"><label>Não preencha <input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
+          <input type="hidden" name="origem" id="f-origem" />
+          <input type="hidden" name="pagina" value="/mapeamento/" />
+          <button class="btn btn-rosa enviar" type="submit">Entrar na lista de espera</button>
+          <p class="aviso" id="f-erro" role="alert" hidden style="color:var(--m-rosa-tx)"></p>
+        </form>
+      </div>
+
+      <div class="feito" id="feito" hidden aria-live="polite" tabindex="-1">
+        <h3 id="feitoT">Pronto! Você está na lista.</h3>
+        <p id="feitoP">Avisamos quando abrir uma nova turma. Enquanto isso, que tal começar pelo percurso?</p>
+        <div class="ctas"><a class="btn btn-rosa" href="/percurso/mapeamento/" data-cta="percurso-feito">Fazer o percurso grátis <span class="seta" aria-hidden="true">→</span></a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ PERGUNTAS FREQUENTES ═══════ -->
+  <section class="sec faq" aria-labelledby="t-faq">
+    <div class="in">
+      <p class="rot">Perguntas frequentes</p>
+      <h2 id="t-faq">Ainda com dúvida?</h2>
+      <details><summary>Preciso fazer o percurso antes?</summary><p>Não precisa. Mas ele é um bom jeito de experimentar o instrumental antes de decidir: é gratuito, no seu ritmo, e o que você escreve fica só no seu aparelho.</p></details>
+      <details><summary>Como funciona a oficina?</summary><p>É um encontro online de 2 horas, em um grupo de até 10 pessoas. Vamos trabalhar com o Mapeamento das Relações, um instrumental feito de perguntas.</p></details>
+      <details><summary>O que eu preciso ter?</summary><p>Apenas uma folha de papel, lápis de cor e uma caneta.</p></details>
+      <details><summary>Quanto custa?</summary><p>R$ 50,00 por participante.</p></details>
+      <details><summary>Posso usar o instrumental no meu trabalho?</summary><p>Sim. Você poderá reproduzir esse instrumental em seu próprio trabalho com pessoas e grupos.</p></details>
+      <details><summary>Isso é terapia?</summary><p>Não. É uma vivência reflexiva em grupo, baseada em perguntas. Não substitui acompanhamento psicológico.</p></details>
+      <details><summary>Quando acontece a próxima turma?</summary><p>As datas ainda serão divulgadas. Entre na lista de espera e avisamos primeiro a quem está nela.</p></details>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="in">
+    <span>Elaine Narcizo · Arteterapia, educação e pesquisa</span>
+    <span><a href="/">Voltar ao site</a></span>
+  </div>
+</footer>
+
+<script>
+document.documentElement.classList.add('js');
+
+(function(){
+  var hdr=document.getElementById('hdr'), burger=document.getElementById('burger'), menu=document.getElementById('menu');
+  if(!hdr) return;
+  addEventListener('scroll',function(){ hdr.classList.toggle('scrolled', scrollY>40); },{passive:true});
+  if(burger&&menu){
+    var bLabel=burger.querySelector('.b-label');
+    function setMenu(open){
+      burger.classList.toggle('open',open); menu.classList.toggle('open',open);
+      hdr.classList.toggle('menu-open',open);
+      burger.setAttribute('aria-expanded',open); menu.setAttribute('aria-hidden',!open);
+      if(bLabel) bLabel.textContent=open?'Fechar':'Menu';
+    }
+    burger.addEventListener('click',function(){ setMenu(!menu.classList.contains('open')); });
+    menu.addEventListener('click',function(e){ if(e.target.closest('a')) setMenu(false); });
+    addEventListener('keydown',function(e){ if(e.key==='Escape') setMenu(false); });
+  }
+})();
+
+/* ═══════ as quatro portas: ?para=voce|profissionais|virada|grupos ═══════
+   Troca a frase do topo, destaca o card e já marca o interesse na lista. Dá pra divulgar
+   o MESMO endereço com textos diferentes (um link por público). Sem parâmetro = versão geral. */
+(function(){
+  var VAR = {
+    voce:          { lead:'Sozinha? Sozinho? Vamos conferir.', sub:'Uma oficina para reconhecer quem — e o quê — já faz parte da sua vida.', interesse:'pessoal' },
+    profissionais: { lead:'Um instrumental simples, feito de perguntas.', sub:'Você o vivencia na oficina e poderá reproduzi-lo no seu próprio trabalho com pessoas e grupos.', interesse:'trabalho' },
+    virada:        { lead:'Quando a vida muda, o mapa das suas relações também muda.', sub:'Descubra com quem — e com o quê — você já conta.', interesse:'pessoal' },
+    grupos:        { lead:'Quer fazer com o seu grupo ou equipe?', sub:'Conte para nós na lista de espera e fale um pouco sobre o grupo.', interesse:'grupo' }
+  };
+  function marca(interesse){
+    var r = document.querySelector('input[name=interesse][value="'+interesse+'"]');
+    if(r) r.checked = true;
+  }
+  var q = {}; try{ q = new URLSearchParams(location.search); }catch(e){ q = { get:function(){ return null; } }; }
+  var para = q.get('para'), v = para && VAR[para];
+  if(v){
+    document.getElementById('heroLead').textContent = v.lead;
+    document.getElementById('heroSub').textContent = v.sub;
+    var card = document.getElementById(para); if(card) card.setAttribute('data-foco','1');
+    marca(v.interesse);
+  }
+  /* os links "Quero…" de cada card já marcam o interesse na lista */
+  document.querySelectorAll('[data-interesse]').forEach(function(a){
+    a.addEventListener('click', function(){ marca(a.getAttribute('data-interesse')); });
+  });
+  /* origem do contato (de onde veio), pra o Daniel saber QUEM está chegando */
+  var partes = [];
+  if(para) partes.push('para='+para);
+  ['utm_source','utm_medium','utm_campaign'].forEach(function(k){ var x = q.get(k); if(x) partes.push(k+'='+x); });
+  partes.push(document.referrer ? 'ref='+document.referrer : 'acesso direto');
+  document.getElementById('f-origem').value = partes.join(' | ');
+})();
+
+/* ═══════ LISTA DE ESPERA → Google Sheets via Apps Script ═══════
+   ⚠️ COLE ABAIXO a URL /exec do Apps Script. Enquanto estiver VAZIA, o envio abre o
+   WhatsApp da Elaine com a mensagem pronta (o contato não se perde).
+   mode:'no-cors' = a linha entra na planilha, mas o navegador não lê a resposta; por isso o
+   "pronto" é otimista (só falha se a rede cair). Planilha PRIVADA: o público só fala com o script.
+
+   ───────── CÓDIGO DO APPS SCRIPT (crie uma planilha "Oficina Mapeamento — lista de espera":
+   Extensões → Apps Script, cole, depois Implantar → App da Web → executar como EU, acesso
+   "Qualquer pessoa"; copie a URL /exec pra cá). 🔑 Mexeu no script? "Implantar → Nova versão":
+   só salvar no editor NÃO publica. Em appsscript.json use o escopo estreito
+   "https://www.googleapis.com/auth/spreadsheets.currentonly". ─────────
+
+   var ABA = 'Lista de espera';
+   var COLUNAS = ['Data/hora','Nome','E-mail','WhatsApp','Interesse','Mensagem','Origem','Página'];
+
+   function doPost(e) {
+     var p = (e && e.parameter) || {};
+     if (p.website) return resposta_('ok');            // campo-isca: robô
+     var lock = LockService.getScriptLock();
+     lock.waitLock(20000);
+     try {
+       aba_().appendRow([new Date(), p.nome||'', p.email||'', p.whatsapp||'',
+                         p.interesse||'', p.mensagem||'', p.origem||'', p.pagina||'']);
+     } finally { lock.releaseLock(); }
+     return resposta_('ok');
+   }
+   function doGet(){ return resposta_('Lista no ar.'); }
+   function aba_() {
+     var ss = SpreadsheetApp.getActiveSpreadsheet();
+     var sh = ss.getSheetByName(ABA) || ss.insertSheet(ABA);
+     if (sh.getLastRow() === 0) {
+       sh.appendRow(COLUNAS);
+       sh.getRange(1,1,1,COLUNAS.length).setFontWeight('bold');
+       sh.setFrozenRows(1);
+     }
+     return sh;
+   }
+   function resposta_(t){ return ContentService.createTextOutput(t).setMimeType(ContentService.MimeType.TEXT); }
+   ───────────────────────────────────────────────────────────────────────────── */
+(function(){
+  var FORM_ENDPOINT = '';   /* ← URL /exec do Apps Script (Google Sheets). VAZIA = cai no WhatsApp */
+  var WHATS = '5516991595707';
+
+  var form = document.getElementById('listaForm'), btn = form.querySelector('.enviar'), erro = document.getElementById('f-erro');
+  var ROTULOS = { pessoal:'para mim, no meu dia a dia', trabalho:'para levar ao meu trabalho com pessoas e grupos', ambos:'para os dois', grupo:'para um grupo ou equipe' };
+
+  function feito(titulo, texto){
+    document.getElementById('feitoT').textContent = titulo;
+    document.getElementById('feitoP').textContent = texto;
+    document.getElementById('formArea').hidden = true;
+    var f = document.getElementById('feito'); f.hidden = false; f.focus({ preventScroll:true });
+    f.scrollIntoView({ behavior:'smooth', block:'center' });
+  }
+  function falhou(msg){ erro.textContent = msg; erro.hidden = false; btn.disabled = false; btn.textContent = 'Entrar na lista de espera'; }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault(); erro.hidden = true;
+    if(form.website.value){ feito('Pronto! Você está na lista.', 'Avisamos quando abrir uma nova turma.'); return; }   /* robô: mesma tela, sem enviar */
+    var nome = form.nome.value.trim(), email = form.email.value.trim();
+    if(!nome) { falhou('Conte como podemos chamar você.'); form.nome.focus(); return; }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { falhou('Confira o e-mail: parece que falta alguma coisa.'); form.email.focus(); return; }
+    if(!form.aceite.checked) { falhou('Marque a caixinha para autorizarmos o contato.'); return; }
+    btn.disabled = true; btn.textContent = 'Enviando…';
+
+    if(!FORM_ENDPOINT){
+      /* sem endpoint ainda: manda pelo WhatsApp da Elaine, com a mensagem pronta */
+      var it = form.interesse.value ? ' Quero a oficina ' + ROTULOS[form.interesse.value] + '.' : '';
+      var msg = 'Olá! Quero entrar na lista de espera da oficina Mapeamento das relações. Meu nome é ' + nome + '.' + it + (form.mensagem.value.trim() ? ' ' + form.mensagem.value.trim() : '');
+      window.open('https://api.whatsapp.com/send?phone=' + WHATS + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
+      feito('Quase lá!', 'Abrimos o WhatsApp com a mensagem pronta — é só enviar para entrar na lista.');
+      return;
+    }
+    fetch(FORM_ENDPOINT, { method:'POST', mode:'no-cors', body:new FormData(form) })
+      .then(function(){ feito('Pronto! Você está na lista.', 'Avisamos quando abrir uma nova turma. Enquanto isso, que tal começar pelo percurso?'); })
+      .catch(function(){ falhou('Não consegui enviar agora. Pode tentar de novo? Se preferir, chame no WhatsApp: (16) 99159-5707.'); });
+  });
+})();
+</script>
+</body>
+</html>

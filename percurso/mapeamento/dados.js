@@ -484,8 +484,15 @@ window.PERCURSO = {
         "Desejo que você tenha vislumbrado a oportunidade de expandir suas relações e formas de vínculo. No seu trabalho, torço para que você possa aplicar esse processo para incentivar as pessoas a se tornarem mais conscientes, e, como profissional, que colha frutos valiosos a partir disso.",
         "Muito obrigada pela confiança! Toda alegria do mundo para você!"
       ],
-      assinatura: "Até breve!"
-      /* convite: { titulo, texto, rotulo, href, externo }  ← GANCHO pra oficina "Mapeamento das relações" (a decidir) */
+      assinatura: "Até breve!",
+      /* 🔗 O FUNIL: o percurso (gratuito) é o chamariz da OFICINA (online, 2 h, até 10 pessoas, R$ 50). Aponta pra hotpage /mapeamento/.
+         Só fatos do documento de divulgação da oficina; datas e pagamento NÃO entram aqui (a lista de espera cuida). */
+      convite: {
+        titulo: "Quer fazer isso com outras pessoas?",
+        texto: "A oficina Mapeamento das relações leva este instrumental para um encontro online de 2 horas, em um grupo de até 10 pessoas — para você, ou para levar ao seu trabalho com pessoas e grupos. R$ 50,00 por participante.",
+        rotulo: "Conhecer a oficina",
+        href: "/mapeamento/"
+      }
     }
   ]
 };

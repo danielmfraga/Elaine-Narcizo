@@ -67,6 +67,43 @@ test('o texto não tem os erros de digitação que já corrigimos (não voltar a
   for (const ruim of ['possam possibilitem', '00emprestado', 'Serum corpo', 'estamos entendo isso', 'nos misturamos e', 'já há havia', 'respotas', 'engôdo', 'vaga- lumes', 'por aqu"'])
     assert.ok(!tudo.includes(ruim), `voltou o erro: "${ruim}"`);
 });
+test('o convite do final aponta pra hotpage da oficina, que existe e tem as duas CTAs', () => {
+  const cv = P.passos.at(-1).convite;
+  assert.ok(cv && cv.titulo && cv.texto && cv.rotulo && cv.href, 'o encerramento ficou sem o convite da oficina');
+  assert.match(cv.href, /^\/mapeamento\/?/);
+  const hot = fs.readFileSync(RAIZ + 'mapeamento/index.html', 'utf8');
+  assert.match(hot, /href="\/percurso\/mapeamento\/"/, 'a hotpage não tem a CTA do percurso');
+  assert.match(hot, /id="lista"/, 'a hotpage não tem a lista de espera');
+  assert.match(hot, /href="#lista"/, 'a hotpage não leva à lista de espera');
+});
+/* ── a hotpage da oficina (/mapeamento/) ── */
+const hot = fs.readFileSync(RAIZ + 'mapeamento/index.html', 'utf8');
+test('hotpage: o <div> do menu fecha ANTES do <main> (bug real: sem isso a página inteira caía dentro do menu invisível)', () => {
+  const antes = hot.slice(hot.indexOf('<body>'), hot.indexOf('<main>'));
+  assert.equal((antes.match(/<div/g) || []).length, (antes.match(/<\/div>/g) || []).length, 'há <div> aberto ao chegar no <main>');
+});
+test('hotpage: <div>s balanceados e scripts compilam', () => {
+  const corpo = hot.slice(hot.indexOf('<body>'));
+  assert.equal((corpo.match(/<div/g) || []).length, (corpo.match(/<\/div>/g) || []).length);
+  for (const m of hot.matchAll(/<script>([\s\S]*?)<\/script>/g)) assert.doesNotThrow(() => new Function(m[1]));
+});
+test('hotpage: as DUAS CTAs (percurso e lista de espera) estão no topo', () => {
+  const topo = hot.slice(hot.indexOf('<main>'), hot.indexOf('class="sec perguntas"'));
+  assert.match(topo, /href="\/percurso\/mapeamento\/"/);
+  assert.match(topo, /href="#lista"/);
+});
+test('hotpage: o formulário tem os campos que o Apps Script espera, a isca anti-robô e o aceite', () => {
+  for (const nome of ['nome', 'email', 'whatsapp', 'interesse', 'mensagem', 'origem', 'pagina', 'website', 'aceite'])
+    assert.match(hot, new RegExp(`name="${nome}"`), `campo ausente: ${nome}`);
+  assert.match(hot, /COLUNAS = \['Data\/hora','Nome','E-mail','WhatsApp','Interesse','Mensagem','Origem','Página'\]/, 'o código do Apps Script mudou de colunas');
+});
+test('hotpage: só fatos do documento da oficina (R$ 50, 2 h, até 10 pessoas, online) e nada de data/pagamento inventado', () => {
+  for (const f of ['R$ 50', '2 horas', 'até 10', 'Online', 'folha de papel, lápis de cor e uma caneta']) assert.ok(hot.includes(f), `faltou o fato: ${f}`);
+  assert.ok(!/(PIX|Pix|cartão de crédito|boleto|Zoom|Google Meet|certificado)/.test(hot.replace(/<style[\s\S]*?<\/style>/, '').replace(/<script[\s\S]*?<\/script>/g, '')), 'a página cita pagamento/plataforma/certificado que não estão no documento da oficina');
+});
+test('hotpage: as 4 portas existem e cada variante ?para= tem o seu card', () => {
+  for (const id of ['voce', 'profissionais', 'virada', 'grupos']) assert.match(hot, new RegExp(`id="${id}"[^>]*data-para="${id}"`));
+});
 test('a PONTE não foi tocada: o motor dela e o CSS base não mencionam o modo declarativo', () => {
   assert.ok(!/passos\.css|motor-passos/.test(fs.readFileSync(RAIZ + 'percurso/ponte/index.html', 'utf8')));
   assert.ok(!/P\.passos\b/.test(fs.readFileSync(RAIZ + 'percurso/_motor/motor.js', 'utf8')));
