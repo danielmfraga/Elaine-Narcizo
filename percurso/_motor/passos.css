@@ -1,0 +1,180 @@
+/* ============================================================================
+   MOTOR DE PERCURSOS — estilo do modo declarativo ("passos")        (out/2026)
+   Vem DEPOIS do percurso.css e só ACRESCENTA classes (ou usa seletor mais
+   específico): o percurso.css, que é o da PONTE, não foi tocado.
+   Cada percurso põe a identidade dele num tema.css próprio (cores, fontes).
+   ============================================================================ */
+
+/* ─── formas decorativas (manchas e fio) — ficam ATRÁS do texto ─────────── */
+.pc-pagina, .pc-secao, .pc-capa{ position:relative; overflow:clip; }   /* clip (não hidden): não vira contêiner de rolagem, o cabeçalho segue grudado */
+.pc-deco-g{ position:absolute; inset:0; pointer-events:none; z-index:0; overflow:clip; }
+.pc-deco{ position:absolute; width:min(54vw,300px); opacity:.85; }
+.pc-deco svg{ display:block; width:100%; height:auto; }
+.pc-deco-tl{ top:54px;  left:calc(min(54vw,300px) * -.46); }
+.pc-deco-tr{ top:54px;  right:calc(min(54vw,300px) * -.5); }
+.pc-deco-bl{ bottom:-30px; left:calc(min(54vw,300px) * -.5); }
+.pc-deco-br{ bottom:-30px; right:calc(min(54vw,300px) * -.46); }
+.pc-deco-mr{ top:42%; right:calc(min(54vw,300px) * -.62); width:min(40vw,230px); }
+.pc-deco-ml{ top:46%; left:calc(min(54vw,300px) * -.6); width:min(40vw,230px); }
+/* composição da capa: duas manchas sobrepostas atrás do título, como no PDF */
+.pc-deco-ca{ top:50%; left:50%; width:min(84vw,460px); transform:translate(-64%,-58%) rotate(-8deg); opacity:.95; }
+.pc-deco-cb{ top:50%; left:50%; width:min(76vw,420px); transform:translate(-36%,-42%) rotate(14deg); opacity:.9; }
+.pc-capa .pc-deco-fio-r{ top:14%; right:7%; width:44px; opacity:.7; }
+.pc-deco-fio-r{ top:96px; right:12px; width:34px; opacity:.55; }
+.pc-deco-fio-l{ bottom:40px; left:10px; width:34px; opacity:.55; }
+/* o texto fica acima das formas. ⚠️ NÃO mexer no position do .pc-top: ele é sticky (cabeçalho grudado) */
+.pc-pagina .pc-corpo, .pc-secao .pc-excapa-in{ position:relative; z-index:1; }
+
+/* ─── capa clara (sem vídeo) ────────────────────────────────────────────── */
+.pc-capa-clara{ background:var(--paper); color:var(--ink); justify-content:center; text-align:center; }
+.pc-capa-clara .pc-capa-in{ padding:clamp(70px,14vh,120px) var(--pad); max-width:34rem; width:100%; margin:0 auto; position:relative; z-index:2; color:var(--ink); }
+.pc-capa-clara .pc-capa-sair{ color:var(--mute); background:var(--white); border:1px solid var(--line); backdrop-filter:none; z-index:3; }
+.pc-capa-clara .pc-capa-et{ color:var(--mute); opacity:1; }
+.pc-capa-clara .pc-capa-t{
+  font-family:var(--titulo,var(--disp)); font-weight:400; font-stretch:100%; text-transform:uppercase;
+  font-size:clamp(3.4rem,18vw,6.8rem); line-height:.95; letter-spacing:.01em; margin:10px 0 6px;
+}
+.pc-capa-clara .pc-capa-sub{ margin:0 auto; max-width:24ch; opacity:1; color:rgba(15,14,12,.82); }
+.pc-capa-clara .pc-capa-ch{ margin:18px auto 0; max-width:24ch; }
+.pc-capa-clara .pc-capa-acoes{ justify-content:center; }
+.pc-capa-clara .pc-b-vazio{ color:var(--mute); border-color:var(--line); }
+.pc-capa-clara .pc-capa-meta{ opacity:1; color:var(--mute); }
+.pc-capa-clara .pc-capa-cred{ opacity:1; color:var(--mute); }
+
+/* ─── cores por fase: texto sobre a cor e cor de destaque legível sobre o creme ─── */
+.pc-pagina .pc-b-cheio, .pc-secao .pc-b-cheio{ color:var(--sobre,#fff); }
+.pc-pagina .pc-b-cheio:hover{ opacity:.92; }
+.pc-pagina .pc-assina, .pc-pagina .pc-area-passo, .pc-pagina .pc-fim .pc-t, .pc-pagina .pc-fund-n{ color:var(--ct,var(--c)); }
+.pc-pagina .pc-papel-tog[data-on]{ color:var(--ct,var(--c)); }
+.pc-pagina .pc-papel-tog[data-on] .pc-tick{ color:var(--sobre,#fff); }
+.pc-capa-clara .pc-b-cheio{ color:var(--sobre,#fff); }
+/* abertura de parte: tela inteira na cor da fase, com o texto na cor "sobre" */
+.pc-secao{ color:var(--sobre,#fff); }
+.pc-secao .pc-nome, .pc-secao .pc-salvo, .pc-secao .pc-excapa-n, .pc-secao .pc-excapa-ch{ color:var(--sobre,#fff); }
+.pc-secao .pc-sair, .pc-secao .pc-mapa-btn{ color:var(--sobre,#fff); border-color:currentColor; background:transparent; }
+.pc-secao .pc-barra{ background:color-mix(in srgb, var(--sobre,#fff) 25%, transparent); }
+.pc-secao .pc-barra i{ background:var(--sobre,#fff); }
+.pc-secao .pc-b-cheio{ background:var(--sobre,#fff); color:var(--c); }
+.pc-secao .pc-b-ghost{ color:var(--sobre,#fff); border-color:color-mix(in srgb, var(--sobre,#fff) 50%, transparent); }
+.pc-secao .pc-deco{ opacity:.18; }
+.pc-secao .pc-deco{ color:var(--sobre,#fff) !important; }
+
+/* ─── blocos de leitura ─────────────────────────────────────────────────── */
+.pc-h3{ font-family:var(--disp); font-weight:700; font-size:1.1rem; line-height:1.25; margin:24px 0 8px; }
+.pc-grande{ font-family:var(--disp); font-weight:700; font-size:clamp(1.25rem,5.4vw,1.55rem); line-height:1.3; margin:22px 0; }
+.pc-nota-b{ margin:14px 0 18px; }
+.pc-numeros{ list-style:none; counter-reset:n; margin:14px 0 18px; }
+.pc-numeros li{
+  counter-increment:n; position:relative; padding:4px 0 12px 38px; font-size:.98rem; line-height:1.55;
+}
+.pc-numeros li::before{
+  content:counter(n); position:absolute; left:0; top:3px; width:25px; height:25px; border-radius:50%;
+  display:grid; place-items:center; font-family:var(--mono); font-size:.74rem; font-weight:700;
+  background:var(--c); color:var(--sobre,#fff);
+}
+.pc-citacao{
+  margin:20px 0; padding:4px 0 4px 18px; border-left:3px solid var(--c);
+  font-size:.99rem; line-height:1.66; font-style:italic; color:rgba(15,14,12,.9);
+}
+.pc-citacao p{ margin-bottom:.95em; }
+.pc-citacao cite{ display:block; font-style:normal; font-family:var(--mono); font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--mute); }
+.pc-poema{ margin:22px 0; padding-left:2px; }
+.pc-estrofe{ font-size:1.02rem; line-height:1.72; margin-bottom:1.35em; }
+.pc-def{ margin:16px 0 8px; }
+.pc-def dt{ font-family:var(--disp); font-weight:700; font-size:1rem; margin-top:14px; color:var(--ct,var(--c)); }
+.pc-def dd{ margin:2px 0 0; font-size:.96rem; line-height:1.55; }
+.pc-lista li::before{ background:var(--c); }
+
+/* ─── perguntas e listas ────────────────────────────────────────────────── */
+.pc-pergunta{
+  font-family:var(--disp); font-weight:700; font-size:clamp(1.45rem,6.2vw,2rem); line-height:1.2;
+  letter-spacing:-.01em; margin:4px 0 14px;
+}
+.pc-pergunta-longa{ font-size:clamp(1.15rem,4.8vw,1.5rem); line-height:1.38; font-weight:600; letter-spacing:0; }   /* enunciado comprido (a vivência) */
+.pc-regra{
+  margin:0 0 14px; padding:10px 14px; border-radius:12px; font-size:.88rem; line-height:1.45;
+  background:color-mix(in srgb, var(--c) 14%, var(--white)); color:var(--ink);
+}
+.pc-dica{ margin-bottom:14px; }
+.pc-rotulo{
+  font-family:var(--mono); font-size:.68rem; text-transform:uppercase; letter-spacing:.11em;
+  color:var(--mute); margin:22px 0 8px;
+}
+.pc-add{ display:flex; gap:8px; align-items:stretch; margin-top:6px; }
+.pc-in{
+  flex:1; min-width:0; padding:14px 16px; border-radius:14px; border:1.5px solid var(--line);
+  background:var(--white); color:var(--ink); font-family:var(--sans); font-size:1rem;     /* 16px+: o iPhone não dá zoom */
+  transition:border-color .18s;
+}
+.pc-in:focus{ outline:none; border-color:var(--c); }
+.pc-in::placeholder{ color:#a8a49b; }
+.pc-add-b{ padding:0 18px; flex:none; }
+.pc-chips{ list-style:none; display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 4px; }
+.pc-chip{
+  display:inline-flex; align-items:center; gap:4px; max-width:100%; padding:6px 6px 6px 14px; border-radius:999px;
+  background:var(--white); border:1.5px solid var(--c); font-size:.95rem; line-height:1.3;
+  animation:pc-chip-in .22s var(--ease);
+}
+.pc-chip span{ overflow-wrap:anywhere; }
+.pc-chip[data-fixo]{ padding-right:14px; }
+.pc-chip-fixo{ border-color:var(--line); }
+.pc-chip-novo{ background:color-mix(in srgb, var(--c) 22%, var(--white)); }
+.pc-chip-x{
+  flex:none; width:28px; height:28px; border-radius:50%; border:0; background:transparent; cursor:pointer;
+  font-size:19px; line-height:1; color:var(--mute); display:grid; place-items:center; -webkit-tap-highlight-color:transparent;
+}
+.pc-chip-x:hover{ background:rgba(15,14,12,.08); color:var(--ink); }
+@keyframes pc-chip-in{ from{ opacity:0; transform:scale(.94); } to{ opacity:1; transform:none; } }
+.pc-vazio{ margin-top:14px; }
+
+/* revisão */
+.pc-rev-lista{ margin-bottom:6px; }
+.pc-refl{ margin-top:6px; }
+.pc-rev-novos{ margin-top:8px; }
+.pc-fecho{ margin-top:30px; padding:20px; border-radius:16px; background:var(--white); border:1px solid var(--line); }
+.pc-fecho .p:last-child{ margin-bottom:0; }
+
+/* mapa das listas */
+.pc-mapa-grade{ list-style:none; display:grid; gap:12px; margin:18px 0 8px; grid-template-columns:1fr; }
+@media(min-width:720px){ .pc-mapa-grade{ grid-template-columns:1fr 1fr; } }
+.pc-mapa-card{ padding:14px 16px 12px; border-radius:16px; background:var(--white); border:1px solid var(--line); border-top:4px solid var(--c); }
+.pc-mapa-card .pc-h3{ margin:0 0 4px; font-size:.98rem; }
+.pc-mapa-card .pc-chips{ margin:8px 0 2px; }
+.pc-mapa-card .pc-chip{ font-size:.88rem; padding:4px 11px; }
+.pc-crescer{
+  display:flex; align-items:baseline; flex-wrap:wrap; gap:8px 12px; margin:18px 0 6px;
+  padding:16px 18px; border-radius:16px; background:var(--white); border:1px solid var(--line);
+}
+.pc-crescer .n{ font-family:var(--disp); font-weight:800; font-size:2.3rem; line-height:1; }
+.pc-crescer .n2{ color:var(--ct,var(--c)); }
+.pc-crescer .seta{ font-size:1.4rem; color:var(--mute); }
+.pc-crescer .t{ flex-basis:100%; font-size:.92rem; color:var(--mute); }
+
+/* check-in / pausa */
+.pc-centro-b{ justify-content:center; margin-top:22px; }
+.pc-pausa{ margin-top:26px; padding:20px; border-radius:16px; background:var(--white); border:1px solid var(--line); text-align:left; }
+.pc-pausa[hidden]{ display:none; }
+
+/* convite (ex.: pra oficina) */
+.pc-convite{ margin-top:32px; padding:22px; border-radius:18px; background:color-mix(in srgb, var(--c) 16%, var(--white)); border:1.5px solid var(--c); }
+.pc-convite h3{ font-family:var(--disp); font-weight:800; font-size:1.2rem; margin-bottom:8px; }
+
+/* o título que recebe o foco ao trocar de tela não ganha contorno */
+.pc-t:focus, .pc-pergunta:focus, .pc-capa-t:focus, .pc-excapa-t:focus{ outline:none; }
+
+@media (prefers-reduced-motion:reduce){ .pc-chip{ animation:none !important; } }
+
+/* ─── cabeçalho: ✕ · nome · mapa na MESMA linha, barra embaixo ──────────────
+   No percurso.css o botão "mapa" é o 4º filho do grid e, depois da barra (que ocupa a linha
+   toda), caía numa linha só dele. Aqui os quatro ganham posição explícita. */
+.pc-pagina .pc-sair, .pc-secao .pc-sair{ grid-column:1; grid-row:1; }
+.pc-pagina .pc-id, .pc-secao .pc-id{ grid-column:2; grid-row:1; }
+.pc-pagina .pc-mapa-btn, .pc-secao .pc-mapa-btn{ grid-column:3; grid-row:1; }
+.pc-pagina .pc-barra, .pc-secao .pc-barra{ grid-row:2; }
+/* o círculo de "já fiz no papel" some quando desligado (currentColor virava transparente) */
+.pc-pagina .pc-papel-tog .pc-tick{ border-color:var(--mute); }
+.pc-pagina .pc-papel-tog[data-on] .pc-tick{ border-color:var(--c); }
+.pc-fecho .pc-rotulo:first-child{ margin-top:0; }
+/* botões "fantasma" com fundo: as formas decorativas passam por trás e não riscam o texto */
+.pc-pagina .pc-b-ghost{ background:var(--paper); }
+.pc-secao .pc-b-ghost{ background:transparent; }

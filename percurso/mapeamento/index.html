@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PERCURSO: MAPEAMENTO  (/percurso/mapeamento/)
+     O 2º percurso do site, a partir do PDF "MAPEAMENTO" da Elaine (out/2026).
+     Usa o motor DECLARATIVO (../_motor/motor-passos.js + passos.css): o
+     percurso é uma lista de telas tipadas em dados.js. A identidade visual
+     (creme, amarelo/rosa/oliva, Amatic SC + Quicksand) é a do PDF, em tema.css.
+     O percurso.css é o MESMO da Ponte (mesma URL e versão → já vem do cache).
+     ⚠️ Mexeu em dados.js / passos.css / tema.css / motor-passos.js? Suba o ?v=N
+     de TODOS aqui embaixo: o vercel.json serve css/js como "immutable" por 7 dias.
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<title>Mapeamento — um percurso sobre as suas relações | Elaine Narcizo</title>
+<meta name="description" content="Percurso autoguiado de Elaine Narcizo: dois instrumentais para reconhecer o tamanho do seu mundo de relações — e descobrir que ele é maior do que você imagina. Gratuito, no seu ritmo, e o que você escreve fica só no seu aparelho." />
+<meta name="author" content="Elaine Narcizo" />
+<link rel="canonical" href="https://www.elainenarcizo.com.br/percurso/mapeamento/" />
+
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="pt_BR" />
+<meta property="og:site_name" content="Elaine Narcizo" />
+<meta property="og:title" content="Mapeamento — um percurso sobre as suas relações" />
+<meta property="og:description" content="O seu mundo de relações é maior do que você imagina. Dois instrumentais, no seu ritmo, gratuitos." />
+<meta property="og:url" content="https://www.elainenarcizo.com.br/percurso/mapeamento/" />
+<meta property="og:image" content="https://www.elainenarcizo.com.br/assets/elaine-narcizo.jpeg" />
+<meta name="twitter:card" content="summary" />
+
+<link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Quicksand:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_motor/percurso.css?v=6" />
+<link rel="stylesheet" href="../_motor/passos.css?v=1" />
+<link rel="stylesheet" href="tema.css?v=1" />
+<script>
+  /* ?capa=1 → modo "só a capa": é como a home embute o percurso num cartaz, sem
+     manter uma CÓPIA da capa lá (fonte única de verdade) — mesmo mecanismo da Ponte. */
+  if (window !== window.top) document.documentElement.classList.add('embedded');
+  try { if (new URLSearchParams(location.search).get('capa') === '1')
+    document.documentElement.classList.add('so-capa'); } catch (e) {}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "Mapeamento — um percurso sobre as suas relações",
+  "description": "Percurso autoguiado com dois instrumentais: o Mapeamento das Relações e uma vivência de presença corporal. Para reconhecer a extensão e a diversidade das relações que já constituem a sua vida.",
+  "inLanguage": "pt-BR",
+  "isAccessibleForFree": true,
+  "provider": { "@type": "Person", "name": "Elaine Narcizo", "url": "https://www.elainenarcizo.com.br/" },
+  "author": { "@type": "Person", "name": "Elaine Narcizo" }
+}
+</script>
+</head>
+<body>
+
+<!-- o motor desenha tudo aqui dentro -->
+<div id="percurso"></div>
+
+<noscript>
+  <div style="max-width:34rem;margin:0 auto;padding:48px 24px;font-family:system-ui,sans-serif;line-height:1.6">
+    <h1 style="font-size:1.5rem;margin-bottom:12px">Mapeamento</h1>
+    <p>Este percurso é interativo e precisa de JavaScript para funcionar — ele guarda o que você escreve só no seu próprio aparelho.</p>
+    <p style="margin-top:12px">Se preferir, dá para fazer só com papel e caneta: numa folha, escreva as perguntas “Para quem posso pedir R$ 500,00 emprestado? Com quem me sinto segura? Com quem posso conversar durante 4 horas seguidas? Para quem eu peço ajuda? Com quem sinto prazer? De quem eu cuido? Com quem aprendo? Quem aprende comigo?” e, para cada uma, anote quem ou o quê responde.</p>
+    <p style="margin-top:16px"><a href="/">← Voltar ao site</a></p>
+  </div>
+</noscript>
+
+<script src="dados.js?v=1"></script>
+<script src="../_motor/motor-passos.js?v=1"></script>
+</body>
+</html>

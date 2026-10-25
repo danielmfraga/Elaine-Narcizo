@@ -1,0 +1,28 @@
+/* ============================================================================
+   PERCURSO MAPEAMENTO — identidade visual (a do PDF original da Elaine, feito no Canva)
+   Creme + manchas amarelas e rosas + fio verde-oliva + título desenhado à mão.
+   Só variáveis e ajustes de tipografia: o resto vem do percurso.css + passos.css.
+   ⚠️ As ilustrações de banco do PDF NÃO foram usadas (licença a verificar) — as
+   formas são vetores próprios, gerados em dados.js (P.deco).
+   ============================================================================ */
+:root{
+  --paper:#FDF9E4;
+  --ink:#1B1A17;
+  --mute:#6B675C;
+  --line:rgba(27,26,23,.14);
+  --disp:"Quicksand",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  --sans:"Quicksand",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  --titulo:"Amatic SC","Quicksand",cursive;
+  --c:#E5264F;
+}
+body{ font-weight:500; font-size:1.06rem; line-height:1.66; }
+/* Quicksand é redonda e leve: títulos em 700 (o 800 do percurso.css não existe nela) */
+.pc-t, .pc-pergunta, .pc-excapa-t, .pc-nome, .pc-fund-t, .pc-area-nome{ font-variation-settings:normal; font-weight:700; }
+.pc-t{ letter-spacing:-.01em; }
+.pc-excapa-t{ letter-spacing:-.01em; line-height:1.08; }
+.pc-b{ font-weight:700; letter-spacing:.005em; }
+.pc-et, .pc-rotulo, .pc-area-topo, .pc-capa-meta, .pc-salvo, .pc-mapa-btn{ font-family:"Space Mono",ui-monospace,monospace; }
+/* o título de cada parte ("Parte 1") usa o lettering desenhado, como a capa */
+.pc-secao .pc-excapa-t{ font-family:var(--titulo); font-weight:700; text-transform:uppercase; font-size:clamp(2.8rem,13vw,4.8rem); line-height:.98; letter-spacing:.01em; }
+.pc-secao .pc-excapa-n{ font-family:"Space Mono",ui-monospace,monospace; }
+::selection{ background:#FBB03B; color:#1B1A17; }
