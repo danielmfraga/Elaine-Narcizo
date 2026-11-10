@@ -82,6 +82,9 @@ window.PERCURSO = {
     { tipo: "capa", fase: "intro" },
 
     { tipo: "carta", fase: "intro", rotulo: "Boas-vindas", etiqueta: "Boas-vindas", saudacao: "Saudações!",
+      /* protótipo de áudio (nov/2026): voz sintética a partir de gravações da Elaine. Lê só o 2º parágrafo
+         ("É com imensa alegria…"); o "Olá! Desejo que esteja bem!" fica só na tela. */
+      audio: "/percurso/mapeamento/audio/boas-vindas.mp3",
       paragrafos: [
         "Olá! Desejo que esteja bem!",
         "É com imensa alegria que inicio esta jornada, e é uma verdadeira honra tê-la como companheira neste percurso! Desejo que este processo enriqueça sua perspectiva sobre si mesma e o mundo ao seu redor, proporcionando-lhe a ampliação de ideias, repertórios, criatividade e, consequentemente, mais alegria em sua vida e em seu trabalho!"
@@ -89,6 +92,7 @@ window.PERCURSO = {
       assinatura: "Elaine Narcizo" },
 
     { tipo: "leitura", fase: "intro", rotulo: "Propósito", etiqueta: "Antes de começar", titulo: "Propósito",
+      audio: "/percurso/mapeamento/audio/proposito.mp3",
       blocos: [
         "O propósito desta jornada é auxiliá-la a encontrar novas perspectivas e possibilidades que possibilitem:",
         { lista: [

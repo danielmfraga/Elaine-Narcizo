@@ -159,6 +159,27 @@
 .pc-convite{ margin-top:32px; padding:22px; border-radius:18px; background:color-mix(in srgb, var(--c) 16%, var(--white)); border:1.5px solid var(--c); }
 .pc-convite h3{ font-family:var(--disp); font-weight:800; font-size:1.2rem; margin-bottom:8px; }
 
+/* áudio opcional ("Ouvir esta tela") — protótipo nov/2026 */
+.pc-ouvir{ margin:0 0 24px; }
+.pc-ouvir-b{
+  display:inline-flex; align-items:center; gap:10px; max-width:100%; min-height:46px; padding:5px 18px 5px 6px;
+  border-radius:999px; border:1.5px solid var(--ct,var(--c)); background:var(--white); color:var(--ink);
+  font:inherit; font-weight:700; font-size:.92rem; line-height:1.2; text-align:left; cursor:pointer;
+  -webkit-tap-highlight-color:transparent; transition:background .18s;
+}
+.pc-ouvir-b:hover{ background:color-mix(in srgb, var(--c) 10%, var(--white)); }
+.pc-ouvir-b[aria-pressed="true"]{ background:color-mix(in srgb, var(--c) 16%, var(--white)); }
+.pc-ouvir-b:focus-visible{ outline:2px solid var(--ct,var(--c)); outline-offset:3px; }
+.pc-ouvir-b[data-erro]{ border-style:dashed; }
+.pc-ouvir-ic{ flex:none; width:34px; height:34px; border-radius:50%; display:grid; place-items:center; background:var(--c); color:var(--sobre,#fff); }
+.pc-ouvir-ic svg{ width:17px; height:17px; display:block; }
+.pc-ouvir-tempo{ flex:none; font-family:var(--mono); font-weight:400; font-size:.72rem; color:var(--mute); }
+.pc-ouvir-tempo:empty{ display:none; }
+.pc-ouvir-barra{ display:block; height:3px; max-width:300px; margin:10px 4px 0; border-radius:2px; background:var(--line); overflow:hidden; }
+.pc-ouvir-barra i{ display:block; height:100%; width:0; background:var(--c); transition:width .3s linear; }
+.pc-ouvir-aviso{ margin-top:8px; font-size:.78rem; }
+@media (prefers-reduced-motion:reduce){ .pc-ouvir-barra i{ transition:none; } }
+
 /* o título que recebe o foco ao trocar de tela não ganha contorno */
 .pc-t:focus, .pc-pergunta:focus, .pc-capa-t:focus, .pc-excapa-t:focus{ outline:none; }
 

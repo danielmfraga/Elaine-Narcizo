@@ -13,6 +13,7 @@
      capa        capa do percurso (sem vídeo; formas orgânicas)
      carta       carta de boas-vindas: etiqueta, saudacao, paragrafos[], assinatura
      leitura     texto: etiqueta, titulo, blocos[]  (ver BLOCOS abaixo)
+     (carta e leitura aceitam `audio: "/caminho.mp3"` → botão opcional "Ouvir esta tela")
      secao       abertura de uma parte (tela inteira na cor da fase)
      lista       uma pergunta cuja resposta é uma LISTA de "sujeitos" (chips)
      pergunta    uma pergunta de resposta livre (um campo de texto)
@@ -182,6 +183,65 @@
   }
   function etiqueta(t) { return t ? h("div", { class: "pc-et" }, h("span", { class: "pc-et-fio" }), t) : null; }
 
+  /* ---------- áudio opcional: "Ouvir esta tela" (protótipo, nov/2026) ------------
+     Um passo `carta` ou `leitura` pode ter `audio: "/caminho/arquivo.mp3"`. Nada toca
+     sozinho: só com o toque da pessoa. Troca de tela PARA o áudio (paraAudio, em desenhar).
+     O arquivo é gerado offline (voz sintética a partir de gravações da Elaine) e servido
+     estático: NADA do que a pessoa escreve vai pra serviço nenhum. O aviso de "voz criada
+     por IA" fica sempre visível junto do botão. */
+  var audioAtual = null;
+  function paraAudio() {
+    if (!audioAtual) return;
+    try { audioAtual.pause(); audioAtual.removeAttribute("src"); audioAtual.load(); } catch (e) {}
+    audioAtual = null;
+  }
+  var ICO_SOM = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M2 6h2.8L8.6 2.6v10.8L4.8 10H2z" fill="currentColor"/>' +
+    '<path d="M10.6 5.3a3.6 3.6 0 0 1 0 5.4M12.4 3.5a6.1 6.1 0 0 1 0 9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
+  var ICO_PAUSA = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.8 2.5h3v11h-3zM9.2 2.5h3v11h-3z" fill="currentColor"/></svg>';
+  function mmss(s) { if (!isFinite(s) || s <= 0) return ""; s = Math.round(s); return Math.floor(s / 60) + ":" + ("0" + (s % 60)).slice(-2); }
+
+  function ouvir(passo) {
+    if (!passo.audio || SO_CAPA || typeof Audio === "undefined") return null;
+    paraAudio();
+    var a = new Audio();
+    a.preload = "metadata";                               /* só o cabeçalho: mostra a duração sem baixar tudo */
+    a.src = passo.audio;
+    audioAtual = a;
+    var ic = h("span", { class: "pc-ouvir-ic", html: ICO_SOM });
+    var tx = h("span", { class: "pc-ouvir-t" }, "Ouvir esta tela");
+    var tp = h("span", { class: "pc-ouvir-tempo", "aria-hidden": "true" });
+    var fio = h("i");
+    var b = h("button", {
+      class: "pc-ouvir-b", type: "button", "aria-pressed": "false", "aria-label": "Ouvir esta tela em áudio",
+      onClick: function () {
+        if (a.paused) {
+          var p = a.play();
+          if (p && p.catch) p.catch(function () { erro(); });
+        } else a.pause();
+      }
+    }, ic, tx, tp);
+    function pinta(texto, tocando) {
+      tx.textContent = texto;
+      ic.innerHTML = tocando ? ICO_PAUSA : ICO_SOM;
+      b.setAttribute("aria-pressed", tocando ? "true" : "false");
+      b.setAttribute("aria-label", texto + " — áudio desta tela");
+      b.removeAttribute("data-erro");
+    }
+    function erro() { pinta("Não consegui tocar o áudio. Tentar de novo", false); b.setAttribute("data-erro", "1"); try { a.load(); } catch (e) {} }
+    a.addEventListener("loadedmetadata", function () { tp.textContent = mmss(a.duration); });
+    a.addEventListener("play", function () { pinta("Pausar", true); });
+    a.addEventListener("waiting", function () { pinta("Carregando…", true); });
+    a.addEventListener("playing", function () { pinta("Pausar", true); });
+    a.addEventListener("pause", function () { if (!a.ended) pinta("Continuar", false); });
+    a.addEventListener("ended", function () { pinta("Ouvir de novo", false); fio.style.width = "0"; });
+    a.addEventListener("error", erro);
+    a.addEventListener("timeupdate", function () { if (a.duration > 0) fio.style.width = Math.min(100, a.currentTime / a.duration * 100) + "%"; });
+    return h("div", { class: "pc-ouvir" },
+      b,
+      h("span", { class: "pc-ouvir-barra", "aria-hidden": "true" }, fio),
+      h("p", { class: "pc-nota pc-ouvir-aviso" }, "Voz criada com inteligência artificial, a partir de gravações da Elaine."));
+  }
+
   /* ---------- campos ------------------------------------------------------ */
   function cresce(ta) { ta.style.height = "auto"; ta.style.height = Math.max(120, ta.scrollHeight) + "px"; }
   function campo(valor, rotulo, placeholder, aoDigitar) {
@@ -318,6 +378,7 @@
       h("div", { class: "pc-bloco" },
         etiqueta(passo.etiqueta),
         h("h2", { class: "pc-t pc-t-carta" }, passo.saudacao),
+        ouvir(passo),
         blocos(passo.paragrafos),
         passo.assinatura ? h("p", { class: "pc-assina" }, passo.assinatura) : null
       ),
@@ -329,6 +390,7 @@
       h("div", { class: "pc-bloco" },
         etiqueta(passo.etiqueta),
         passo.titulo ? h("h2", { class: "pc-t" }, passo.titulo) : null,
+        ouvir(passo),
         blocos(passo.blocos)
       ),
       rodape(passo.avancar));
@@ -612,6 +674,7 @@
   function desenhar() {
     if (SO_CAPA) estado.i = 0;                            /* vitrine mostra sempre a capa */
     var passo = passos[estado.i];
+    paraAudio();                                          /* trocar de tela para o áudio da anterior */
     raiz.innerHTML = "";
     raiz.appendChild((TELAS[passo.tipo] || telaCapa)(passo));
     /* acessibilidade: a troca de tela leva o foco pro título (sem rolar), pro leitor de tela anunciar */
@@ -620,7 +683,7 @@
     document.documentElement.style.setProperty("--c-atual", fase(passo).cor);
   }
 
-  addEventListener("pagehide", function () { salvar(true); });
+  addEventListener("pagehide", function () { salvar(true); paraAudio(); });
   addEventListener("visibilitychange", function () { if (document.hidden) salvar(true); });
 
   desenhar();
