@@ -30,6 +30,7 @@ window.PERCURSO = {
 
   id: "mapeamento",
   nome: "Mapeamento",
+  en: { nome: "Mapping" },               /* nome no cabeçalho quando a tela está em inglês */
   subtitulo: "um percurso sobre as suas relações",
   autora: "Elaine Narcizo",
   versao: 1,                              /* ⚠️ subir isto invalida o progresso salvo de todo mundo */
@@ -85,6 +86,16 @@ window.PERCURSO = {
       /* protótipo de áudio (nov/2026): voz sintética a partir de gravações da Elaine. Lê só o 2º parágrafo
          ("É com imensa alegria…"); o "Olá! Desejo que esteja bem!" fica só na tela. */
       audio: "/percurso/mapeamento/audio/boas-vindas.mp3",
+      /* versão em inglês (protótipo, nov/2026): o texto do 2º parágrafo é EXATAMENTE o que o áudio fala */
+      en: {
+        rotulo: "Welcome", etiqueta: "Welcome", saudacao: "Greetings!",
+        audio: "/percurso/mapeamento/audio/boas-vindas-en.mp3",
+        paragrafos: [
+          "Hello! I hope you’re doing well!",
+          "It is with immense joy that I begin this journey, and it is a true honor to have you as my companion along the way! I hope this process enriches your perspective on yourself and the world around you, broadening your ideas, experiences, and creativity, and, as a result, bringing more joy to your life and work!"
+        ],
+        assinatura: "Elaine Narcizo"
+      },
       paragrafos: [
         "Olá! Desejo que esteja bem!",
         "É com imensa alegria que inicio esta jornada, e é uma verdadeira honra tê-la como companheira neste percurso! Desejo que este processo enriqueça sua perspectiva sobre si mesma e o mundo ao seu redor, proporcionando-lhe a ampliação de ideias, repertórios, criatividade e, consequentemente, mais alegria em sua vida e em seu trabalho!"
@@ -93,6 +104,18 @@ window.PERCURSO = {
 
     { tipo: "leitura", fase: "intro", rotulo: "Propósito", etiqueta: "Antes de começar", titulo: "Propósito",
       audio: "/percurso/mapeamento/audio/proposito.mp3",
+      en: {
+        rotulo: "Purpose", etiqueta: "Before we begin", titulo: "Purpose",
+        audio: "/percurso/mapeamento/audio/proposito-en.mp3",
+        blocos: [
+          "The purpose of this journey is to help you discover new perspectives and possibilities that will enable you to:",
+          { lista: [
+            "Deepen your presence and, through this sensitive way of connecting, enjoy more fulfilling relationships;",
+            "Recognize that your relational world is broader and more diverse than you may imagine;",
+            "Explore and experiment with the tools suggested here, so that you can work with others using the perspectives presented."
+          ] }
+        ]
+      },
       blocos: [
         "O propósito desta jornada é auxiliá-la a encontrar novas perspectivas e possibilidades que possibilitem:",
         { lista: [

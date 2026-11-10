@@ -14,6 +14,7 @@
      carta       carta de boas-vindas: etiqueta, saudacao, paragrafos[], assinatura
      leitura     texto: etiqueta, titulo, blocos[]  (ver BLOCOS abaixo)
      (carta e leitura aceitam `audio: "/caminho.mp3"` → botão opcional "Ouvir esta tela")
+     (qualquer passo aceita `en: {…campos traduzidos…}` → seletor PT | EN naquela tela; ver "idioma" abaixo)
      secao       abertura de uma parte (tela inteira na cor da fase)
      lista       uma pergunta cuja resposta é uma LISTA de "sujeitos" (chips)
      pergunta    uma pergunta de resposta livre (um campo de texto)
@@ -47,6 +48,56 @@
   var VOLTAR = P.voltar || "/";
   var passos = P.passos, TOTAL = passos.length;
   var DIAS_EXPIRA = 60, MAX_ITEM = 80, MAX_ITENS = 60;
+
+  /* ---------- idioma PT | EN (protótipo, nov/2026) ------------------------------
+     Um passo pode ter `en: { …campos traduzidos… }` (rotulo, etiqueta, titulo, saudacao, paragrafos,
+     blocos, assinatura, avancar, audio). Se a pessoa escolheu EN e o passo tem `en`, a tela é desenhada
+     com esses campos POR CIMA dos originais; sem `en`, fica em português (com um aviso). O seletor
+     PT | EN só aparece nas telas que têm tradução. `P.en.nome` traduz o nome do percurso no cabeçalho.
+     LANG = idioma da tela desenhada AGORA (t() lê dele). A escolha fica no aparelho (chave própria,
+     fora do estado das respostas) e também vem de ?lang=en | ?lang=pt na URL. */
+  var UI = {
+    pt: {
+      voltarSite: "Voltar ao site", progresso: "Progresso do percurso", mapa: "mapa", mapaAria: "Ver o mapa do percurso",
+      guardado: "guardado", voltar: "← Voltar", continuar: "Continuar",
+      ouvir: "Ouvir esta tela", ouvirAria: "Ouvir esta tela em áudio", pausar: "Pausar", retomar: "Continuar",
+      denovo: "Ouvir de novo", carregando: "Carregando…", erro: "Não consegui tocar o áudio. Tentar de novo",
+      audioDe: " — áudio desta tela", aviso: "Voz criada com inteligência artificial, a partir de gravações da Elaine.",
+      idioma: "Idioma / Language", mapaTitulo: "Mapa do percurso", fechar: "Fechar",
+      etapas: function (a, b) { return a + " de " + b + " etapas preenchidas."; },
+      baixar: "Baixar material", imprimir: "Imprimir / PDF"
+    },
+    en: {
+      voltarSite: "Back to the site", progresso: "Journey progress", mapa: "map", mapaAria: "See the map of the journey",
+      guardado: "saved", voltar: "← Back", continuar: "Continue",
+      ouvir: "Listen to this screen", ouvirAria: "Listen to this screen as audio", pausar: "Pause", retomar: "Resume",
+      denovo: "Listen again", carregando: "Loading…", erro: "Couldn’t play the audio. Try again",
+      audioDe: " — audio for this screen", aviso: "Voice generated with artificial intelligence from recordings of Elaine.",
+      idioma: "Idioma / Language", mapaTitulo: "Journey map", fechar: "Close",
+      etapas: function (a, b) { return a + " of " + b + " steps completed."; },
+      baixar: "Download material", imprimir: "Print / PDF",
+      soPt: "This part of the journey is only available in Portuguese for now."
+    }
+  };
+  var LANG = "pt";
+  function t(k) { var v = UI[LANG][k]; return v === undefined ? UI.pt[k] : v; }
+  var LS_LANG = "percurso:" + P.id + ":lang";
+  var preferencia = (function () {
+    try {
+      var q = new URLSearchParams(location.search).get("lang");
+      if (q === "en" || q === "pt") { try { localStorage.setItem(LS_LANG, q); } catch (e) {} return q; }
+    } catch (e) {}
+    try { return localStorage.getItem(LS_LANG) === "en" ? "en" : "pt"; } catch (e) { return "pt"; }
+  })();
+  /* a "vista" do passo no idioma escolhido (cópia rasa com o `en` por cima; _orig aponta pro original) */
+  function visao(p) {
+    if (preferencia !== "en" || !p.en) return p;
+    var v = { _orig: p }, k;
+    for (k in p) v[k] = p[k];
+    for (k in p.en) v[k] = p.en[k];
+    return v;
+  }
+  function nomeDoPercurso() { return (LANG === "en" && P.en && P.en.nome) || P.nome; }
 
   /* ---------- helpers de DOM ---------------------------------------------- */
   function junta(e, c) {
@@ -101,7 +152,7 @@
   function pintarSalvo() {
     var el = document.querySelector(".pc-salvo");
     if (!el) return;
-    el.textContent = "guardado";
+    el.textContent = t("guardado");
     el.setAttribute("data-on", "1");
     clearTimeout(el._t);
     el._t = setTimeout(function () { el.removeAttribute("data-on"); }, 1400);
@@ -148,7 +199,7 @@
   function deco(passo) {
     var D = P.deco;
     if (!D || !D.layouts || !D.layouts.length) return null;   /* a capa tem composição própria (D.capa) */
-    var L = (passo.tipo === "capa" && D.capa) ? D.capa : D.layouts[passos.indexOf(passo) % D.layouts.length];
+    var L = (passo.tipo === "capa" && D.capa) ? D.capa : D.layouts[passos.indexOf(passo._orig || passo) % D.layouts.length];
     return h("div", { class: "pc-deco-g", "aria-hidden": "true" }, L.map(function (it) {
       return h("div", { class: "pc-deco pc-deco-" + it.pos, style: "color:" + D.cores[it.cor], html: D.formas[it.forma] });
     }));
@@ -157,25 +208,53 @@
   function cabecalho() {
     var pct = Math.round((estado.i / (TOTAL - 1)) * 100);
     return h("header", { class: "pc-top" },
-      h("a", { class: "pc-sair", href: VOLTAR, "aria-label": "Voltar ao site" }, "✕"),
+      h("a", { class: "pc-sair", href: VOLTAR, "aria-label": t("voltarSite") }, "✕"),
       h("div", { class: "pc-id" },
-        h("span", { class: "pc-nome" }, P.nome),
+        h("span", { class: "pc-nome" }, nomeDoPercurso()),
         h("span", { class: "pc-salvo", role: "status" }, "")
       ),
-      h("div", { class: "pc-barra", role: "progressbar", "aria-label": "Progresso do percurso", "aria-valuenow": pct, "aria-valuemin": "0", "aria-valuemax": "100" },
+      h("div", { class: "pc-barra", role: "progressbar", "aria-label": t("progresso"), "aria-valuenow": pct, "aria-valuemin": "0", "aria-valuemax": "100" },
         h("i", { style: "width:" + pct + "%" })
       ),
-      h("button", { class: "pc-mapa-btn", type: "button", "aria-label": "Ver o mapa do percurso", onClick: abrirMapa }, "mapa")
+      h("button", { class: "pc-mapa-btn", type: "button", "aria-label": t("mapaAria"), onClick: abrirMapa }, t("mapa"))
     );
   }
   function rodape(rotulo, podeVoltar, aoAvancar) {
     return h("div", { class: "pc-nav" },
       podeVoltar !== false
-        ? h("button", { class: "pc-b pc-b-ghost", type: "button", onClick: anterior }, "← Voltar")
+        ? h("button", { class: "pc-b pc-b-ghost", type: "button", onClick: anterior }, t("voltar"))
         : h("span"),
       h("button", { class: "pc-b pc-b-cheio", type: "button", onClick: aoAvancar || proximo },
-        rotulo || "Continuar", h("span", { class: "pc-seta" }, "→"))
+        rotulo || t("continuar"), h("span", { class: "pc-seta" }, "→"))
     );
+  }
+
+  /* seletor PT | EN — só nas telas que têm tradução (`passo.en`) */
+  function setIdioma(l) {
+    if (l === preferencia) return;
+    preferencia = l;
+    try { localStorage.setItem(LS_LANG, l); } catch (e) {}
+    desenhar();
+    var b = raiz.querySelector('.pc-lang-b[aria-pressed="true"]');          /* o foco fica no seletor, não no título */
+    if (b) { try { b.focus({ preventScroll: true }); } catch (e) {} }
+  }
+  function seletorIdioma(passo) {
+    if (!passo.en || SO_CAPA) return null;
+    function botao(cod, rotulo, nome) {
+      var on = LANG === cod;
+      return h("button", {
+        class: "pc-lang-b", type: "button", lang: cod, "aria-pressed": on ? "true" : "false", "aria-label": nome,
+        onClick: function () { setIdioma(cod); }
+      }, rotulo);
+    }
+    return h("div", { class: "pc-lang", role: "group", "aria-label": t("idioma") },
+      botao("pt", "PT", "Português"), botao("en", "EN", "English"));
+  }
+  /* quem escolheu EN e cai numa tela sem tradução: um aviso curto no topo (a tela segue em português) */
+  function avisoSoPt(tela) {
+    var alvo = tela.querySelector(".pc-corpo, .pc-excapa-in, .pc-capa-in");
+    if (!alvo) return;
+    alvo.insertBefore(h("p", { class: "pc-aviso-lang", lang: "en", role: "note" }, UI.en.soPt), alvo.firstChild);
   }
   function pagina(passo, conteudo, nav) {
     return h("section", { class: "pc-tela pc-pagina", style: estiloFase(passo) },
@@ -208,11 +287,11 @@
     a.src = passo.audio;
     audioAtual = a;
     var ic = h("span", { class: "pc-ouvir-ic", html: ICO_SOM });
-    var tx = h("span", { class: "pc-ouvir-t" }, "Ouvir esta tela");
+    var tx = h("span", { class: "pc-ouvir-t" }, t("ouvir"));
     var tp = h("span", { class: "pc-ouvir-tempo", "aria-hidden": "true" });
     var fio = h("i");
     var b = h("button", {
-      class: "pc-ouvir-b", type: "button", "aria-pressed": "false", "aria-label": "Ouvir esta tela em áudio",
+      class: "pc-ouvir-b", type: "button", "aria-pressed": "false", "aria-label": t("ouvirAria"),
       onClick: function () {
         if (a.paused) {
           var p = a.play();
@@ -224,22 +303,22 @@
       tx.textContent = texto;
       ic.innerHTML = tocando ? ICO_PAUSA : ICO_SOM;
       b.setAttribute("aria-pressed", tocando ? "true" : "false");
-      b.setAttribute("aria-label", texto + " — áudio desta tela");
+      b.setAttribute("aria-label", texto + t("audioDe"));
       b.removeAttribute("data-erro");
     }
-    function erro() { pinta("Não consegui tocar o áudio. Tentar de novo", false); b.setAttribute("data-erro", "1"); try { a.load(); } catch (e) {} }
+    function erro() { pinta(t("erro"), false); b.setAttribute("data-erro", "1"); try { a.load(); } catch (e) {} }
     a.addEventListener("loadedmetadata", function () { tp.textContent = mmss(a.duration); });
-    a.addEventListener("play", function () { pinta("Pausar", true); });
-    a.addEventListener("waiting", function () { pinta("Carregando…", true); });
-    a.addEventListener("playing", function () { pinta("Pausar", true); });
-    a.addEventListener("pause", function () { if (!a.ended) pinta("Continuar", false); });
-    a.addEventListener("ended", function () { pinta("Ouvir de novo", false); fio.style.width = "0"; });
+    a.addEventListener("play", function () { pinta(t("pausar"), true); });
+    a.addEventListener("waiting", function () { pinta(t("carregando"), true); });
+    a.addEventListener("playing", function () { pinta(t("pausar"), true); });
+    a.addEventListener("pause", function () { if (!a.ended) pinta(t("retomar"), false); });
+    a.addEventListener("ended", function () { pinta(t("denovo"), false); fio.style.width = "0"; });
     a.addEventListener("error", erro);
     a.addEventListener("timeupdate", function () { if (a.duration > 0) fio.style.width = Math.min(100, a.currentTime / a.duration * 100) + "%"; });
     return h("div", { class: "pc-ouvir" },
       b,
       h("span", { class: "pc-ouvir-barra", "aria-hidden": "true" }, fio),
-      h("p", { class: "pc-nota pc-ouvir-aviso" }, "Voz criada com inteligência artificial, a partir de gravações da Elaine."));
+      h("p", { class: "pc-nota pc-ouvir-aviso" }, t("aviso")));
   }
 
   /* ---------- campos ------------------------------------------------------ */
@@ -376,6 +455,7 @@
   function telaCarta(passo) {
     return pagina(passo,
       h("div", { class: "pc-bloco" },
+        seletorIdioma(passo),
         etiqueta(passo.etiqueta),
         h("h2", { class: "pc-t pc-t-carta" }, passo.saudacao),
         ouvir(passo),
@@ -388,6 +468,7 @@
   function telaLeitura(passo) {
     return pagina(passo,
       h("div", { class: "pc-bloco" },
+        seletorIdioma(passo),
         etiqueta(passo.etiqueta),
         passo.titulo ? h("h2", { class: "pc-t" }, passo.titulo) : null,
         ouvir(passo),
@@ -572,24 +653,25 @@
   function abrirMapa() {
     var itens = [];
     passos.forEach(function (p, i) {
-      if (!p.rotulo) return;
+      var rot = (LANG === "en" && p.en && p.en.rotulo) || p.rotulo;      /* no mapa, o rótulo traduzido quando houver */
+      if (!rot) return;
       var f = fase(p);
       itens.push(h("button", {
         class: "pc-mapa-i", type: "button", "data-forte": p.tipo === "secao" ? "1" : null, "data-on": i === estado.i ? "1" : null,
         style: p.tipo === "secao" ? "--c:" + (f.ct || f.cor) : null,
         onClick: function () { fecharMapa(); ir(i); }
-      }, p.rotulo));
+      }, rot));
     });
-    var veu = h("div", { class: "pc-mapa", id: "pcMapa", role: "dialog", "aria-label": "Mapa do percurso", onClick: function (e) { if (e.target.id === "pcMapa") fecharMapa(); } },
+    var veu = h("div", { class: "pc-mapa", id: "pcMapa", role: "dialog", "aria-label": t("mapaTitulo"), lang: LANG === "en" ? "en" : null, onClick: function (e) { if (e.target.id === "pcMapa") fecharMapa(); } },
       h("div", { class: "pc-mapa-cx" },
         h("div", { class: "pc-mapa-top" },
-          h("strong", null, "Mapa do percurso"),
-          h("button", { class: "pc-mapa-x", type: "button", onClick: fecharMapa, "aria-label": "Fechar" }, "✕")),
-        h("p", { class: "pc-nota" }, preenchidas() + " de " + ETAPAS.length + " etapas preenchidas."),
+          h("strong", null, t("mapaTitulo")),
+          h("button", { class: "pc-mapa-x", type: "button", onClick: fecharMapa, "aria-label": t("fechar") }, "✕")),
+        h("p", { class: "pc-nota" }, t("etapas")(preenchidas(), ETAPAS.length)),
         h("div", { class: "pc-mapa-l" }, itens),
         h("div", { class: "pc-levar-b" },
-          h("button", { class: "pc-b pc-b-ghost", type: "button", onClick: baixar }, "Baixar material"),
-          h("button", { class: "pc-b pc-b-ghost", type: "button", onClick: imprimir }, "Imprimir / PDF"))));
+          h("button", { class: "pc-b pc-b-ghost", type: "button", onClick: baixar }, t("baixar")),
+          h("button", { class: "pc-b pc-b-ghost", type: "button", onClick: imprimir }, t("imprimir")))));
     document.body.appendChild(veu);
     requestAnimationFrame(function () { veu.setAttribute("data-on", "1"); });
   }
@@ -673,10 +755,15 @@
     revisao: telaRevisao, mapa: telaMapa, checkin: telaCheckin, encerramento: telaEncerramento };
   function desenhar() {
     if (SO_CAPA) estado.i = 0;                            /* vitrine mostra sempre a capa */
-    var passo = passos[estado.i];
+    var base = passos[estado.i];
+    var passo = visao(base);                              /* a tela no idioma escolhido (se tiver tradução) */
+    LANG = passo._orig ? "en" : "pt";
     paraAudio();                                          /* trocar de tela para o áudio da anterior */
     raiz.innerHTML = "";
-    raiz.appendChild((TELAS[passo.tipo] || telaCapa)(passo));
+    var tela = (TELAS[passo.tipo] || telaCapa)(passo);
+    if (LANG === "en") tela.setAttribute("lang", "en");   /* leitor de tela pronuncia certo */
+    else if (preferencia === "en" && !SO_CAPA) avisoSoPt(tela);
+    raiz.appendChild(tela);
     /* acessibilidade: a troca de tela leva o foco pro título (sem rolar), pro leitor de tela anunciar */
     var titulo = raiz.querySelector("h1, h2");
     if (titulo && !SO_CAPA) { titulo.setAttribute("tabindex", "-1"); try { titulo.focus({ preventScroll: true }); } catch (e) {} }

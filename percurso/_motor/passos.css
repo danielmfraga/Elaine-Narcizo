@@ -180,6 +180,23 @@
 .pc-ouvir-aviso{ margin-top:8px; font-size:.78rem; }
 @media (prefers-reduced-motion:reduce){ .pc-ouvir-barra i{ transition:none; } }
 
+/* seletor de idioma PT | EN (só nas telas com tradução) e aviso nas que não têm */
+.pc-lang{
+  display:flex; width:max-content; margin:0 0 16px auto; padding:3px; border-radius:999px;
+  border:1.5px solid var(--line); background:var(--white);
+}
+.pc-lang-b{
+  min-width:46px; min-height:36px; padding:0 14px; border:0; border-radius:999px; background:transparent; cursor:pointer;
+  font-family:var(--mono); font-size:.72rem; font-weight:700; letter-spacing:.1em; color:var(--mute);
+  -webkit-tap-highlight-color:transparent; transition:background .18s, color .18s;
+}
+.pc-lang-b[aria-pressed="true"]{ background:var(--c); color:var(--sobre,#fff); }
+.pc-lang-b:focus-visible{ outline:2px solid var(--ct,var(--c)); outline-offset:2px; }
+.pc-aviso-lang{
+  margin:0 0 18px; padding:8px 12px; border-radius:10px; border:1px dashed color-mix(in srgb, currentColor 40%, transparent);
+  font-family:var(--mono); font-size:.72rem; line-height:1.45; letter-spacing:.03em; text-align:left; color:inherit; opacity:.9;
+}
+
 /* o título que recebe o foco ao trocar de tela não ganha contorno */
 .pc-t:focus, .pc-pergunta:focus, .pc-capa-t:focus, .pc-excapa-t:focus{ outline:none; }
 
