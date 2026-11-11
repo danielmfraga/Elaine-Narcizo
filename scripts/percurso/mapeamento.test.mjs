@@ -104,6 +104,54 @@ test('hotpage: só fatos do documento da oficina (R$ 50, 2 h, até 10 pessoas, o
 test('hotpage: as 4 portas existem e cada variante ?para= tem o seu card', () => {
   for (const id of ['voce', 'profissionais', 'virada', 'grupos']) assert.match(hot, new RegExp(`id="${id}"[^>]*data-para="${id}"`));
 });
+/* ── a hotpage em INGLÊS (/mapeamento/en/) — nov/2026, protótipo ── */
+const en = fs.readFileSync(RAIZ + 'mapeamento/en/index.html', 'utf8');
+const visivel = (h) => h.replace(/<style[\s\S]*?<\/style>/, '').replace(/<script[\s\S]*?<\/script>/g, '').replace(/<!--[\s\S]*?-->/g, '').replace(/<svg[\s\S]*?<\/svg>/g, '');
+test('hotpage EN: html lang=en, noindex enquanto a Elaine não aprovar, canonical com www', () => {
+  assert.match(en, /<html lang="en">/);
+  assert.match(en, /<meta name="robots" content="noindex/, 'tirou o noindex? só depois da aprovação da Elaine');
+  assert.match(en, /canonical" href="https:\/\/www\.elainenarcizo\.com\.br\/mapeamento\/en\/"/);
+});
+test('hotpage EN: <div>s balanceados, menu fecha antes do <main>, scripts compilam', () => {
+  const corpo = en.slice(en.indexOf('<body>'));
+  assert.equal((corpo.match(/<div/g) || []).length, (corpo.match(/<\/div>/g) || []).length);
+  const antes = en.slice(en.indexOf('<body>'), en.indexOf('<main>'));
+  assert.equal((antes.match(/<div/g) || []).length, (antes.match(/<\/div>/g) || []).length, 'há <div> aberto ao chegar no <main>');
+  for (const m of en.matchAll(/<script>([\s\S]*?)<\/script>/g)) assert.doesNotThrow(() => new Function(m[1]));
+});
+test('hotpage EN: o CSS é IDÊNTICO ao da versão em português (mexeu num? mexa nos dois)', () => {
+  const css = (h) => h.match(/<style>([\s\S]*?)<\/style>/)[1];
+  assert.equal(css(en), css(hot));
+});
+test('hotpage EN: as duas CTAs no topo (percurso em inglês + lista de espera) e o formulário completo', () => {
+  const topo = en.slice(en.indexOf('<main>'), en.indexOf('class="sec perguntas"'));
+  assert.match(topo, /href="\/percurso\/mapeamento\/\?lang=en"/);
+  assert.match(topo, /href="#lista"/);
+  for (const nome of ['nome', 'email', 'whatsapp', 'interesse', 'mensagem', 'origem', 'pagina', 'website', 'aceite'])
+    assert.match(en, new RegExp(`name="${nome}"`), `campo ausente: ${nome}`);
+  assert.match(en, /name="pagina" value="\/mapeamento\/en\/"/, 'a planilha precisa distinguir a página em inglês');
+  for (const v of ['pessoal', 'trabalho', 'ambos', 'grupo']) assert.match(en, new RegExp(`name="interesse" value="${v}"`), `valor de interesse ausente: ${v}`);
+});
+test('hotpage EN: as 4 portas e as 4 variantes ?para= têm as MESMAS chaves da versão em português', () => {
+  for (const id of ['voce', 'profissionais', 'virada', 'grupos']) assert.match(en, new RegExp(`id="${id}"[^>]*data-para="${id}"`));
+  const chaves = (h) => [...h.match(/var VAR = \{([\s\S]*?)\n  \};/)[1].matchAll(/^\s{4}(\w+):/gm)].map((m) => m[1]).join(',');
+  assert.equal(chaves(en), chaves(hot));
+});
+test('hotpage EN: FORM_ENDPOINT é a MESMA URL da versão em português (colar nos dois)', () => {
+  const ep = (h) => h.match(/var FORM_ENDPOINT = '([^']*)'/)[1];
+  assert.equal(ep(en), ep(hot));
+});
+test('hotpage EN: só fatos do documento — R$ 50, 2 h, até 10, online, material — e nada inventado (pagamento, plataforma, certificado, idioma)', () => {
+  const v = visivel(en);
+  for (const f of ['R$ 50', '2 hours', 'up to 10', 'Online', 'a sheet of paper, colored pencils and a pen']) assert.ok(v.includes(f), `faltou o fato: ${f}`);
+  assert.ok(!/(PIX|Pix|credit card|boleto|Zoom|Google Meet|certificate|\bUS\$|\$ ?\d)/.test(v.replace(/R\$/g, 'R')), 'a página cita pagamento/plataforma/certificado/dólar que não estão no documento da oficina');
+  assert.ok(!/English|inglês/i.test(v), 'a página não pode afirmar em que idioma a oficina é dada — o documento não diz');
+  assert.ok(!/"inLanguage"/.test(en), 'o JSON-LD não pode declarar o idioma da oficina');
+});
+test('hotpage EN: sobrou texto em português? (só nomes próprios podem ter acento)', () => {
+  const sobras = [...visivel(en).matchAll(/>([^<>]*[áàâãéêíóôõúç][^<>]*)</g)].map((m) => m[1].trim()).filter((t) => !/^(Rádio Tinhosa|DançaDestino)$/.test(t));
+  assert.deepEqual(sobras, []);
+});
 test('a PONTE não foi tocada: o motor dela e o CSS base não mencionam o modo declarativo', () => {
   assert.ok(!/passos\.css|motor-passos/.test(fs.readFileSync(RAIZ + 'percurso/ponte/index.html', 'utf8')));
   assert.ok(!/P\.passos\b/.test(fs.readFileSync(RAIZ + 'percurso/_motor/motor.js', 'utf8')));
